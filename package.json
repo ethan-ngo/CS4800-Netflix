@@ -1,0 +1,15 @@
+{
+	"name": "cs4800-netflix",
+	"version": "1.0.0",
+	"description": "CS4800 Netflix project",
+	"scripts": {
+	  "start": "npm run start:backend",
+	  "start:backend": "cd backend && npm install && --env-file=config.env server",
+	  "build:frontend": "cd frontend && npm install && npm run build",
+	  "start:frontend": "cd frontend && npm run dev"
+	},
+	"dependencies": {},
+	"devDependencies": {},
+	"author": "Your Name",
+	"license": "ISC"
+  }
