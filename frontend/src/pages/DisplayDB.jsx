@@ -11,7 +11,7 @@ function DisplayDB() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5050/users", {
+      const res = await fetch("https://cs4800netflix.vercel.app/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -29,7 +29,7 @@ function DisplayDB() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://localhost:5050/users");
+      const res = await fetch("https://cs4800netflix.vercel.app/users");
       const data = await res.json();
       setUsers(data);
     } catch (error) {

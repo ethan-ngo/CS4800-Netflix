@@ -1,4 +1,5 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
+import 'dotenv/config';
 
 const uri = process.env.ATLAS_URI || "";
 const client = new MongoClient(uri, {
