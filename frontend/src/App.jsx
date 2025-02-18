@@ -1,5 +1,5 @@
 import './App.css';
-import DisplayDB from './pages/displayDB';
+import DisplayDB from './pages/DisplayDB';
 
 function App() {
   return (
