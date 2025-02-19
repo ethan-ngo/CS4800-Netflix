@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
+import "./displayDB.css";
 
 function DisplayDB() {
   const [username, setUsername] = useState("");
@@ -44,7 +45,7 @@ function DisplayDB() {
   return (
     <>
       <h1>User Database</h1>
-      <div>
+      <div style={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center" }}>
         <h2>Add User</h2>
         <form onSubmit={handleSubmit}>
           <div>
