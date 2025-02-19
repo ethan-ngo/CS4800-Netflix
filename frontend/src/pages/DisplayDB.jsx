@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import "./displayDB.css";
+import "./DisplayDB.css";
 
 function DisplayDB() {
   const [username, setUsername] = useState("");
