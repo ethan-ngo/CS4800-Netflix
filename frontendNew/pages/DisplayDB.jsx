@@ -5,6 +5,7 @@ function DisplayDB() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [profile_picture, setProfilePicture] = useState(null);
   const [response, setResponse] = useState(null);
   const [users, setUsers] = useState([]);
 
@@ -16,7 +17,7 @@ function DisplayDB() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: username, email, password }),
+        body: JSON.stringify({ name: username, email, password, profile_picture}),
       });
       const data = await res.json();
       setResponse(data);
@@ -84,6 +85,19 @@ function DisplayDB() {
                 />
               </label>
             </div>
+            <div>
+              <label>
+                Profile Upload:
+                <input
+                  type="file"
+                  value={profile_picture}
+                  onChange={(e) => setProfilePicture(e.target.value)}
+                  required
+                  style={webStyles.input}
+                  accept='.png,.jpeg'
+                />
+              </label>
+            </div>
             <button type="submit" style={webStyles.button}>Submit</button>
           </form>
           {response && (
@@ -99,7 +113,7 @@ function DisplayDB() {
             <ul style={webStyles.userList}>
               {users.map((user) => (
                 <li key={user._id} style={webStyles.userItem}>
-                  {user.name} - {user.email} - {user.password}
+                  {user.name} - {user.email} - {user.password} - {user.profile_picture}
                 </li>
               ))}
             </ul>

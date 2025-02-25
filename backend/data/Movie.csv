@@ -1,0 +1,11 @@
+_id,Title,OverallRating,Genres,Length,Actors,Directors
+ObjectId("65b2fa1a1c9d4f201"),Inception,8.8,"Sci-Fi, Thriller",148,"Leonardo DiCaprio, Joseph Gordon-Levitt, Ellen Page","Christopher Nolan"
+ObjectId("65b2fa1a1c9d4f202"),Interstellar,8.6,"Sci-Fi, Drama",169,"Matthew McConaughey, Anne Hathaway, Jessica Chastain","Christopher Nolan"
+ObjectId("65b2fa1a1c9d4f203"),Parasite,8.9,"Thriller, Drama",132,"Song Kang-ho, Lee Sun-kyun, Cho Yeo-jeong","Bong Joon-ho"
+ObjectId("65b2fa1a1c9d4f204"),The Dark Knight,9.0,"Action, Crime, Drama",152,"Christian Bale, Heath Ledger, Aaron Eckhart","Christopher Nolan"
+ObjectId("65b2fa1a1c9d4f205"),The Matrix,8.7,"Sci-Fi, Action",136,"Keanu Reeves, Laurence Fishburne, Carrie-Anne Moss","Lana Wachowski, Lilly Wachowski"
+ObjectId("65b2fa1a1c9d4f206"),Avengers: Endgame,8.4,"Action, Adventure, Sci-Fi",181,"Robert Downey Jr., Chris Evans, Mark Ruffalo","Anthony Russo, Joe Russo"
+ObjectId("65b2fa1a1c9d4f207"),The Godfather,9.2,"Crime, Drama",175,"Marlon Brando, Al Pacino, James Caan","Francis Ford Coppola"
+ObjectId("65b2fa1a1c9d4f208"),Shawshank Redemption,9.3,"Drama",142,"Tim Robbins, Morgan Freeman, Bob Gunton","Frank Darabont"
+ObjectId("65b2fa1a1c9d4f209"),Spirited Away,8.6,"Animation, Fantasy",125,"Rumi Hiiragi, Miyu Irino, Mari Natsuki","Hayao Miyazaki"
+ObjectId("65b2fa1a1c9d4f210"),The Lion King,8.5,"Animation, Adventure, Drama",88,"Matthew Broderick, Jeremy Irons, James Earl Jones","Roger Allers, Rob Minkoff"
