@@ -35,7 +35,7 @@ router.post("/", async (req, res) => {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
-      profile_picture: req.body.profile_picture,
+      profilePicture: null,
     };
     let collection = await db.collection("users");
     let result = await collection.insertOne(newUser);

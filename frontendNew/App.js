@@ -1,13 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Platform, ScrollView } from 'react-native';
 import DisplayDB from './pages/DisplayDB';
+import PicUpload from './pages/PicUpload';
 
 export default function App() {
   return (
     <View style={styles.container}>
       {Platform.OS === 'web' ? (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <DisplayDB />
+          <DisplayDB/>
         </ScrollView>
       ) : (
         <DisplayDB />

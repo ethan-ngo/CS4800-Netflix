@@ -17,7 +17,7 @@ function DisplayDB() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: username, email, password, profile_picture}),
+        body: JSON.stringify({ name: username, email: email, password: password, profile_picture: profile_picture}),
       });
       const data = await res.json();
       setResponse(data);
@@ -82,19 +82,6 @@ function DisplayDB() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   style={webStyles.input}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Profile Upload:
-                <input
-                  type="file"
-                  value={profile_picture}
-                  onChange={(e) => setProfilePicture(e.target.value)}
-                  required
-                  style={webStyles.input}
-                  accept='.png,.jpeg'
                 />
               </label>
             </div>
