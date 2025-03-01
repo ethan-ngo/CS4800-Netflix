@@ -7,10 +7,20 @@ export default function App() {
     <View style={styles.container}>
       {Platform.OS === 'web' ? (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <DisplayDB />
+          <DisplayDB collectionName="users" fields={['name', 'email', 'password']} />
+          <DisplayDB
+            collectionName="userMovieInfo"
+            fields={['userID', 'movieID', 'numWatched', 'timeStamp', 'userRating']}
+          />
         </ScrollView>
       ) : (
-        <DisplayDB />
+        <div>
+          <DisplayDB collectionName="users" fields={['name', 'email', 'password']} />
+          <DisplayDB
+            collectionName="userMovieInfo"
+            fields={['userID', 'movieID', 'numWatched', 'timeStamp', 'userRating']}
+          />
+        </div>
       )}
     </View>
   )

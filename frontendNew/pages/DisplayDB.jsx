@@ -1,89 +1,73 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { View, Text, TextInput, Button, FlatList, StyleSheet, Platform } from 'react-native'
 
-function DisplayDB() {
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+function DisplayDB({ collectionName, fields }) {
+  const [formData, setFormData] = useState({})
   const [response, setResponse] = useState(null)
-  const [users, setUsers] = useState([])
+  const [items, setItems] = useState([])
+
+  // useCallback memoizes fetchItems so it only rerenders when collectionName changes
+  const fetchItems = useCallback(async () => {
+    try {
+      const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`)
+      const data = await res.json()
+      setItems(data)
+    } catch (error) {
+      console.error('Error fetching items:', error)
+    }
+  }, [collectionName])
+
+  useEffect(() => {
+    fetchItems()
+  }, [fetchItems])
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault()
     try {
-      const res = await fetch('https://cs4800netflix.vercel.app/users', {
+      const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name: username, email, password }),
+        body: JSON.stringify(formData),
       })
       const data = await res.json()
       setResponse(data)
-      fetchUsers() // Fetch users again to update the list
+      fetchItems() // Fetch items again to update the list
     } catch (error) {
       console.error('Error:', error)
-      setResponse({ error: 'Failed to submit user data' })
+      setResponse({ error: 'Failed to submit data' })
     }
   }
 
-  const fetchUsers = async () => {
-    try {
-      const res = await fetch('https://cs4800netflix.vercel.app/users')
-      const data = await res.json()
-      setUsers(data)
-    } catch (error) {
-      console.error('Error fetching users:', error)
-    }
+  const handleInputChange = (field, value) => {
+    setFormData({
+      ...formData,
+      [field]: value,
+    })
   }
-
-  useEffect(() => {
-    fetchUsers()
-  }, [])
 
   if (Platform.OS === 'web') {
     return (
       <div style={webStyles.container}>
-        <h1 style={webStyles.title}>User Database</h1>
+        <h1 style={webStyles.title}>{collectionName} Database</h1>
         <div style={webStyles.form}>
-          <h2 style={webStyles.subtitle}>Add User</h2>
+          <h2 style={webStyles.subtitle}>Add {collectionName}</h2>
           <form onSubmit={handleSubmit}>
-            <div>
-              <label>
-                Username:
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  style={webStyles.input}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Email:
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  style={webStyles.input}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                Password:
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  style={webStyles.input}
-                />
-              </label>
-            </div>
+            {fields.map((field) => (
+              <div key={field}>
+                <label>
+                  {field}:
+                  <input
+                    type="text"
+                    value={formData[field] || ''}
+                    onChange={(e) => handleInputChange(field, e.target.value)}
+                    required
+                    style={webStyles.input}
+                  />
+                </label>
+              </div>
+            ))}
             <button type="submit" style={webStyles.button}>
               Submit
             </button>
@@ -95,18 +79,20 @@ function DisplayDB() {
             </div>
           )}
         </div>
-        <div style={webStyles.users}>
-          <h2 style={webStyles.subtitle}>All Users</h2>
-          {users.length > 0 ? (
-            <ul style={webStyles.userList}>
-              {users.map((user) => (
-                <li key={user._id} style={webStyles.userItem}>
-                  {user.name} - {user.email} - {user.password}
+        <div style={webStyles.items}>
+          <h2 style={webStyles.subtitle}>All {collectionName}</h2>
+          {items.length > 0 ? (
+            <ul style={webStyles.itemList}>
+              {items.map((item) => (
+                <li key={item._id} style={webStyles.item}>
+                  {fields.map((field) => (
+                    <span key={field}>{item[field]} - </span>
+                  ))}
                 </li>
               ))}
             </ul>
           ) : (
-            <p>No users found.</p>
+            <p>No items found.</p>
           )}
         </div>
       </div>
@@ -115,31 +101,19 @@ function DisplayDB() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>User Database</Text>
+      <Text style={styles.title}>{collectionName} Database</Text>
       <View style={styles.form}>
-        <Text style={styles.subtitle}>Add User</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Username"
-          value={username}
-          onChangeText={setUsername}
-          required
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          required
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          required
-        />
+        <Text style={styles.subtitle}>Add {collectionName}</Text>
+        {fields.map((field) => (
+          <TextInput
+            key={field}
+            style={styles.input}
+            placeholder={field}
+            value={formData[field] || ''}
+            onChangeText={(text) => handleInputChange(field, text)}
+            required
+          />
+        ))}
         <Button title="Submit" onPress={handleSubmit} />
         {response && (
           <View style={styles.response}>
@@ -148,21 +122,23 @@ function DisplayDB() {
           </View>
         )}
       </View>
-      <Text style={styles.subtitle}>All Users</Text>
-      {users.length > 0 ? (
+      <Text style={styles.subtitle}>All {collectionName}</Text>
+      {items.length > 0 ? (
         <FlatList
-          data={users}
+          data={items}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
             <Text>
-              {item.name} - {item.email} - {item.password}
+              {fields.map((field) => (
+                <span key={field}>{item[field]} - </span>
+              ))}
             </Text>
           )}
           ListHeaderComponent={<View style={{ height: 20 }} />}
           ListFooterComponent={<View style={{ height: 20 }} />}
         />
       ) : (
-        <Text>No users found.</Text>
+        <Text>No items found.</Text>
       )}
     </View>
   )
@@ -197,7 +173,7 @@ const styles = StyleSheet.create({
   response: {
     marginTop: 20,
   },
-  users: {
+  items: {
     marginTop: 20,
   },
 })
@@ -241,14 +217,14 @@ const webStyles = {
   response: {
     marginTop: 20,
   },
-  users: {
+  items: {
     marginTop: 20,
   },
-  userList: {
+  itemList: {
     listStyleType: 'none',
     padding: 0,
   },
-  userItem: {
+  item: {
     padding: 10,
     borderBottom: '1px solid #ccc',
   },
