@@ -1,6 +1,6 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Platform, ScrollView } from 'react-native';
-import DisplayDB from './pages/DisplayDB';
+import { StatusBar } from 'expo-status-bar'
+import { StyleSheet, View, Platform, ScrollView } from 'react-native'
+import DisplayDB from './pages/DisplayDB'
 
 export default function App() {
   return (
@@ -13,7 +13,7 @@ export default function App() {
         <DisplayDB />
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -26,4 +26,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-});
+})

@@ -1,10 +1,8 @@
-import './App.css';
-import DisplayDB from './pages/DisplayDB';
+import './App.css'
+import DisplayDB from './pages/DisplayDB'
 
 function App() {
-  return (
-    <DisplayDB />
-  );
+  return <DisplayDB />
 }
 
-export default App;
+export default App

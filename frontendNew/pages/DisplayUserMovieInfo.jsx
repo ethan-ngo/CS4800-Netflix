@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, TextInput, Button, FlatList, StyleSheet, Platform } from 'react-native'
 
-function DisplayDB() {
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+function DisplayUserMovieInfo() {
+  const [movieID, setMovieID] = useState('')
+  const [numWatched, setNumWatched] = useState('')
+  const [timeStamp, setTimeStamp] = useState('')
+  const [userMovieRating, setUserMovieRating] = useState('')
+  const [userID, setUserID] = useState('')
   const [response, setResponse] = useState(null)
-  const [users, setUsers] = useState([])
+  const [userMovieInfo, setUserMovieInfo] = useState([])
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault()
     try {
-      const res = await fetch('https://cs4800netflix.vercel.app/users', {
+      const res = await fetch('https://cs4800netflix.vercel.app/user-movie-info', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -20,7 +22,7 @@ function DisplayDB() {
       })
       const data = await res.json()
       setResponse(data)
-      fetchUsers() // Fetch users again to update the list
+      fetchUsers() // Fetch user-movie-info again to update the list
     } catch (error) {
       console.error('Error:', error)
       setResponse({ error: 'Failed to submit user data' })
@@ -254,4 +256,4 @@ const webStyles = {
   },
 }
 
-export default DisplayDB
+export default DisplayUserMovieInfo

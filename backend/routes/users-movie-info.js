@@ -8,19 +8,19 @@ import { ObjectId } from 'mongodb'
 
 // router is an instance of the express router.
 // We use it to define our routes.
-// The router will be added as a middleware and will take control of requests starting with path /users.
+// The router will be added as a middleware and will take control of requests starting with path /userMovieInfo.
 const router = express.Router()
 
-// This section will help you get a list of all the users.
+// This section will help you get a list of all the userMovieInfo instances.
 router.get('/', async (req, res) => {
-  let collection = await db.collection('users')
+  let collection = await db.collection('userMovieInfo')
   let results = await collection.find({}).toArray()
   res.send(results).status(200)
 })
 
-// This section will help you get a single user by id
+// This section will help you get a single userMovieInfo by id
 router.get('/:id', async (req, res) => {
-  let collection = await db.collection('users')
+  let collection = await db.collection('userMovieInfo')
   let query = { _id: new ObjectId(req.params.id) }
   let result = await collection.findOne(query)
 
@@ -28,41 +28,45 @@ router.get('/:id', async (req, res) => {
   else res.send(result).status(200)
 })
 
-// This section will help you create a new user.
+// This section will help you create a new userMovieInfo.
 router.post('/', async (req, res) => {
   try {
-    let newUser = {
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
+    let newuserMovieInfo = {
+      movieID: req.body.movieID,
+      numWatched: req.body.numWatched,
+      timeStamp: req.body.timeStamp,
+      userMovieRating: req.body.userMovieRating,
+      userID: req.body.userID,
     }
-    let collection = await db.collection('users')
-    let result = await collection.insertOne(newUser)
+    let collection = await db.collection('userMovieInfo')
+    let result = await collection.insertOne(newuserMovieInfo)
     res.send(result).status(204)
   } catch (err) {
     console.error(err)
-    res.status(500).send('Error adding newUser')
+    res.status(500).send('Error adding newUserMovieInfo')
   }
 })
 
-// This section will help you update a user by id.
+// This section will help you update a userMovieInfo by id.
 router.patch('/:id', async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) }
     const updates = {
       $set: {
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
+        movieID: req.body.movieID,
+        numWatched: req.body.numWatched,
+        timeStamp: req.body.timeStamp,
+        userMovieRating: req.body.userMovieRating,
+        userID: req.body.userID,
       },
     }
 
-    let collection = await db.collection('users')
+    let collection = await db.collection('userMovieInfo')
     let result = await collection.updateOne(query, updates)
     res.send(result).status(200)
   } catch (err) {
     console.error(err)
-    res.status(500).send('Error updating users')
+    res.status(500).send('Error updating userMovieInfo')
   }
 })
 
@@ -71,13 +75,13 @@ router.delete('/:id', async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) }
 
-    const collection = db.collection('users')
+    const collection = db.collection('userMovieInfo')
     let result = await collection.deleteOne(query)
 
     res.send(result).status(200)
   } catch (err) {
     console.error(err)
-    res.status(500).send('Error deleting user')
+    res.status(500).send('Error deleting userMovieInfo')
   }
 })
 
