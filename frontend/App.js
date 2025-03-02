@@ -6,21 +6,21 @@ export default function App() {
   return (
     <View style={styles.container}>
       {Platform.OS === 'web' ? (
+        <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
+          <DisplayDB collectionName="users" fields={['name', 'email', 'password']} />
+          <DisplayDB
+            collectionName="userMovieInfo"
+            fields={['userID', 'movieID', 'numWatched', 'timeStamp', 'userMovieRating']}
+          />
+        </div>
+      ) : (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <DisplayDB collectionName="users" fields={['name', 'email', 'password']} />
           <DisplayDB
             collectionName="userMovieInfo"
-            fields={['userID', 'movieID', 'numWatched', 'timeStamp', 'userRating']}
+            fields={['userID', 'movieID', 'numWatched', 'timeStamp', 'userMovieRating']}
           />
         </ScrollView>
-      ) : (
-        <div>
-          <DisplayDB collectionName="users" fields={['name', 'email', 'password']} />
-          <DisplayDB
-            collectionName="userMovieInfo"
-            fields={['userID', 'movieID', 'numWatched', 'timeStamp', 'userRating']}
-          />
-        </div>
       )}
     </View>
   )

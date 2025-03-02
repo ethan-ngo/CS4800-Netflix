@@ -9,11 +9,14 @@ function DisplayDB({ collectionName, fields }) {
   // useCallback memoizes fetchItems so it only rerenders when collectionName changes
   const fetchItems = useCallback(async () => {
     try {
-      const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`)
+      console.log()
+      //const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`)
+      const res = await fetch(`http://localhost:5050/${collectionName}`)
       const data = await res.json()
+      console.log(`Raw response of ${collectionName}:`, data)
       setItems(data)
     } catch (error) {
-      console.error('Error fetching items:', error)
+      console.error(`Error fetching items in ${collectionName}:`, error)
     }
   }, [collectionName])
 
@@ -24,7 +27,8 @@ function DisplayDB({ collectionName, fields }) {
   const handleSubmit = async (e) => {
     if (e) e.preventDefault()
     try {
-      const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`, {
+      //const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`, {
+      const res = await fetch(`http://localhost:5050/${collectionName}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -181,8 +185,9 @@ const styles = StyleSheet.create({
 const webStyles = {
   container: {
     padding: 20,
-    maxWidth: 800,
+    maxWidth: '100%',
     margin: '0 auto',
+    flex: 1,
   },
   title: {
     fontSize: 24,
