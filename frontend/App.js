@@ -12,6 +12,10 @@ export default function App() {
             collectionName="userMovieInfo"
             fields={['userID', 'movieID', 'numWatched', 'timeStamp', 'userMovieRating']}
           />
+          <DisplayDB 
+            collectionName="movies" 
+            fields={['title', 'genres', 'date_released', 'rating', 'cast', 'plot']} 
+          />
         </div>
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -20,8 +24,17 @@ export default function App() {
             collectionName="userMovieInfo"
             fields={['userID', 'movieID', 'numWatched', 'timeStamp', 'userMovieRating']}
           />
+           <DisplayDB 
+            collectionName="movies" 
+            fields={['title', 'genres', 'date_released', 'rating', 'cast', 'plot']} 
+          />
         </ScrollView>
-      )}
+      )
+      (
+
+      )
+      }
+
     </View>
   )
 }
