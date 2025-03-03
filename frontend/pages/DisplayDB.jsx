@@ -10,8 +10,8 @@ function DisplayDB({ collectionName, fields }) {
   const fetchItems = useCallback(async () => {
     try {
       console.log()
-      //const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`)
-      const res = await fetch(`http://localhost:5050/${collectionName}`)
+      const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`)
+      // const res = await fetch(`http://localhost:5050/${collectionName}`)
       const data = await res.json()
       console.log(`Raw response of ${collectionName}:`, data)
       setItems(data)
@@ -27,8 +27,8 @@ function DisplayDB({ collectionName, fields }) {
   const handleSubmit = async (e) => {
     if (e) e.preventDefault()
     try {
-      //const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`, {
-      const res = await fetch(`http://localhost:5050/${collectionName}`, {
+      const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`, {
+      // const res = await fetch(`http://localhost:5050/${collectionName}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
