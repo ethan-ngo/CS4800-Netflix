@@ -1,29 +1,38 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet, Platform, ScrollView } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react'
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  FlatList,
+  StyleSheet,
+  Platform,
+  ScrollView,
+} from 'react-native'
 
 function DisplayDB({ collectionName, fields }) {
-  const [formData, setFormData] = useState({});
-  const [response, setResponse] = useState(null);
-  const [items, setItems] = useState([]);
+  const [formData, setFormData] = useState({})
+  const [response, setResponse] = useState(null)
+  const [items, setItems] = useState([])
 
   // useCallback memoizes fetchItems so it only rerenders when collectionName changes
   const fetchItems = useCallback(async () => {
     try {
-      const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`);
+      const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`)
       // const res = await fetch(`http://localhost:5050/${collectionName}`);
-      const data = await res.json();
-      setItems(data);
+      const data = await res.json()
+      setItems(data)
     } catch (error) {
-      console.error(`Error fetching items in ${collectionName}:`, error);
+      console.error(`Error fetching items in ${collectionName}:`, error)
     }
-  }, [collectionName]);
+  }, [collectionName])
 
   useEffect(() => {
-    fetchItems();
-  }, [fetchItems]);
+    fetchItems()
+  }, [fetchItems])
 
   const handleSubmit = async (e) => {
-    if (e) e.preventDefault();
+    if (e) e.preventDefault()
     try {
       const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`, {
         // const res = await fetch(`http://localhost:5050/${collectionName}`, {
@@ -32,22 +41,22 @@ function DisplayDB({ collectionName, fields }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-      });
-      const data = await res.json();
-      setResponse(data);
-      fetchItems(); // Fetch items again to update the list
+      })
+      const data = await res.json()
+      setResponse(data)
+      fetchItems() // Fetch items again to update the list
     } catch (error) {
-      console.error('Error:', error);
-      setResponse({ error: 'Failed to submit data' });
+      console.error('Error:', error)
+      setResponse({ error: 'Failed to submit data' })
     }
-  };
+  }
 
   const handleInputChange = (field, value) => {
     setFormData({
       ...formData,
       [field]: value,
-    });
-  };
+    })
+  }
 
   if (Platform.OS === 'web') {
     return (
@@ -82,7 +91,7 @@ function DisplayDB({ collectionName, fields }) {
           )}
         </div>
         <div style={webStyles.items}>
-          <h2 style={webStyles.subtitle}>All {collectionName}</h2>
+          <h2 style={webStyles.subtitle}>All {collectionName}:</h2>
           <div style={webStyles.itemListContainer}>
             {items.length > 0 ? (
               <ul style={webStyles.itemList}>
@@ -100,7 +109,7 @@ function DisplayDB({ collectionName, fields }) {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -125,26 +134,28 @@ function DisplayDB({ collectionName, fields }) {
           </View>
         )}
       </View>
-      <Text style={styles.subtitle}>All {collectionName}</Text>
-      {items.length > 0 ? (
-        <FlatList
-          data={items}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item }) => (
-            <View style={styles.item}>
-              {fields.map((field) => (
-                <Text key={field}>{item[field]} - </Text>
-              ))}
-            </View>
-          )}
-          ListHeaderComponent={<View style={{ height: 20 }} />}
-          ListFooterComponent={<View style={{ height: 20 }} />}
-        />
-      ) : (
-        <Text>No items found.</Text>
-      )}
+      <div>
+        <Text style={styles.subtitle}>All {collectionName}:</Text>
+        {items.length > 0 ? (
+          <FlatList
+            data={items}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <View style={styles.item}>
+                {fields.map((field) => (
+                  <Text key={field}>{item[field]} - </Text>
+                ))}
+              </View>
+            )}
+            ListHeaderComponent={<View style={{ height: 20 }} />}
+            ListFooterComponent={<View style={{ height: 20 }} />}
+          />
+        ) : (
+          <Text>No items found.</Text>
+        )}
+      </div>
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -159,7 +170,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   form: {
-    marginBottom: 20,
+    marginBottom: 100,
   },
   subtitle: {
     fontSize: 18,
@@ -184,62 +195,80 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
-});
+})
 
 const webStyles = {
   container: {
     padding: 20,
     maxWidth: '100%',
-    margin: '0 auto',
-    flex: 1,
+    height: '100vh',
+    margin: '100',
+    display: 'flex',
+    flexDirection: 'column',
+    border: '1px solid #ccc',
+    borderRadius: 20,
+    overflowY: 'hidden',
+    boxSizing: 'border-box', // include padding in height calculation
+    boxShadow: '0 0 8px 1px rgba(0, 0, 0, 0.1)',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    textDecoration: 'underline',
+    //marginBottom: 20,
   },
   form: {
-    marginBottom: 20,
+    //marginBottom: 20,
   },
   subtitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    //marginBottom: 10,
   },
   input: {
     width: '100%',
     height: 40,
-    borderColor: 'gray',
+    borderColor: 'black',
     borderWidth: 1,
     marginBottom: 10,
     paddingLeft: 8,
   },
   button: {
     padding: 10,
-    backgroundColor: '#007BFF',
+    fontSize: 14,
+    marginTop: 20,
+    backgroundColor: '#6200ea',
     color: 'white',
     border: 'none',
     borderRadius: 5,
     cursor: 'pointer',
   },
   response: {
-    marginTop: 20,
+    //marginTop: 20,
   },
   items: {
-    marginTop: 20,
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    //marginTop: 10,
+    overflowY: 'hidden',
   },
   itemListContainer: {
-    overflowY: 'auto', // Enable vertical scrolling if the content exceeds the height
+    flex: 1,
+    overflowY: 'auto',
+    border: '1px solid #A9A9A9',
   },
   itemList: {
     listStyleType: 'none',
     padding: 0,
+    //margin: 0,
+    height: '100%',
   },
   item: {
     padding: 10,
     borderBottom: '1px solid #ccc',
   },
-};
+}
 
-export default DisplayDB;
+export default DisplayDB
