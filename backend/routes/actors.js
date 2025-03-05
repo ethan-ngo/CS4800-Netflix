@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
   res.send(results).status(200)
 })
 
-// This section will help you get a single user by id
+// This section will help you get a single actor by id
 router.get('/:id', async (req, res) => {
   let collection = await db.collection('actors')
   let query = { _id: new ObjectId(req.params.id) }
@@ -28,13 +28,13 @@ router.get('/:id', async (req, res) => {
   else res.send(result).status(200)
 })
 
-// This section will help you create a new user.
+// This section will help you create a new actor.
 router.post('/', async (req, res) => {
   try {
     let newActor = {
       actor_name: req.body.actor_name,
       DOB: req.body.DOB,
-      movies_appeared_in: req.body.movies_appeared_in,
+      movies_appeared: req.body.movies_appeared,
     }
     let collection = await db.collection('actors')
     let result = await collection.insertOne(newActor)
@@ -45,15 +45,15 @@ router.post('/', async (req, res) => {
   }
 })
 
-// This section will help you update a user by id.
+// This section will help you update an actor by id.
 router.patch('/:id', async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) }
     const updates = {
       $set: {
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password,
+        actor_name: req.body.actor_name,
+        DOB: req.body.DOB,
+        movies_appeared: req.body.movies_appeared,
       },
     }
 
@@ -66,7 +66,7 @@ router.patch('/:id', async (req, res) => {
   }
 })
 
-// This section will help you delete a actor
+// This section will help you delete an actor
 router.delete('/:id', async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) }
