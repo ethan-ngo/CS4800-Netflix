@@ -1,55 +1,53 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { View, Text, TextInput, Button, FlatList, StyleSheet, Platform } from 'react-native'
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, Platform, ScrollView } from 'react-native';
 
 function DisplayDB({ collectionName, fields }) {
-  const [formData, setFormData] = useState({})
-  const [response, setResponse] = useState(null)
-  const [items, setItems] = useState([])
+  const [formData, setFormData] = useState({});
+  const [response, setResponse] = useState(null);
+  const [items, setItems] = useState([]);
 
   // useCallback memoizes fetchItems so it only rerenders when collectionName changes
   const fetchItems = useCallback(async () => {
     try {
-      console.log()
-      const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`)
-      // const res = await fetch(`http://localhost:5050/${collectionName}`)
-      const data = await res.json()
-      console.log(`Raw response of ${collectionName}:`, data)
-      setItems(data)
+      const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`);
+      // const res = await fetch(`http://localhost:5050/${collectionName}`);
+      const data = await res.json();
+      setItems(data);
     } catch (error) {
-      console.error(`Error fetching items in ${collectionName}:`, error)
+      console.error(`Error fetching items in ${collectionName}:`, error);
     }
-  }, [collectionName])
+  }, [collectionName]);
 
   useEffect(() => {
-    fetchItems()
-  }, [fetchItems])
+    fetchItems();
+  }, [fetchItems]);
 
   const handleSubmit = async (e) => {
-    if (e) e.preventDefault()
+    if (e) e.preventDefault();
     try {
       const res = await fetch(`https://cs4800netflix.vercel.app/${collectionName}`, {
-      // const res = await fetch(`http://localhost:5050/${collectionName}`, {
+        // const res = await fetch(`http://localhost:5050/${collectionName}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-      })
-      const data = await res.json()
-      setResponse(data)
-      fetchItems() // Fetch items again to update the list
+      });
+      const data = await res.json();
+      setResponse(data);
+      fetchItems(); // Fetch items again to update the list
     } catch (error) {
-      console.error('Error:', error)
-      setResponse({ error: 'Failed to submit data' })
+      console.error('Error:', error);
+      setResponse({ error: 'Failed to submit data' });
     }
-  }
+  };
 
   const handleInputChange = (field, value) => {
     setFormData({
       ...formData,
       [field]: value,
-    })
-  }
+    });
+  };
 
   if (Platform.OS === 'web') {
     return (
@@ -85,26 +83,28 @@ function DisplayDB({ collectionName, fields }) {
         </div>
         <div style={webStyles.items}>
           <h2 style={webStyles.subtitle}>All {collectionName}</h2>
-          {items.length > 0 ? (
-            <ul style={webStyles.itemList}>
-              {items.map((item) => (
-                <li key={item._id} style={webStyles.item}>
-                  {fields.map((field) => (
-                    <span key={field}>{item[field]} - </span>
-                  ))}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No items found.</p>
-          )}
+          <div style={webStyles.itemListContainer}>
+            {items.length > 0 ? (
+              <ul style={webStyles.itemList}>
+                {items.map((item) => (
+                  <li key={item._id} style={webStyles.item}>
+                    {fields.map((field) => (
+                      <span key={field}>{item[field]} - </span>
+                    ))}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No items found.</p>
+            )}
+          </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>{collectionName} Database</Text>
       <View style={styles.form}>
         <Text style={styles.subtitle}>Add {collectionName}</Text>
@@ -115,7 +115,6 @@ function DisplayDB({ collectionName, fields }) {
             placeholder={field}
             value={formData[field] || ''}
             onChangeText={(text) => handleInputChange(field, text)}
-            required
           />
         ))}
         <Button title="Submit" onPress={handleSubmit} />
@@ -132,11 +131,11 @@ function DisplayDB({ collectionName, fields }) {
           data={items}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
-            <Text>
+            <View style={styles.item}>
               {fields.map((field) => (
-                <span key={field}>{item[field]} - </span>
+                <Text key={field}>{item[field]} - </Text>
               ))}
-            </Text>
+            </View>
           )}
           ListHeaderComponent={<View style={{ height: 20 }} />}
           ListFooterComponent={<View style={{ height: 20 }} />}
@@ -144,8 +143,8 @@ function DisplayDB({ collectionName, fields }) {
       ) : (
         <Text>No items found.</Text>
       )}
-    </View>
-  )
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -180,7 +179,12 @@ const styles = StyleSheet.create({
   items: {
     marginTop: 20,
   },
-})
+  item: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+});
 
 const webStyles = {
   container: {
@@ -225,6 +229,9 @@ const webStyles = {
   items: {
     marginTop: 20,
   },
+  itemListContainer: {
+    overflowY: 'auto', // Enable vertical scrolling if the content exceeds the height
+  },
   itemList: {
     listStyleType: 'none',
     padding: 0,
@@ -233,6 +240,6 @@ const webStyles = {
     padding: 10,
     borderBottom: '1px solid #ccc',
   },
-}
+};
 
-export default DisplayDB
+export default DisplayDB;

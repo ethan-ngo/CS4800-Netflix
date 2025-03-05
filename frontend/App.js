@@ -8,38 +8,35 @@ export default function App() {
       {Platform.OS === 'web' ? (
         <ScrollView>
           <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
-          <DisplayDB collectionName="users" fields={['name', 'email', 'password']} />
-          <DisplayDB
-            collectionName="userMovieInfo"
-            fields={['userID', 'movieID', 'numWatched', 'timeStamp', 'userMovieRating']}
-          />
-          <DisplayDB collectionName="actors" fields={['actor_name', 'DOB', 'movies_appeared']} />
-          <DisplayDB
-            collectionName="directors"
-            fields={['director_name', 'DOB', 'movies_directed']}
-          />
-          <DisplayDB
-            collectionName="movies"
-            fields={['title', 'overall_rating', 'genres', 'movie_length', 'actors', 'directors']}
-          />
-        </div>
+            <div style={{ maxWidth: "20%"}}>
+              <DisplayDB collectionName="users" fields={['name', 'email', 'password']} />
+            </div>
+            <div style={{ maxWidth: "20%"}}>
+              <DisplayDB
+              collectionName="userMovieInfo"
+              fields={['userID', 'movieID', 'numWatched', 'timeStamp', 'userMovieRating']}
+              />
+            </div>
+            <div style={{ maxWidth: "20%"}}>
+              <DisplayDB collectionName="actors" fields={['actor_name', 'DOB', 'movies_appeared']} />
+            </div>
+            <div style={{ maxWidth: "20%"}}>
+              <DisplayDB
+              collectionName="directors"
+              fields={['director_name', 'DOB', 'movies_directed']}
+              />
+            </div>
+            <div style={{ maxWidth: "20%"}}>
+              <DisplayDB
+              collectionName="movies"
+              fields={['title', 'overall_rating', 'genres', 'movie_length', 'actors', 'directors']}
+              />
+            </div>
+          </div>
         </ScrollView>
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <DisplayDB collectionName="users" fields={['name', 'email', 'password']} />
-          <DisplayDB
-            collectionName="userMovieInfo"
-            fields={['userID', 'movieID', 'numWatched', 'timeStamp', 'userMovieRating']}
-          />
-          <DisplayDB collectionName="actors" fields={['actor_name', 'DOB', 'movies_appeared']} />
-          <DisplayDB
-            collectionName="directors"
-            fields={['director_name', 'DOB', 'movies_directed']}
-          />
-          <DisplayDB
-            collectionName="movies"
-            fields={['title', 'overall_rating', 'genres', 'movie_length', 'actors', 'directors']}
-          />
         </ScrollView>
       )}
     </View>
