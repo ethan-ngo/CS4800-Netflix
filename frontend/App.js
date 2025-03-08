@@ -1,10 +1,22 @@
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View, Platform, ScrollView } from 'react-native'
 import DisplayDB from './pages/DisplayDB'
+import LoginPage from './pages/LoginPage'
 
 export default function App() {
   return (
     <View style={styles.container}>
+        {Platform.OS === 'web' ? (
+          <View>
+              <LoginPage />
+          </View>
+        ) : (
+          <View style={styles.container}> 
+            <LoginPage/>
+          </View> 
+          )}
+      </View>
+   /* <View style={styles.container}>
       {Platform.OS === 'web' ? (
         <ScrollView>
           <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
@@ -49,7 +61,7 @@ export default function App() {
           <DisplayDB collectionName="users" fields={['name', 'email', 'password']} />
         </ScrollView>
       )}
-    </View>
+    </View>*/
   )
 }
 
