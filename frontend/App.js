@@ -2,20 +2,21 @@ import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View, Platform, ScrollView } from 'react-native'
 import DisplayDB from './pages/DisplayDB'
 import LoginPage from './pages/LoginPage'
+import SignUpPage from './pages/signUpPage'
 
 export default function App() {
   return (
-    <View style={styles.container}>
+    <div style={styles.container}>
         {Platform.OS === 'web' ? (
-          <View>
-              <LoginPage />
-          </View>
+          <div>
+              <LoginPage/>
+          </div>
         ) : (
-          <View style={styles.container}> 
+          <div style={styles.container}> 
             <LoginPage/>
-          </View> 
+          </div> 
           )}
-      </View>
+      </div>
    /* <View style={styles.container}>
       {Platform.OS === 'web' ? (
         <ScrollView>
