@@ -2,20 +2,14 @@ import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View, Platform, ScrollView } from 'react-native'
 import DisplayDB from './pages/DisplayDB'
 import LoginPage from './pages/LoginPage'
+import ForgotPassword from './pages/ForgotPassword'
+import { SafeAreaView } from 'react-native-web'
 
 export default function App() {
   return (
-    <View style={styles.container}>
-        {Platform.OS === 'web' ? (
-          <View>
-              <LoginPage />
-          </View>
-        ) : (
-          <View style={styles.container}> 
-            <LoginPage/>
-          </View> 
-          )}
-      </View>
+    <SafeAreaView style={styles.container}>
+      <ForgotPassword/>
+    </SafeAreaView>
    /* <View style={styles.container}>
       {Platform.OS === 'web' ? (
         <ScrollView>
