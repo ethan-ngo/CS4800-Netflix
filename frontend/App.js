@@ -7,17 +7,17 @@ import SignUpPage from './pages/signUpPage'
 export default function App() {
   return (
     <div style={styles.container}>
-        {Platform.OS === 'web' ? (
-          <div>
-              <LoginPage/>
-          </div>
-        ) : (
-          <div style={styles.container}> 
-            <LoginPage/>
-          </div> 
-          )}
-      </div>
-   /* <View style={styles.container}>
+      {Platform.OS === 'web' ? (
+        <div>
+          <SignUpPage />
+        </div>
+      ) : (
+        <div style={styles.container}>
+          <SignUpPage />
+        </div>
+      )}
+    </div>
+    /* <View style={styles.container}>
       {Platform.OS === 'web' ? (
         <ScrollView>
           <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>

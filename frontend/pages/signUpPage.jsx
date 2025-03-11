@@ -1,38 +1,65 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Alert, StyleSheet, Platform } from 'react-native';
+import React, { useState } from 'react'
+import { View, Text, TextInput, Button, Alert, StyleSheet, Platform } from 'react-native'
 
 const SignUpPage = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [response, setResponse] = useState(null)
 
   // validations and confirmation for sign-up
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
+    try {
+      const res = await fetch(`https://cs4800netflix.vercel.app/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password, profilePic: null }),
+      })
+
+      if (!res.ok) {
+        const errorResponse = await res.text()
+        console.error('Server error response:', errorResponse)
+        throw new Error(`HTTP error! Status: ${res.status}`)
+      }
+
+      const data = await res.json()
+      setResponse(data)
+      console.log('New user with username: ' + name + ' and email: ' + email + ' has been created')
+    } catch (error) {
+      console.error('Error:', error)
+      setResponse({ error: 'Failed to submit data' })
+    }
+
     if (!name || !email || !password || !confirmPassword) {
       if (Platform.OS === 'web') {
-        alert('Error', 'Please fill in all fields');
+        alert('Error', 'Please fill in all fields')
       } else {
-        Alert.alert('Error', 'Please fill in all fields');
+        Alert.alert('Error', 'Please fill in all fields')
       }
-    return;
-  }
+
+      return
+    }
 
     if (password !== confirmPassword) {
       if (Platform.OS === 'web') {
-      alert('Error', 'Passwords do not match');
-    } else {
-      Alert.alert('Error', 'Passwords do not match');
+        alert('Error', 'Passwords do not match')
+      } else {
+        Alert.alert('Error', 'Passwords do not match')
+      }
+      return
     }
-    return;
-  }
 
-  if (Platform.OS === 'web') {
-      alert('Profile Created', `Email: ${email}\nPassword: ${password}`);
-  } else {
-    Alert.alert('Profile Created', `Email: ${email}\nPassword: ${password}`);
+    if (Platform.OS === 'web') {
+      //alert('Profile Created', `Email: ${email}\nPassword: ${password}`)
+      console.log('Profile Created', `Email: ${email}\nPassword: ${password}`)
+    } else {
+      //Alert.alert('Profile Created', `Email: ${email}\nPassword: ${password}`)
+      console.log('Profile Created', `Email: ${email}\nPassword: ${password}`)
+    }
   }
-};
 
   if (Platform.OS === 'web') {
     return (
@@ -67,22 +94,21 @@ const SignUpPage = () => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-          <button style={webStyles.button} onClick={handleSignUp}>Sign Up</button>
-          <p>Already have an account? <a href="/Login"> Sign in</a></p>
+          <button style={webStyles.button} onClick={handleSignUp}>
+            Sign Up
+          </button>
+          <p>
+            Already have an account? <a href="/Login"> Sign in</a>
+          </p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Sign-up</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="name"
-        value={name}
-        onChangeText={setName}
-      />
+      <TextInput style={styles.input} placeholder="name" value={name} onChangeText={setName} />
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -106,8 +132,8 @@ const SignUpPage = () => {
       />
       <Button title="Sign Up" onPress={handleSignUp} />
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -129,7 +155,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingLeft: 8,
   },
-});
+})
 
 const webStyles = {
   container: {
@@ -170,7 +196,6 @@ const webStyles = {
     borderRadius: 5,
     cursor: 'pointer',
   },
-};
+}
 
-export default SignUpPage;
-
+export default SignUpPage

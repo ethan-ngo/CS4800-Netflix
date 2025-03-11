@@ -55,7 +55,7 @@ router.patch('/:id', async (req, res) => {
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
-        profilePic: req.body.profilePic
+        profilePic: req.body.profilePic,
       },
     }
 
@@ -63,7 +63,7 @@ router.patch('/:id', async (req, res) => {
     let result = await collection.updateOne(query, updates)
     res.send(result).status(200)
   } catch (err) {
-    console.error(err)
+    console.error('Error adding newUser:', err)
     res.status(500).send('Error updating users')
   }
 })
