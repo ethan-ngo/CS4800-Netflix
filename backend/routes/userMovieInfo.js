@@ -36,6 +36,7 @@ router.post('/', async (req, res) => {
       movieID: req.body.movieID,
       numWatched: req.body.numWatched,
       timeStamp: req.body.timeStamp,
+      isBookmarked: false,
       userMovieRating: req.body.userMovieRating,
     }
     let collection = await db.collection('userMovieInfo')
@@ -57,6 +58,7 @@ router.patch('/:id', async (req, res) => {
         movieID: req.body.movieID,
         numWatched: req.body.numWatched,
         timeStamp: req.body.timeStamp,
+        isBookmarked: req.body.isBookmarked,
         userMovieRating: req.body.userMovieRating,
       },
     }
