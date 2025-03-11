@@ -10,6 +10,48 @@ const SignUpPage = () => {
 
   // validations and confirmation for sign-up
   const handleSignUp = async () => {
+    if (!name || !email || !password || !confirmPassword) {
+      if (Platform.OS === 'web') {
+        alert('Error', 'Please fill in all fields')
+      } else {
+        Alert.alert('Error', 'Please fill in all fields')
+      }
+
+      return
+    }
+
+    if (password !== confirmPassword) {
+      if (Platform.OS === 'web') {
+        alert('Error', 'Passwords do not match')
+      } else {
+        Alert.alert('Error', 'Passwords do not match')
+      }
+      return
+    }
+
+    // check if email is already in use
+    try {
+      const res = await fetch(`https://cs4800netflix.vercel.app/users?email=${email}`)
+      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
+
+      const users = await res.json()
+      const usersWithMatchingEmail = users.filter((user) => user.email === email)
+      console.log('Number of users with that email: ', usersWithMatchingEmail.length)
+
+      if (usersWithMatchingEmail.length > 0) {
+        if (Platform.OS === 'web') {
+          alert('Error: Email is already in use')
+        } else {
+          Alert.alert('Error: Email is already in use')
+        }
+        return
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      setResponse({ error: 'Failed to submit data' })
+    }
+
+    // if the email is not in use, create a new user
     try {
       const res = await fetch(`https://cs4800netflix.vercel.app/users`, {
         method: 'POST',
@@ -31,25 +73,6 @@ const SignUpPage = () => {
     } catch (error) {
       console.error('Error:', error)
       setResponse({ error: 'Failed to submit data' })
-    }
-
-    if (!name || !email || !password || !confirmPassword) {
-      if (Platform.OS === 'web') {
-        alert('Error', 'Please fill in all fields')
-      } else {
-        Alert.alert('Error', 'Please fill in all fields')
-      }
-
-      return
-    }
-
-    if (password !== confirmPassword) {
-      if (Platform.OS === 'web') {
-        alert('Error', 'Passwords do not match')
-      } else {
-        Alert.alert('Error', 'Passwords do not match')
-      }
-      return
     }
 
     if (Platform.OS === 'web') {
