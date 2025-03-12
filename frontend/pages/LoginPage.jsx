@@ -12,7 +12,8 @@ const LoginPage = () => {
 
     // Check if login credentials exist in db with "login"
     try {
-      const res = await fetch(`http://localhost:5050/users/login`, {
+      //const res = await fetch(`http://localhost:5050/users/login`, {
+      const res = await fetch(`https://cs4800netflix.vercel.app/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

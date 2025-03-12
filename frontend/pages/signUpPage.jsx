@@ -31,8 +31,8 @@ const SignUpPage = () => {
 
     // check if email is already in use
     try {
-      // const res = await fetch(`https://cs4800netflix.vercel.app/users?email=${email}`)
-      const res = await fetch(`http://localhost:5050/users?email=${email}`)
+      const res = await fetch(`https://cs4800netflix.vercel.app/users?email=${email}`)
+      //const res = await fetch(`http://localhost:5050/users?email=${email}`)
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
 
       const users = await res.json()
@@ -54,7 +54,8 @@ const SignUpPage = () => {
 
     // if the email is not in use, create a new user
     try {
-      const res = await fetch(`http://localhost:5050/users`, {
+      //const res = await fetch(`http://localhost:5050/users`, {
+      const res = await fetch(`https://cs4800netflix.vercel.app/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
