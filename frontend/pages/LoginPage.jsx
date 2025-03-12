@@ -9,26 +9,47 @@ const LoginPage = () => {
       Alert.alert('Login Attempt', `Email: ${email}\nPassword: ${password}`);
     };
     
+    
+
+    const handleUsernameOrEmailChange = (field, value) => {
+      setEmail({
+        ...email,
+        [field]: value,
+      })
+    }
+
+    const handlePasswordChange = (field, value) => {
+      setPassword({
+        ...password,
+        [field]: value,
+      })
+    }
+
     if (Platform.OS === 'web') {
       return (
         <div style={webStyles.container}>
           <h1 style={webStyles.title}>Login</h1>
-          <div style={webStyles.formContainer}>
+          <div style={webStyles.form}>
           <input
             style={webStyles.input}
             placeholder="Email"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
+            type="email-address"
+            value={email[email] || ''}
+            onChange={(e) => handleUsernameOrEmailChange(email, e.target.value)}
           />
+          <br />
           <input
             style={webStyles.input}
             placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
+            securetextentry="true"
+            value={password[password] || ''}
+            onChange={(e) => handlePasswordChange(password, e.target.value)}
           />
-          <button title="Login" onPress={handleLogin} />
+          <br />
+          <button onClick={handleLogin}
+            style={webStyles.button}> 
+            Login
+          </button>
         </div>
       </div>
       )
@@ -69,7 +90,7 @@ const LoginPage = () => {
       marginBottom: 20,
     },
     input: {
-      width: '100%',
+      width: '100',
       height: 40,
       borderColor: 'gray',
       borderWidth: 1,
@@ -99,7 +120,7 @@ const webStyles = {
       marginBottom: 10,
     },
     input: {
-      width: '100%',
+      width: '400', 
       height: 40,
       borderColor: 'gray',
       borderWidth: 1,
@@ -111,7 +132,10 @@ const webStyles = {
       backgroundColor: '#007BFF',
       color: 'white',
       border: 'none',
+      height: 40,
+      width: 200,
       borderRadius: 5,
+      marginLeft: '100',
       cursor: 'pointer',
     },
     response: {
