@@ -6,6 +6,9 @@ import db from '../db/connection.js'
 // This help convert the id from string to ObjectId for the _id.
 import { ObjectId } from 'mongodb'
 
+// This will help us hash the password
+import bcrypt from 'bcrypt'
+
 // router is an instance of the express router.
 // We use it to define our routes.
 // The router will be added as a middleware and will take control of requests starting with path /users.
@@ -29,21 +32,38 @@ router.get('/:id', async (req, res) => {
 })
 
 // This section will help you create a new user.
-router.post('/', async (req, res) => {
-  try {
-    let newUser = {
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      profilePic: null,
-    }
-    let collection = await db.collection('users')
-    let result = await collection.insertOne(newUser)
-    res.send(result).status(204)
-  } catch (err) {
-    console.error(err)
-    res.status(500).send('Error adding newUser')
-  }
+router.post('/', (req, res) => {
+  console.log('POST /users endpoint hit')
+  console.log('hashing password')
+
+  const saltRounds = 10
+  bcrypt
+    .hash(req.body.password, saltRounds)
+    .then((hashedPassword) => {
+      console.log('Hashed password:', hashedPassword)
+
+      let newUser = {
+        name: req.body.name,
+        email: req.body.email,
+        password: hashedPassword,
+        profilePic: null,
+      }
+
+      db.collection('users')
+        .insertOne(newUser)
+        .then((result) => {
+          console.log('User created:', newUser)
+          res.status(201).send(result)
+        })
+        .catch((err) => {
+          console.error('Error adding newUser:', err)
+          res.status(500).send('Error adding newUser')
+        })
+    })
+    .catch((err) => {
+      console.error('Error hashing password:', err)
+      res.status(500).send('Error hashing password')
+    })
 })
 
 // This section will help you update a user by id.
