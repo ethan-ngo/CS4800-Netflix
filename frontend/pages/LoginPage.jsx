@@ -9,30 +9,61 @@ const LoginPage = () => {
       Alert.alert('Login Attempt', `Email: ${email}\nPassword: ${password}`);
     };
     
+    const handleSignUp = () => {
+      Alert.alert('Sign Up Attempt', `Email: ${email}\nPassword: ${password}`);
+    };
+
+    const handleUsernameOrEmailChange = (field, value) => {
+      setEmail({
+        ...email,
+        [field]: value,
+      })
+    }
+
+    const handlePasswordChange = (field, value) => {
+      setPassword({
+        ...password,
+        [field]: value,
+      })
+    }
+
     if (Platform.OS === 'web') {
       return (
-        <View style={styles.container}>
-          <Text style={styles.title}>Login</Text>
-          <View style={styles.formContainer}>
-          <TextInput
-            style={styles.input}
+        <div style={webStyles.container}>
+          <h1 style={webStyles.title}>Login</h1>
+          <div style={webStyles.form}>
+          <input
+            style={webStyles.input}
             placeholder="Email"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
+            type="email-address"
+            value={email || ''}
+            onChange={(e) => handleUsernameOrEmailChange(email, e.target.value)}
           />
-          <TextInput
-            style={styles.input}
+          <br />
+          <input
+            style={webStyles.input}
             placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
+            securetextentry="true"
+            value={password || ''}
+            onChange={(e) => handlePasswordChange(password, e.target.value)}
           />
-          <Button title="Login" onPress={handleLogin} />
-        </View>
-      </View>
+          <div style={{width: "100%", textAlign: "right"}}>
+            <a href="https://www.google.com">Forgot Password?</a>
+          </div>
+          <button onClick={handleLogin}
+            style={webStyles.LoginButton}> 
+            Login
+          </button>
+          <p>Don't have an account yet? Sign up!</p>
+          <button onClick={handleSignUp}
+            style={webStyles.SignUpButton}> 
+            Sign Up
+          </button>
+        </div>
+      </div>
       )
     }
+
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Login</Text>
@@ -68,7 +99,7 @@ const LoginPage = () => {
       marginBottom: 20,
     },
     input: {
-      width: '100%',
+      width: '100',
       height: 40,
       borderColor: 'gray',
       borderWidth: 1,
@@ -77,40 +108,62 @@ const LoginPage = () => {
     },
 })
 const webStyles = {
-    container: {
-      padding: 20,
-      maxWidth: '100%',
-      margin: '0 auto',
-      flex: 1,
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      textAlign: 'center',
-      marginBottom: 20,
-    },
-    form: {
-      marginBottom: 20,
-    },
+  link:{
+    justifyContent: 'right',
+    cursor: "pointer",
+  },
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "10px", 
+  },
     subtitle: {
       fontSize: 18,
       fontWeight: 'bold',
       marginBottom: 10,
     },
     input: {
-      width: '100%',
+      width: 250, 
       height: 40,
       borderColor: 'gray',
       borderWidth: 1,
       marginBottom: 10,
       paddingLeft: 8,
     },
-    button: {
+    LoginButton: {
       padding: 10,
       backgroundColor: '#007BFF',
       color: 'white',
       border: 'none',
+      height: 40,
+      width: 200,
       borderRadius: 5,
+      marginLeft: '100',
+      cursor: 'pointer',
+    },
+    SignUpButton:{
+      padding: 10,
+      backgroundColor: '#00008B',
+      color: 'white',
+      border: 'none',
+      height: 40,
+      width: 200,
+      borderRadius: 5,
+      marginLeft: '100',
       cursor: 'pointer',
     },
     response: {
