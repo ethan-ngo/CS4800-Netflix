@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { View, Text, TextInput, Button, StyleSheet, Platform, Alert } from 'react-native'
 import { useNavigate } from 'react-router-dom'
+import { validateEmail } from '../utils/validateEmail'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
@@ -50,6 +51,11 @@ const LoginPage = () => {
             type="email"
             value={email || ''}
             onChange={(e) => setEmail(e.target.value)}
+            onBlur={() => {
+              if (email && !validateEmail(email)) {
+                alert('Please enter a valid email address')
+              }
+            }}
           />
           <br />
           <input
