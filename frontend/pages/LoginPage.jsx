@@ -11,28 +11,29 @@ const LoginPage = () => {
     
     if (Platform.OS === 'web') {
       return (
-        <View style={styles.container}>
-          <Text style={styles.title}>Login</Text>
-          <View style={styles.formContainer}>
-          <TextInput
-            style={styles.input}
+        <div style={webStyles.container}>
+          <h1 style={webStyles.title}>Login</h1>
+          <div style={webStyles.formContainer}>
+          <input
+            style={webStyles.input}
             placeholder="Email"
             keyboardType="email-address"
             value={email}
             onChangeText={setEmail}
           />
-          <TextInput
-            style={styles.input}
+          <input
+            style={webStyles.input}
             placeholder="Password"
             secureTextEntry
             value={password}
             onChangeText={setPassword}
           />
-          <Button title="Login" onPress={handleLogin} />
-        </View>
-      </View>
+          <button title="Login" onPress={handleLogin} />
+        </div>
+      </div>
       )
     }
+
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Login</Text>
