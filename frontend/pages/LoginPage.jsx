@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, TextInput, Button, FlatList, StyleSheet, Platform, Alert } from 'react-native'
+import { View, Text, TextInput, Button, StyleSheet, Platform, Alert } from 'react-native'
 import { useNavigate } from 'react-router-dom'
 
 const LoginPage = () => {
@@ -10,7 +10,7 @@ const LoginPage = () => {
   const handleLogin = async () => {
     console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
 
-    // check if login credentials exist in db with "login"
+    // Check if login credentials exist in db with "login"
     try {
       const res = await fetch(`http://localhost:5050/users/login`, {
         method: 'POST',
@@ -21,42 +21,58 @@ const LoginPage = () => {
       })
 
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-      alert('Login successful')
+      Alert.alert('Login successful')
       const data = await res.json()
       console.log('Data:', data)
-      // store token
+      // Store token
       localStorage.setItem('token', data.token)
-      // navigate to homepage
+      // Navigate to homepage
       navigate('/home')
     } catch (error) {
       console.error('Error (unable to login): ', error)
+      Alert.alert('Login failed', 'Invalid email or password')
     }
+  }
+
+  const handleSignUp = () => {
+    Alert.alert('Sign Up Attempt', `Email: ${email}\nPassword: ${password}`)
   }
 
   if (Platform.OS === 'web') {
     return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Login</Text>
-        <View style={styles.formContainer}>
-          <TextInput
-            style={styles.input}
+      <div style={webStyles.container}>
+        <h1 style={webStyles.title}>Login</h1>
+        <div style={webStyles.form}>
+          <input
+            style={webStyles.input}
             placeholder="Email"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
+            type="email"
+            value={email || ''}
+            onChange={(e) => setEmail(e.target.value)}
           />
-          <TextInput
-            style={styles.input}
+          <br />
+          <input
+            style={webStyles.input}
             placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
+            type="password"
+            value={password || ''}
+            onChange={(e) => setPassword(e.target.value)}
           />
-          <Button title="Login" onPress={handleLogin} />
-        </View>
-      </View>
+          <div style={{ width: '100%', textAlign: 'right' }}>
+            <a href="https://www.google.com">Forgot Password?</a>
+          </div>
+          <button onClick={handleLogin} style={webStyles.LoginButton}>
+            Login
+          </button>
+          <p>Don't have an account yet? Sign up!</p>
+          <button onClick={handleSignUp} style={webStyles.SignUpButton}>
+            Sign Up
+          </button>
+        </div>
+      </div>
     )
   }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
@@ -100,12 +116,18 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
   },
 })
+
 const webStyles = {
+  link: {
+    justifyContent: 'right',
+    cursor: 'pointer',
+  },
   container: {
-    padding: 20,
-    maxWidth: '100%',
-    margin: '0 auto',
-    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
   },
   title: {
     fontSize: 24,
@@ -114,42 +136,41 @@ const webStyles = {
     marginBottom: 20,
   },
   form: {
-    marginBottom: 20,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '10px',
   },
   input: {
-    width: '100%',
+    width: 250,
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 10,
     paddingLeft: 8,
   },
-  button: {
+  LoginButton: {
     padding: 10,
     backgroundColor: '#007BFF',
     color: 'white',
     border: 'none',
+    height: 40,
+    width: 200,
     borderRadius: 5,
+    marginLeft: '100',
     cursor: 'pointer',
   },
-  response: {
-    marginTop: 20,
-  },
-  items: {
-    marginTop: 20,
-  },
-  itemList: {
-    listStyleType: 'none',
-    padding: 0,
-  },
-  item: {
+  SignUpButton: {
     padding: 10,
-    borderBottom: '1px solid #ccc',
+    backgroundColor: '#00008B',
+    color: 'white',
+    border: 'none',
+    height: 40,
+    width: 200,
+    borderRadius: 5,
+    marginLeft: '100',
+    cursor: 'pointer',
   },
 }
+
 export default LoginPage
