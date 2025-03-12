@@ -34,7 +34,7 @@ const LoginPage = () => {
             style={webStyles.input}
             placeholder="Email"
             type="email-address"
-            value={email[email] || ''}
+            value={email || ''}
             onChange={(e) => handleUsernameOrEmailChange(email, e.target.value)}
           />
           <br />
@@ -42,14 +42,19 @@ const LoginPage = () => {
             style={webStyles.input}
             placeholder="Password"
             securetextentry="true"
-            value={password[password] || ''}
+            value={password || ''}
             onChange={(e) => handlePasswordChange(password, e.target.value)}
           />
-          <br />
+          <div style={{width: "100%", textAlign: "right"}}>
+            <a href="https://www.google.com">Forgot Password?</a>
+          </div>
+          
+          
           <button onClick={handleLogin}
             style={webStyles.button}> 
             Login
           </button>
+          
         </div>
       </div>
       )
@@ -99,11 +104,16 @@ const LoginPage = () => {
     },
 })
 const webStyles = {
+  link:{
+    justifyContent: 'right',
+    cursor: "pointer",
+  },
     container: {
-      padding: 20,
-      maxWidth: '100%',
-      margin: '0 auto',
-      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "100vh",
     },
     title: {
       fontSize: 24,
@@ -112,7 +122,10 @@ const webStyles = {
       marginBottom: 20,
     },
     form: {
-      marginBottom: 20,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: "10px", 
     },
     subtitle: {
       fontSize: 18,
