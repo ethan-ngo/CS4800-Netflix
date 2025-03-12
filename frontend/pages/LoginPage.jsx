@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { View, Text, TextInput, Button, FlatList, StyleSheet, Platform, Alert } from 'react-native'
+import { useNavigate } from 'react-router-dom'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const navigate = useNavigate()
 
   const handleLogin = async () => {
     console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
@@ -20,6 +22,12 @@ const LoginPage = () => {
 
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
       alert('Login successful')
+      const data = await res.json()
+      console.log('Data:', data)
+      // store token
+      localStorage.setItem('token', data.token)
+      // navigate to homepage
+      navigate('/home')
     } catch (error) {
       console.error('Error (unable to login): ', error)
     }

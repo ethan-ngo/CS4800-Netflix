@@ -3,22 +3,26 @@ import { StyleSheet, View, Platform, ScrollView } from 'react-native'
 import DisplayDB from './pages/DisplayDB'
 import LoginPage from './pages/LoginPage'
 import SignUpPage from './pages/signUpPage'
+import HomePage from './pages/HomePage'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 export default function App() {
   return (
-    <div style={styles.container}>
-      {Platform.OS === 'web' ? (
-        <div>
-          {/* <SignUpPage /> */}
-          <LoginPage />
-        </div>
-      ) : (
-        <div style={styles.container}>
-          {/* <SignUpPage /> */}
-          <LoginPage />
-        </div>
-      )}
-    </div>
+    <Router>
+      <div style={styles.container}>
+        {Platform.OS === 'web' ? (
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/home" element={<HomePage />} />
+          </Routes>
+        ) : (
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/home" element={<HomePage />} />
+          </Routes>
+        )}
+      </div>
+    </Router>
   )
 }
 
