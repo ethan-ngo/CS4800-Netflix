@@ -36,7 +36,7 @@ const LoginPage = () => {
   }
 
   const handleSignUp = () => {
-    Alert.alert('Sign Up Attempt', `Email: ${email}\nPassword: ${password}`)
+    navigate('/signUp')
   }
 
   if (Platform.OS === 'web') {

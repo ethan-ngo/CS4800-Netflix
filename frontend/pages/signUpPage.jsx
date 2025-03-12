@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { View, Text, TextInput, Button, Alert, StyleSheet, Platform } from 'react-native'
+import { useNavigate, Link } from 'react-router-dom'
 
 const SignUpPage = () => {
   const [name, setName] = useState('')
@@ -123,7 +124,7 @@ const SignUpPage = () => {
             Sign Up
           </button>
           <p>
-            Already have an account? <a href="/Login"> Sign in</a>
+            Already have an account? <Link to="/Login"> Sign in</Link>
           </p>
         </div>
       </div>

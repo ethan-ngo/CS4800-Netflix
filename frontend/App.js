@@ -14,11 +14,15 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/home" element={<HomePage />} />
+            <Route path="/signUp" element={<SignUpPage/>} />
+            <Route path="/login" element={<LoginPage/>} />
           </Routes>
         ) : (
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/home" element={<HomePage />} />
+            <Route path="/signUp" element={<signUpPage/>} />
+            <Route path="/login" element={<LoginPage/>} />
           </Routes>
         )}
       </div>
