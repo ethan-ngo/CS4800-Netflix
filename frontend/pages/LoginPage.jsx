@@ -1,12 +1,28 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { View, Text, TextInput, Button, FlatList, StyleSheet, Platform } from 'react-native'
+import React, { useState } from 'react'
+import { View, Text, TextInput, Button, FlatList, StyleSheet, Platform, Alert } from 'react-native'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
+
+    // check if login credentials exist in db with "login"
+    try {
+      const res = await fetch(`http://localhost:5050/users/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
+      alert('Login successful')
+    } catch (error) {
+      console.error('Error (unable to login): ', error)
+    }
   }
 
   if (Platform.OS === 'web') {

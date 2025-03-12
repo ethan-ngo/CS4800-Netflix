@@ -9,6 +9,9 @@ import { ObjectId } from 'mongodb'
 // This will help us hash the password
 import bcrypt from 'bcrypt'
 
+// This will help us generate a new token
+import jwt from 'jsonwebtoken'
+
 // router is an instance of the express router.
 // We use it to define our routes.
 // The router will be added as a middleware and will take control of requests starting with path /users.
@@ -61,6 +64,30 @@ router.post('/', (req, res) => {
       console.error('Error hashing password:', err)
       res.status(500).send('Error hashing password')
     })
+})
+
+// This section is for logging in
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body
+  console.log('Login attempt:', `Email: ${email}, Password: ${password}`)
+  try {
+    const user = await db.collection('users').findOne({ email })
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+
+    if (isPasswordValid) {
+      res.status(200).json({ message: 'Login successful', user: { email: user.email } })
+    } else {
+      res.status(401).json({ message: 'Invalid password' })
+    }
+  } catch (error) {
+    console.error('Error during login:', error)
+    res.status(500).json({ message: 'Internal server error' })
+  }
 })
 
 // This section will help you update a user by id.
