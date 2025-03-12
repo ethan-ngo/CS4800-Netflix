@@ -10,7 +10,7 @@ import { dir } from 'console'
 const PORT = process.env.PORT || 5050
 const app = express()
 
-app.use(cors({ origin: '*', methods: ['GET', 'POST', 'DELETE'] }))
+app.use(cors({ origin: '*', methods: ['GET', 'POST', 'DELETE', 'PATCH'] }))
 app.use(express.json())
 app.use('/users', users)
 app.use('/userMovieInfo', userMovieInfo)

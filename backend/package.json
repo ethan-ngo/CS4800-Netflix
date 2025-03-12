@@ -12,8 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "mongodb": "^6.13.0"
+    "mongodb": "^6.13.0",
+    "nodemailer": "^6.10.0"
   }
 }

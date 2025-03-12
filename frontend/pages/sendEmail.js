@@ -1,3 +1,7 @@
+const crypto = require('crypto');
+const resetToken = crypto.randomBytes(20).toString('hex');
+const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
+
 var nodemailer = require('nodemailer');
 
 var transporter = nodemailer.createTransport({
@@ -12,7 +16,7 @@ var mailOptions = {
   from: 'domainfilms4800@gmail.com',
   to: 'ethanngo3539@gmail.com',
   subject: 'Sending Email using Node.js',
-  text: 'That was easy!'
+  text: 'Here is your reset token: ' + resetToken
 };
 
 transporter.sendMail(mailOptions, function(error, info){
