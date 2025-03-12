@@ -33,9 +33,6 @@ router.get('/:id', async (req, res) => {
 
 // This section will help you create a new user.
 router.post('/', (req, res) => {
-  console.log('POST /users endpoint hit')
-  console.log('hashing password')
-
   const saltRounds = 10
   bcrypt
     .hash(req.body.password, saltRounds)
