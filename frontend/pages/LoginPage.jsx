@@ -9,7 +9,9 @@ const LoginPage = () => {
       Alert.alert('Login Attempt', `Email: ${email}\nPassword: ${password}`);
     };
     
-    
+    const handleSignUp = () => {
+      Alert.alert('Sign Up Attempt', `Email: ${email}\nPassword: ${password}`);
+    };
 
     const handleUsernameOrEmailChange = (field, value) => {
       setEmail({
@@ -48,13 +50,15 @@ const LoginPage = () => {
           <div style={{width: "100%", textAlign: "right"}}>
             <a href="https://www.google.com">Forgot Password?</a>
           </div>
-          
-          
           <button onClick={handleLogin}
-            style={webStyles.button}> 
+            style={webStyles.LoginButton}> 
             Login
           </button>
-          
+          <p>Don't have an account yet? Sign up!</p>
+          <button onClick={handleSignUp}
+            style={webStyles.SignUpButton}> 
+            Sign Up
+          </button>
         </div>
       </div>
       )
@@ -140,9 +144,20 @@ const webStyles = {
       marginBottom: 10,
       paddingLeft: 8,
     },
-    button: {
+    LoginButton: {
       padding: 10,
       backgroundColor: '#007BFF',
+      color: 'white',
+      border: 'none',
+      height: 40,
+      width: 200,
+      borderRadius: 5,
+      marginLeft: '100',
+      cursor: 'pointer',
+    },
+    SignUpButton:{
+      padding: 10,
+      backgroundColor: '#00008B',
       color: 'white',
       border: 'none',
       height: 40,
