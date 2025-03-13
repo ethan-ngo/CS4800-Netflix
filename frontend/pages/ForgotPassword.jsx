@@ -7,10 +7,11 @@ function ForgotPassword() {
   const [token, setToken] = useState("");
   const [isValidToken, setIsValidToken] = useState(null)
 
+  
   const handleEmailSubmit = async (e) => {
     setSubmitted(true);
 	try{
-		const response = await fetch('http://localhost:5050/users/send-email/' + email, {
+		const response = await fetch(process.env.LOCAL_URL + 'users/send-email/' + email, {
 			method: 'PATCH',
 			headers: {
 				'Content-Type': 'application/json',
@@ -25,7 +26,7 @@ function ForgotPassword() {
   const handleTokenSubmit = async (e) => {
 	e.preventDefault();
 	try{
-		const response = await fetch('http://localhost:5050/users/validate-token/', {
+		const response = await fetch(process.env.LOCAL_URL + 'users/validate-token/', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
