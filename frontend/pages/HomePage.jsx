@@ -50,93 +50,91 @@ const HomePage = () => {
   
   if (Platform.OS === 'web') {
     return(
-      <div style={webStyles.navBar}>
+      <><div style={webStyles.navBar}>
         <h1 style={webStyles.Logo}>
           DomainFilms
         </h1>
-      </div>
-    <div>
-      <h1>Media Library</h1>
+      </div><div>
+          <h1>Media Library</h1>
 
-      <h2>All Items</h2>
-      <div className="media-list" style={{ overflowX: "scroll", whiteSpace: "nowrap" }}>
-        {items.map((item) => (
-          <div
-            key={item.Id}
-            className="media-item"
-            onClick={() => { setSelectedItem(item); printItem(item); }}
-            style={{ display: "inline-block", marginRight: "10px" }}
-          >
-            <img
-              src={`${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`}
-              alt={item.Name}
-              width={150}
-            />
-            <h5>{item.Name}</h5>
+          <h2>All Items</h2>
+          <div className="media-list" style={{ overflowX: "scroll", whiteSpace: "nowrap" }}>
+            {items.map((item) => (
+              <div
+                key={item.Id}
+                className="media-item"
+                onClick={() => { setSelectedItem(item); printItem(item); } }
+                style={{ display: "inline-block", marginRight: "10px" }}
+              >
+                <img
+                  src={`${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`}
+                  alt={item.Name}
+                  width={150} />
+                <h5>{item.Name}</h5>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <h2>Movies</h2>
-      <div className="media-list" style={{ overflowX: "scroll", whiteSpace: "nowrap" }}>
-        {movies.map((item) => (
-          <div
-            className="media-item"
-            key={item.Id}
-            onClick={() => handleSelectItem(item)}
-            style={{ display: "inline-block", marginRight: "10px", cursor: "pointer" }}
-          >
-            <img
-              src={`${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`}
-              alt={item.Name}
-              width={150}
-            />
-            <h5>{item.Name}</h5>
+          <h2>Movies</h2>
+          <div className="media-list" style={{ overflowX: "scroll", whiteSpace: "nowrap" }}>
+            {movies.map((item) => (
+              <div
+                className="media-item"
+                key={item.Id}
+                onClick={() => handleSelectItem(item)}
+                style={{ display: "inline-block", marginRight: "10px", cursor: "pointer" }}
+              >
+                <img
+                  src={`${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`}
+                  alt={item.Name}
+                  width={150} />
+                <h5>{item.Name}</h5>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <h2>Shows</h2>
-      <div className="media-list" style={{ overflowX: "scroll", whiteSpace: "nowrap" }}>
-        {shows.map((item) => (
-          <div
-            className="media-item"
-            key={item.Id}
-            onClick={() => handleSelectItem(item)}
-            style={{ display: "inline-block", marginRight: "10px", cursor: "pointer" }}
-          >
-            <img
-              src={`${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`}
-              alt={item.Name}
-              width={150}
-            />
-            <h5>{item.Name}</h5>
+          <h2>Shows</h2>
+          <div className="media-list" style={{ overflowX: "scroll", whiteSpace: "nowrap" }}>
+            {shows.map((item) => (
+              <div
+                className="media-item"
+                key={item.Id}
+                onClick={() => handleSelectItem(item)}
+                style={{ display: "inline-block", marginRight: "10px", cursor: "pointer" }}
+              >
+                <img
+                  src={`${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`}
+                  alt={item.Name}
+                  width={150} />
+                <h5>{item.Name}</h5>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Video Player Section */}
-      {selectedItem && (
-        <div className="video-player">
-          <h2 style={{ color: "white", fontSize: "16px" }}>Now Playing: {selectedItem.Name}</h2>
-          <video
-            controls
-            src={`${API_URL}/Videos/${selectedItem.Id}/stream?api_key=${ACCESS_TOKEN}`}
-            onTimeUpdate={(e) => setCurrentTime(e.target.currentTime)}
-            onLoadedMetadata={(e) => setDuration(e.target.duration)}
-          >
-            Your browser does not support the video tag.
-          </video>
-          <button onClick={() => setSelectedItem(null)}>Close</button>
-        </div>
-      )}
-    </div>
+          {/* Video Player Section */}
+          {selectedItem && (
+            <div className="video-player">
+              <h2 style={{ color: "white", fontSize: "16px" }}>Now Playing: {selectedItem.Name}</h2>
+              <video
+                controls
+                src={`${API_URL}/Videos/${selectedItem.Id}/stream?api_key=${ACCESS_TOKEN}`}
+                onTimeUpdate={(e) => setCurrentTime(e.target.currentTime)}
+                onLoadedMetadata={(e) => setDuration(e.target.duration)}
+              >
+                Your browser does not support the video tag.
+              </video>
+              <button onClick={() => setSelectedItem(null)}>Close</button>
+            </div>
+          )}
+        </div></>
   );
+  }
 return (
     <View style={styles.container}>
       <Text style={styles.title}>Home</Text>
     </View>
   )
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -167,7 +165,5 @@ const webStyles={
     color: 'purple',
   },
 }
-};
 
 export default HomePage;
-
