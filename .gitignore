@@ -1,2 +1,4 @@
 node_modules
 backend/config.env
+*.json
+.vercel

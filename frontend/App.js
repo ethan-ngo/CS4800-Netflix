@@ -2,60 +2,33 @@ import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View, Platform, ScrollView } from 'react-native'
 import DisplayDB from './pages/DisplayDB'
 import LoginPage from './pages/LoginPage'
-import ForgotPassword from './pages/ForgotPassword'
-import { SafeAreaView } from 'react-native-web'
+import SignUpPage from './pages/signUpPage'
+import HomePage from './pages/HomePage'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import MediaDetails from './pages/mediaDetails'
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.container}>
-      <ForgotPassword/>
-    </SafeAreaView>
-   /* <View style={styles.container}>
-      {Platform.OS === 'web' ? (
-        <ScrollView>
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '20px' }}>
-            <div style={{ maxWidth: '20%' }}>
-              <DisplayDB collectionName="users" fields={['name', 'email', 'password']} />
-            </div>
-            <div style={{ maxWidth: '20%' }}>
-              <DisplayDB
-                collectionName="userMovieInfo"
-                fields={['userID', 'movieID', 'numWatched', 'timeStamp', 'userMovieRating']}
-              />
-            </div>
-            <div style={{ maxWidth: '20%' }}>
-              <DisplayDB
-                collectionName="actors"
-                fields={['actor_name', 'DOB', 'movies_appeared']}
-              />
-            </div>
-            <div style={{ maxWidth: '20%' }}>
-              <DisplayDB
-                collectionName="directors"
-                fields={['director_name', 'DOB', 'movies_directed']}
-              />
-            </div>
-            <div style={{ maxWidth: '20%' }}>
-              <DisplayDB
-                collectionName="movies"
-                fields={[
-                  'title',
-                  'overall_rating',
-                  'genres',
-                  'movie_length',
-                  'actors',
-                  'directors',
-                ]}
-              />
-            </div>
-          </div>
-        </ScrollView>
-      ) : (
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <DisplayDB collectionName="users" fields={['name', 'email', 'password']} />
-        </ScrollView>
-      )}
-    </View>*/
+    <Router>
+      <div style={styles.container}>
+        {Platform.OS === 'web' ? (
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/signUp" element={<SignUpPage/>} />
+            <Route path="/login" element={<LoginPage/>} />
+            <Route path="/media/:id" element={<MediaDetails />} />
+          </Routes>
+        ) : (
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/signUp" element={<signUpPage/>} />
+            <Route path="/login" element={<LoginPage/>} />
+          </Routes>
+        )}
+      </div>
+    </Router>
   )
 }
 

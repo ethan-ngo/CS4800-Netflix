@@ -9,6 +9,12 @@ import { ObjectId } from 'mongodb'
 import crypto from 'crypto';
 import nodemailer from 'nodemailer'
 
+// This will help us hash the password
+import bcrypt from 'bcrypt'
+
+// This will help us generate a new token
+import jwt from 'jsonwebtoken'
+
 // router is an instance of the express router.
 // We use it to define our routes.
 // The router will be added as a middleware and will take control of requests starting with path /users.
@@ -32,20 +38,59 @@ router.get('/:id', async (req, res) => {
 })
 
 // This section will help you create a new user.
-router.post('/', async (req, res) => {
+router.post('/', (req, res) => {
+  const saltRounds = 10
+  bcrypt
+    .hash(req.body.password, saltRounds)
+    .then((hashedPassword) => {
+      console.log('Hashed password:', hashedPassword)
+
+      let newUser = {
+        name: req.body.name,
+        email: req.body.email,
+        password: hashedPassword,
+        profilePic: null,
+      }
+
+      db.collection('users')
+        .insertOne(newUser)
+        .then((result) => {
+          console.log('User created:', newUser)
+          res.status(201).send(result)
+        })
+        .catch((err) => {
+          console.error('Error adding newUser:', err)
+          res.status(500).send('Error adding newUser')
+        })
+    })
+    .catch((err) => {
+      console.error('Error hashing password:', err)
+      res.status(500).send('Error hashing password')
+    })
+})
+
+// This section is for logging in
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body
+  console.log('Login attempt:', `Email: ${email}, Password: ${password}`)
   try {
-    let newUser = {
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      profilePic: null,
+    const user = await db.collection('users').findOne({ email })
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
     }
-    let collection = await db.collection('users')
-    let result = await collection.insertOne(newUser)
-    res.send(result).status(204)
-  } catch (err) {
-    console.error(err)
-    res.status(500).send('Error adding newUser')
+
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+
+    if (isPasswordValid) {
+      const token = jwt.sign({ userId: user._id, email: user.email }, 'token')
+      res.status(200).json({ message: 'Login successful', token, user: { email: user.email } })
+    } else {
+      res.status(401).json({ message: 'Invalid password' })
+    }
+  } catch (error) {
+    console.error('Error during login:', error)
+    res.status(500).json({ message: 'Internal server error' })
   }
 })
 
@@ -58,7 +103,7 @@ router.patch('/:id', async (req, res) => {
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
-        profilePic: req.body.profilePic
+        profilePic: req.body.profilePic,
       },
     }
 
@@ -66,7 +111,7 @@ router.patch('/:id', async (req, res) => {
     let result = await collection.updateOne(query, updates)
     res.send(result).status(200)
   } catch (err) {
-    console.error(err)
+    console.error('Error adding newUser:', err)
     res.status(500).send('Error updating users')
   }
 })
