@@ -6,6 +6,8 @@ import { validateEmail } from '../utils/validateEmail'
 const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isHoveringLogin, setIsHoveringLogin] = useState(false)
+  const [isHoveringSignUp, setIsHoveringSignUp] = useState(false)
   const navigate = useNavigate()
 
   const handleLogin = async () => {
@@ -37,7 +39,7 @@ const LoginPage = () => {
   }
 
   const handleSignUp = () => {
-    Alert.alert('Sign Up Attempt', `Email: ${email}\nPassword: ${password}`)
+    navigate('/signUp')
   }
 
   if (Platform.OS === 'web') {
@@ -68,11 +70,23 @@ const LoginPage = () => {
           <div style={{ width: '100%', textAlign: 'right' }}>
             <a href="https://www.google.com">Forgot Password?</a>
           </div>
-          <button onClick={handleLogin} style={webStyles.LoginButton}>
-            Login
+          <button 
+            onClick={handleLogin} 
+            style={{
+              ...webStyles.LoginButton,
+              backgroundColor: isHoveringLogin ? '#0056b3' : '#007BFF',
+            }}
+            onMouseEnter={() => setIsHoveringLogin(true)}
+            onMouseLeave={() => setIsHoveringLogin(false)}>
+              Login
           </button>
           <p>Don't have an account yet? Sign up!</p>
-          <button onClick={handleSignUp} style={webStyles.SignUpButton}>
+          <button onClick={handleSignUp} style={{
+              ...webStyles.SignUpButton,
+              backgroundColor: isHoveringSignUp ? '#00006b' : '#00008B',
+            }}
+            onMouseEnter={() => setIsHoveringSignUp(true)}
+            onMouseLeave={() => setIsHoveringSignUp(false)}>
             Sign Up
           </button>
         </div>
