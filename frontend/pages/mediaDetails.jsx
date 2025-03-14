@@ -33,7 +33,7 @@ const MediaDetails = () => {
 
       <div style={styles.detailsContainer}>
         <img
-          src={`${API_URL}/Items/${media.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`}
+          src={`${API_URL}/Items/${media.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`.replace(/([^:]\/)\/+/g, "$1`")}
           alt={media.Name}
           style={styles.poster}
         />
