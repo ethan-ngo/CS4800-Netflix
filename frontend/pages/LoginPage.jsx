@@ -68,7 +68,12 @@ const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           <div style={{ width: '100%', textAlign: 'right' }}>
-            <a style={{color: 'blue', textDecoration: 'underline'}} onClick={() => navigate('/forgot')}>Forgot Password?</a>
+            <a
+              style={{ color: 'blue', textDecoration: 'underline' }}
+              onClick={() => navigate('/forgot')}
+            >
+              Forgot Password?
+            </a>
           </div>
           <button
             onClick={handleLogin}

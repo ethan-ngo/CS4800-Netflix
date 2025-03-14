@@ -19,15 +19,15 @@ export default function App() {
             <Route path="/signUp" element={<SignUpPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/media/:id" element={<MediaDetails />} />
-            <Route path="/forgot" element={<ForgotPassword/>} />
+            <Route path="/forgot" element={<ForgotPassword />} />
           </Routes>
         ) : (
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/home" element={<HomePage />} />
-            <Route path="/signUp" element={<signUpPage/>} />
-            <Route path="/login" element={<LoginPage/>} />
-            <Route path="/forgot" element={<ForgotPassword/>} />
+            <Route path="/signUp" element={<signUpPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot" element={<ForgotPassword />} />
           </Routes>
         )}
       </div>

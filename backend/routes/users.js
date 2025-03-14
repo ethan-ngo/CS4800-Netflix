@@ -6,7 +6,7 @@ import db from '../db/connection.js'
 // This help convert the id from string to ObjectId for the _id.
 import { ObjectId } from 'mongodb'
 
-import crypto from 'crypto';
+import crypto from 'crypto'
 import nodemailer from 'nodemailer'
 
 // This will help us hash the password
@@ -116,17 +116,16 @@ router.patch('/:id', async (req, res) => {
   }
 })
 
-router.post('/validate-token', async(req, res) => {
+router.post('/validate-token', async (req, res) => {
   try {
     let collection = await db.collection('users')
-    let user = await collection.findOne({email: req.body.email})
-    if(user.token === req.body.token && user.expireDate > Date.now()){
-      res.status(200).send('Token is valid');
-    }
-    else{
+    let user = await collection.findOne({ email: req.body.email })
+    if (user.token === req.body.token && user.expireDate > Date.now()) {
+      res.status(200).send('Token is valid')
+    } else {
       res.status(400).send('Invalid or expired token')
     }
-  } catch(error) {
+  } catch (error) {
     console.log(error)
     res.status(500).send('Error validating token')
   }
@@ -135,29 +134,29 @@ router.post('/validate-token', async(req, res) => {
 // store it and an expiration in the user databse
 router.patch('/send-email/:email', async (req, res) => {
   try {
-    const resetToken = crypto.randomBytes(20).toString('hex');
-    const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
+    const resetToken = crypto.randomBytes(20).toString('hex')
+    const resetTokenExpiry = Date.now() + 3600000 // 1 hour from now
 
-    const query = {email: req.params.email}
+    const query = { email: req.params.email }
     const updates = {
       $set: {
         token: resetToken,
         expireDate: resetTokenExpiry,
-      }
+      },
     }
 
     let collection = await db.collection('users')
     let result = await collection.findOneAndUpdate(query, updates)
     res.send(result).status(200)
-    
+
     var transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: 'domainfilms4800@gmail.com',
-        pass: process.env.EMAIL_PW
-      }
-    });
-    
+        pass: process.env.EMAIL_PW,
+      },
+    })
+
     var mailOptions = {
       from: 'domainfilms4800@gmail.com',
       to: req.params.email,
@@ -174,19 +173,19 @@ router.patch('/send-email/:email', async (req, res) => {
           <p>The Nameless Team</p>
         </div>
       `,
-    };
-    
-    transporter.sendMail(mailOptions, function(error, info){
+    }
+
+    transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
-        console.log(error);
+        console.log(error)
       } else {
-        console.log('Email sent: ' + info.response);
+        console.log('Email sent: ' + info.response)
       }
-    });
+    })
   } catch (err) {
     console.error(err)
     res.status(500).send('Error sending email')
-  } 
+  }
 })
 
 // This section will help you delete a user
