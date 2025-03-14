@@ -10,6 +10,7 @@ const SignUpPage = () => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [response, setResponse] = useState(null)
+  const navigate = useNavigate()
 
   // validations and confirmation for sign-up
   const handleSignUp = async () => {
@@ -75,6 +76,8 @@ const SignUpPage = () => {
       const data = await res.json()
       setResponse(data)
       console.log('New user with username: ' + name + ' and email: ' + email + ' has been created')
+      navigate('/login')
+
     } catch (error) {
       console.error('Error:', error)
       setResponse({ error: 'Failed to submit data' })
