@@ -70,23 +70,27 @@ const LoginPage = () => {
           <div style={{ width: '100%', textAlign: 'right' }}>
             <a style={{color: 'blue', textDecoration: 'underline'}} onClick={() => navigate('/forgot')}>Forgot Password?</a>
           </div>
-          <button 
-            onClick={handleLogin} 
+          <button
+            onClick={handleLogin}
             style={{
               ...webStyles.LoginButton,
               backgroundColor: isHoveringLogin ? '#0056b3' : '#007BFF',
             }}
             onMouseEnter={() => setIsHoveringLogin(true)}
-            onMouseLeave={() => setIsHoveringLogin(false)}>
-              Login
+            onMouseLeave={() => setIsHoveringLogin(false)}
+          >
+            Login
           </button>
           <p>Don't have an account yet? Sign up!</p>
-          <button onClick={handleSignUp} style={{
+          <button
+            onClick={handleSignUp}
+            style={{
               ...webStyles.SignUpButton,
               backgroundColor: isHoveringSignUp ? '#00006b' : '#00008B',
             }}
             onMouseEnter={() => setIsHoveringSignUp(true)}
-            onMouseLeave={() => setIsHoveringSignUp(false)}>
+            onMouseLeave={() => setIsHoveringSignUp(false)}
+          >
             Sign Up
           </button>
         </div>
