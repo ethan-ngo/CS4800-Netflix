@@ -3,7 +3,6 @@ import { View, Text, TextInput, Button, Alert, StyleSheet, Platform } from 'reac
 import { useNavigate, Link } from 'react-router-dom'
 import { validateEmail } from '../utils/validateEmail'
 
-
 const SignUpPage = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
