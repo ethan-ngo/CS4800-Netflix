@@ -1,19 +1,18 @@
-const API_URL = process.env.REACT_APP_API_URL; 
-const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN; 
+const API_URL = process.env.REACT_APP_API_URL?.replace(/\/$/, "");
+const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN;
 
 export const getItems = async () => {
-  const response = await fetch(`${API_URL}/Items?Recursive=true`, {
-    headers: {
-      'X-Emby-Token': ACCESS_TOKEN,
-    },
+  const response = await fetch(`${API_URL}/Items?Recursive=true`.replace(/([^:]\/)\/+/g, "$1"), {
+    headers: { 'X-Emby-Token': ACCESS_TOKEN },
   });
+
   const data = await response.json();
-  return data.Items; 
+  return data.Items;
 };
 
-export const getMovies = async () =>{
+export const getMovies = async () => {
   const response = await fetch(`${API_URL}/Items?Recursive=true&IncludeItemTypes=Movie`, {
-    headers:{
+    headers: {
       'X-Emby-Token': ACCESS_TOKEN,
     },
   });
@@ -22,9 +21,9 @@ export const getMovies = async () =>{
   return data.Items;
 }
 
-export const getShows = async () =>{
+export const getShows = async () => {
   const response = await fetch(`${API_URL}/Items?Recursive=true&IncludeItemTypes=Series`, {
-    headers:{
+    headers: {
       'X-Emby-Token': ACCESS_TOKEN,
     },
   });
