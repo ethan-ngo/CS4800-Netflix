@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View, Platform, ScrollView } from 'react-native'
-import DisplayDB from './pages/DisplayDB'
 import LoginPage from './pages/LoginPage'
 import SignUpPage from './pages/signUpPage'
 import HomePage from './pages/HomePage'
