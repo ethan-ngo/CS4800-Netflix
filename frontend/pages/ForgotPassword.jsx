@@ -12,7 +12,7 @@ function ForgotPassword() {
   const handleEmailSubmit = async (e) => {
 	e.preventDefault();
 	try {
-		const res = await fetch(`https://cs4800netflix.vercel.app/users`)
+		const res = await fetch(process.env.APP_URL + 'users')
 		const users = await res.json()
 		const usersWithMatchingEmail = users.filter((user) => user.email === email)
 		if(usersWithMatchingEmail.length === 0){
@@ -26,7 +26,7 @@ function ForgotPassword() {
 	}
 	if (submitted) {
 		try{
-			const response = await fetch('https://cs4800netflix.vercel.app/users/send-email/' + email, {
+			const response = await fetch(process.env.APP_URL + 'users/send-email/' + email, {
 				method: 'PATCH',
 				headers: {
 					'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ function ForgotPassword() {
   const handleTokenSubmit = async (e) => {
 	e.preventDefault();
 	try{
-		const response = await fetch('https://cs4800netflix.vercel.app/users/validate-token/', {
+		const response = await fetch(process.env.APP_URL + 'users/validate-token/', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
