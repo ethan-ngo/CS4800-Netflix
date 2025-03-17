@@ -45,8 +45,8 @@ const LoginPage = () => {
   if (Platform.OS === 'web') {
     return (
       <div style={webStyles.container}>
-        <h1 style={webStyles.title}>Login</h1>
         <div style={webStyles.form}>
+          <h1 style={webStyles.title}>Login</h1>
           <input
             style={webStyles.input}
             placeholder="Email"
@@ -131,6 +131,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    borderWidth: '2px',
+    borderColor: 'black',
+    borderStyle: 'solid',
   },
   title: {
     fontSize: 24,
@@ -170,6 +173,10 @@ const webStyles = {
     flexDirection: 'column',
     alignItems: 'center',
     gap: '10px',
+    border: '1px solid #ccc',
+    borderRadius: '10px',
+    padding: 30,
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
   },
   input: {
     width: 250,

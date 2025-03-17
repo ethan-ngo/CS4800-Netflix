@@ -76,7 +76,6 @@ const SignUpPage = () => {
       setResponse(data)
       console.log('New user with username: ' + name + ' and email: ' + email + ' has been created')
       navigate('/login')
-
     } catch (error) {
       console.error('Error:', error)
       setResponse({ error: 'Failed to submit data' })
@@ -211,9 +210,10 @@ const webStyles = {
   },
   formContainer: {
     border: '1px solid #ccc',
-    padding: 20,
+    padding: 30,
     borderRadius: 5,
     marginBottom: 20,
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
   },
   input: {
     width: '100%',
