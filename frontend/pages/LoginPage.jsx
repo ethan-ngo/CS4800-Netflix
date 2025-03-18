@@ -12,11 +12,12 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
-
+    console.log(process.env.APP_URL);
+    
     // Check if login credentials exist in db with "login"
     try {
       //const res = await fetch(`http://localhost:5050/users/login`, {
-      const res = await fetch(`https://cs4800netflix.vercel.app/users/login`, {
+      const res = await fetch(process.env.APP_URL + 'users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,8 +46,8 @@ const LoginPage = () => {
   if (Platform.OS === 'web') {
     return (
       <div style={webStyles.container}>
-        <h1 style={webStyles.title}>Login</h1>
         <div style={webStyles.form}>
+          <h1 style={webStyles.title}>Login</h1>
           <input
             style={webStyles.input}
             placeholder="Email"
@@ -68,25 +69,34 @@ const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
           <div style={{ width: '100%', textAlign: 'right' }}>
-            <a href="https://www.google.com">Forgot Password?</a>
+            <a
+              style={{ color: 'blue', textDecoration: 'underline' }}
+              onClick={() => navigate('/forgot')}
+            >
+              Forgot Password?
+            </a>
           </div>
-          <button 
-            onClick={handleLogin} 
+          <button
+            onClick={handleLogin}
             style={{
               ...webStyles.LoginButton,
               backgroundColor: isHoveringLogin ? '#0056b3' : '#007BFF',
             }}
             onMouseEnter={() => setIsHoveringLogin(true)}
-            onMouseLeave={() => setIsHoveringLogin(false)}>
-              Login
+            onMouseLeave={() => setIsHoveringLogin(false)}
+          >
+            Login
           </button>
           <p>Don't have an account yet? Sign up!</p>
-          <button onClick={handleSignUp} style={{
+          <button
+            onClick={handleSignUp}
+            style={{
               ...webStyles.SignUpButton,
               backgroundColor: isHoveringSignUp ? '#00006b' : '#00008B',
             }}
             onMouseEnter={() => setIsHoveringSignUp(true)}
-            onMouseLeave={() => setIsHoveringSignUp(false)}>
+            onMouseLeave={() => setIsHoveringSignUp(false)}
+          >
             Sign Up
           </button>
         </div>
@@ -122,6 +132,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    borderWidth: '2px',
+    borderColor: 'black',
+    borderStyle: 'solid',
   },
   title: {
     fontSize: 24,
@@ -161,6 +174,10 @@ const webStyles = {
     flexDirection: 'column',
     alignItems: 'center',
     gap: '10px',
+    border: '1px solid #ccc',
+    borderRadius: '10px',
+    padding: 30,
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
   },
   input: {
     width: 250,

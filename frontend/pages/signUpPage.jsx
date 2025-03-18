@@ -3,13 +3,13 @@ import { View, Text, TextInput, Button, Alert, StyleSheet, Platform } from 'reac
 import { useNavigate, Link } from 'react-router-dom'
 import { validateEmail } from '../utils/validateEmail'
 
-
 const SignUpPage = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [response, setResponse] = useState(null)
+  const navigate = useNavigate()
 
   // validations and confirmation for sign-up
   const handleSignUp = async () => {
@@ -34,7 +34,7 @@ const SignUpPage = () => {
 
     // check if email is already in use
     try {
-      const res = await fetch(`https://cs4800netflix.vercel.app/users?email=${email}`)
+      const res = await fetch(process.env.APP_URL+ 'users?email=${email}')
       //const res = await fetch(`http://localhost:5050/users?email=${email}`)
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
 
@@ -58,7 +58,7 @@ const SignUpPage = () => {
     // if the email is not in use, create a new user
     try {
       //const res = await fetch(`http://localhost:5050/users`, {
-      const res = await fetch(`https://cs4800netflix.vercel.app/users`, {
+      const res = await fetch(process.env.APP_URL+ 'users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,6 +75,7 @@ const SignUpPage = () => {
       const data = await res.json()
       setResponse(data)
       console.log('New user with username: ' + name + ' and email: ' + email + ' has been created')
+      navigate('/login')
     } catch (error) {
       console.error('Error:', error)
       setResponse({ error: 'Failed to submit data' })
@@ -209,9 +210,10 @@ const webStyles = {
   },
   formContainer: {
     border: '1px solid #ccc',
-    padding: 20,
+    padding: 30,
     borderRadius: 5,
     marginBottom: 20,
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
   },
   input: {
     width: '100%',

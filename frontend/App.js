@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, View, Platform, ScrollView } from 'react-native'
-import DisplayDB from './pages/DisplayDB'
 import LoginPage from './pages/LoginPage'
 import SignUpPage from './pages/signUpPage'
 import HomePage from './pages/HomePage'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import MediaDetails from './pages/mediaDetails'
+import ForgotPassword from './pages/ForgotPassword'
 
 export default function App() {
   return (
@@ -15,16 +15,18 @@ export default function App() {
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/home" element={<HomePage />} />
-            <Route path="/signUp" element={<SignUpPage/>} />
-            <Route path="/login" element={<LoginPage/>} />
+            <Route path="/signUp" element={<SignUpPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/media/:id" element={<MediaDetails />} />
+            <Route path="/forgot" element={<ForgotPassword />} />
           </Routes>
         ) : (
           <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route path="/home" element={<HomePage />} />
-            <Route path="/signUp" element={<signUpPage/>} />
-            <Route path="/login" element={<LoginPage/>} />
+            <Route path="/signUp" element={<signUpPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot" element={<ForgotPassword />} />
           </Routes>
         )}
       </div>
