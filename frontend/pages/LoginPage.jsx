@@ -14,7 +14,7 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
-
+    console.log(process.env.APP_URL);
     // Check if login credentials exist in db with "login"
     try {
       //const res = await fetch(`http://localhost:5050/users/login`, {
