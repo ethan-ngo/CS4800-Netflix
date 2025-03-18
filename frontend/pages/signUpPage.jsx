@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { View, Text, TextInput, Button, Alert, StyleSheet, Platform } from 'react-native'
 import { useNavigate, Link } from 'react-router-dom'
 import { validateEmail } from '../utils/validateEmail'
+import '../globals.css'
 
 const SignUpPage = () => {
   const [name, setName] = useState('')
@@ -10,6 +11,8 @@ const SignUpPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [response, setResponse] = useState(null)
   const navigate = useNavigate()
+  const [isHoveringLink, setIsHoveringLink] = useState(false)
+  const [isHoveringSignUp, setIsHoveringSignup] = useState(false)
 
   // validations and confirmation for sign-up
   const handleSignUp = async () => {
@@ -34,7 +37,7 @@ const SignUpPage = () => {
 
     // check if email is already in use
     try {
-      const res = await fetch(process.env.APP_URL+ 'users?email=${email}')
+      const res = await fetch(process.env.APP_URL + 'users?email=${email}')
       //const res = await fetch(`http://localhost:5050/users?email=${email}`)
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
 
@@ -58,7 +61,7 @@ const SignUpPage = () => {
     // if the email is not in use, create a new user
     try {
       //const res = await fetch(`http://localhost:5050/users`, {
-      const res = await fetch(process.env.APP_URL+ 'users', {
+      const res = await fetch(process.env.APP_URL + 'users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +97,19 @@ const SignUpPage = () => {
     return (
       <div style={webStyles.container}>
         <div style={webStyles.formContainer}>
-          <h1 style={webStyles.title}>Sign-up</h1>
+          <h1 style={webStyles.title}>Sign-up to DomainFilms</h1>
+          {/* <img src="path/to/your/image.jpg" alt="Profile" style={webStyles.profilePic} />
+          <div style={webStyles.uploadContainer}>
+            <label htmlFor="profilePicUpload" style={webStyles.uploadLabel}>
+              Upload Image
+            </label>
+            <input
+              id="profilePicUpload"
+              type="file"
+              accept="image/*"
+              style={webStyles.uploadInput}
+            />
+          </div> */}
           <input
             style={webStyles.input}
             placeholder="Name"
@@ -128,11 +143,29 @@ const SignUpPage = () => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-          <button style={webStyles.button} onClick={handleSignUp}>
+          <button
+            onClick={handleSignUp}
+            style={{
+              ...webStyles.button,
+              backgroundColor: isHoveringSignUp
+                ? 'var(--dark-primary-color)'
+                : 'var(--primary-color)',
+            }}
+            onMouseEnter={() => setIsHoveringSignup(true)}
+            onMouseLeave={() => setIsHoveringSignup(false)}
+          >
             Sign Up
           </button>
           <p>
-            Already have an account? <Link to="/Login"> Sign in</Link>
+            <span>Already have an account? </span>
+            <a
+              style={{ ...webStyles.link, textDecoration: isHoveringLink ? 'underline' : 'none' }}
+              onMouseEnter={() => setIsHoveringLink(true)}
+              onMouseLeave={() => setIsHoveringLink(false)}
+              onClick={() => navigate('/login')}
+            >
+              Log in
+            </a>
           </p>
         </div>
       </div>
@@ -193,42 +226,78 @@ const styles = StyleSheet.create({
 
 const webStyles = {
   container: {
+    display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'absolute',
-    left: '50%',
-    top: '50%',
-    transform: 'translate(-50%, -50%)',
-    maxWidth: '100%',
-    margin: '0 auto',
+    height: '100vh',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
   },
+  profilePic: {
+    width: 100,
+    height: 100,
+    borderRadius: '100%',
+    objectFit: 'cover',
+    margin: 20,
+    border: '1px solid #ccc',
+  },
+  uploadContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: '10px',
+  },
+  uploadLabel: {
+    cursor: 'pointer',
+    padding: '8px 16px',
+    backgroundColor: 'var(--primary-color)',
+    color: 'var(--text-color)',
+    display: 'inline-block',
+    fontSize: '14px',
+    borderRadius: 50,
+  },
+  uploadInput: {
+    display: 'none',
+  },
   formContainer: {
     border: '1px solid #ccc',
     padding: 30,
-    borderRadius: 5,
+    borderRadius: 10,
     marginBottom: 20,
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    maxWidth: '400px',
+    alignItems: 'center',
   },
   input: {
-    width: '100%',
+    fontSize: 12,
+    width: '75%',
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom: 10,
     paddingLeft: 8,
+    margin: 10,
   },
   button: {
     padding: 10,
-    backgroundColor: '#007BFF',
-    color: 'white',
+    margin: 10,
+    backgroundColor: 'var(--primary-color)',
+    color: 'var(--text-color)',
     border: 'none',
     borderRadius: 5,
+    cursor: 'pointer',
+    width: '75%',
+    fontSize: '16px',
+  },
+  link: {
+    color: 'blue',
     cursor: 'pointer',
   },
 }
