@@ -2,18 +2,19 @@ import React, { useState } from 'react'
 import { View, Text, TextInput, Button, StyleSheet, Platform, Alert } from 'react-native'
 import { useNavigate } from 'react-router-dom'
 import { validateEmail } from '../utils/validateEmail'
+import '../globals.css'
 
 const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isHoveringLogin, setIsHoveringLogin] = useState(false)
-  const [isHoveringSignUp, setIsHoveringSignUp] = useState(false)
+  const [isHoveringForgotPassword, setIsHoveringForgotPassword] = useState(false)
+  const [isHoveringSignUpLink, setIsHoveringSignUpLink] = useState(false)
   const navigate = useNavigate()
 
   const handleLogin = async () => {
     console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
     console.log(process.env.APP_URL);
-    
     // Check if login credentials exist in db with "login"
     try {
       //const res = await fetch(`http://localhost:5050/users/login`, {
@@ -39,15 +40,11 @@ const LoginPage = () => {
     }
   }
 
-  const handleSignUp = () => {
-    navigate('/signUp')
-  }
-
   if (Platform.OS === 'web') {
     return (
       <div style={webStyles.container}>
         <div style={webStyles.form}>
-          <h1 style={webStyles.title}>Login</h1>
+          <h1 style={webStyles.title}>Login to DomainFilms</h1>
           <input
             style={webStyles.input}
             placeholder="Email"
@@ -60,7 +57,6 @@ const LoginPage = () => {
               }
             }}
           />
-          <br />
           <input
             style={webStyles.input}
             placeholder="Password"
@@ -68,9 +64,14 @@ const LoginPage = () => {
             value={password || ''}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <div style={{ width: '100%', textAlign: 'right' }}>
+          <div style={{ width: '75%', textAlign: 'right' }}>
             <a
-              style={{ color: 'blue', textDecoration: 'underline' }}
+              style={{
+                ...webStyles.link,
+                textDecoration: isHoveringForgotPassword ? 'underline' : 'none',
+              }}
+              onMouseEnter={() => setIsHoveringForgotPassword(true)}
+              onMouseLeave={() => setIsHoveringForgotPassword(false)}
               onClick={() => navigate('/forgot')}
             >
               Forgot Password?
@@ -80,25 +81,29 @@ const LoginPage = () => {
             onClick={handleLogin}
             style={{
               ...webStyles.LoginButton,
-              backgroundColor: isHoveringLogin ? '#0056b3' : '#007BFF',
+              backgroundColor: isHoveringLogin
+                ? 'var(--dark-primary-color)'
+                : 'var(--primary-color)',
             }}
             onMouseEnter={() => setIsHoveringLogin(true)}
             onMouseLeave={() => setIsHoveringLogin(false)}
           >
             Login
           </button>
-          <p>Don't have an account yet? Sign up!</p>
-          <button
-            onClick={handleSignUp}
-            style={{
-              ...webStyles.SignUpButton,
-              backgroundColor: isHoveringSignUp ? '#00006b' : '#00008B',
-            }}
-            onMouseEnter={() => setIsHoveringSignUp(true)}
-            onMouseLeave={() => setIsHoveringSignUp(false)}
-          >
-            Sign Up
-          </button>
+          <p>
+            <span>Don't have an account yet? </span>
+            <a
+              style={{
+                ...webStyles.link,
+                textDecoration: isHoveringSignUpLink ? 'underline' : 'none',
+              }}
+              onMouseEnter={() => setIsHoveringSignUpLink(true)}
+              onMouseLeave={() => setIsHoveringSignUpLink(false)}
+              onClick={() => navigate('/signUp')}
+            >
+              Sign up!
+            </a>
+          </p>
         </div>
       </div>
     )
@@ -154,6 +159,7 @@ const styles = StyleSheet.create({
 const webStyles = {
   link: {
     justifyContent: 'right',
+    color: 'blue',
     cursor: 'pointer',
   },
   container: {
@@ -167,7 +173,7 @@ const webStyles = {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    margin: 20,
   },
   form: {
     display: 'flex',
@@ -178,36 +184,27 @@ const webStyles = {
     borderRadius: '10px',
     padding: 30,
     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    width: '100%',
+    maxWidth: '400px',
   },
   input: {
-    width: 250,
+    width: '75%',
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 10,
+    margin: 10,
     paddingLeft: 8,
   },
   LoginButton: {
     padding: 10,
-    backgroundColor: '#007BFF',
-    color: 'white',
+    color: 'var(--text-color)',
+    backgroundColor: 'var(--primary-color)',
     border: 'none',
-    height: 40,
-    width: 200,
+    height: '40',
+    width: '75%',
     borderRadius: 5,
-    marginLeft: '100',
     cursor: 'pointer',
-  },
-  SignUpButton: {
-    padding: 10,
-    backgroundColor: '#00008B',
-    color: 'white',
-    border: 'none',
-    height: 40,
-    width: 200,
-    borderRadius: 5,
-    marginLeft: '100',
-    cursor: 'pointer',
+    fontSize: '16px',
   },
 }
 
