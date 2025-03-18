@@ -34,7 +34,7 @@ const HomePage = () => {
 
   return (
     <div style={styles.container}>
-      <h1 style = {styles.title}>DomainFilms</h1>
+      <h1 style={styles.title}>DomainFilms</h1>
       <h2>All Items</h2>
       <div style={styles.mediaList}>
         {items.map((item) => (
@@ -130,13 +130,18 @@ const styles = {
   },
   mediaList: {
     display: "flex",
+    flexwrap: "nowrap",
     overflowX: "auto",
     whiteSpace: "nowrap",
     padding: "10px",
     gap: "10px",
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
   },
   mediaItem: {
     display: "flex",
+    display: "inline-block",
+    minWidth: "150px",
     flexDirection: "column",
     alignItems: "center",
     padding: "10px",
@@ -148,6 +153,7 @@ const styles = {
     overflow: "hidden",
     whiteSpace: "nowrap",
     cursor: "pointer",
+    border: "none",
   },
   videoPlayer: {
     position: "fixed",
