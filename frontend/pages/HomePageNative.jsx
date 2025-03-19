@@ -71,7 +71,6 @@ const HomePageNative = ({ navigation }) => {
     <View style={styles.container}>
       {/* Navbar */}
       <View style={styles.navBar}>
-        <Text style={styles.logo}>DomainFilms</Text>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>

@@ -12,6 +12,7 @@ import ForgotPasswordNative from './pages/ForgotPasswordNative'
 import HomePageNative from './pages/HomePageNative'
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import ResetPasswordNative from './pages/ResetPasswordNative'
 import Header from './components/Header';
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <View style={{ flex: 1 }}>
+        <Header/>
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
@@ -27,9 +29,10 @@ export default function App() {
           }}
         >
           <Stack.Screen name="Login" component={LoginPageNative} />
+          <Stack.Screen name="ResetPassword" component={ResetPasswordNative} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordNative} />
           <Stack.Screen name="Home" component={HomePageNative} />
           <Stack.Screen name="SignUp" component={SignUpPageNative} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPasswordNative} />
         </Stack.Navigator>
       </View>
     </NavigationContainer>

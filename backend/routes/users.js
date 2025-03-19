@@ -98,11 +98,16 @@ router.post('/login', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) }
+    const saltRounds = 10
+    bcrypt
+    .hash(req.body.password, saltRounds)
+    .then((hashedPassword));
+
     const updates = {
       $set: {
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password,
+        password: hashedPassword,
         profilePic: req.body.profilePic,
       },
     }

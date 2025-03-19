@@ -12,6 +12,7 @@ const ForgotPasswordNative = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [token, setToken] = useState('');
+  const [userID, setUserID] = useState(null);
 
   const handleEmailSubmit = async () => {
     try {
@@ -22,8 +23,6 @@ const ForgotPasswordNative = ({ navigation }) => {
       if (usersWithMatchingEmail.length === 0) {
         Alert.alert('Error', `${email} doesn't exist.`);
       } else {
-        setSubmitted(true);
-
         try {
           const response = await fetch(`${process.env.APP_URL}users/send-email/${email}`, {
             method: 'PATCH',
@@ -32,8 +31,8 @@ const ForgotPasswordNative = ({ navigation }) => {
             },
           });
           const data = await response.json();
-          console.log(data);
-          Alert.alert('Success', 'An email with the token has been sent.');
+          setUserID(data._id);
+          setSubmitted(true);
         } catch (error) {
           console.error(error);
           Alert.alert('Error', 'Failed to send email.');
@@ -54,10 +53,10 @@ const ForgotPasswordNative = ({ navigation }) => {
         },
         body: JSON.stringify({ email, token }),
       });
-
       if (response.ok) {
-        Alert.alert('Success', 'Token validated successfully.');
-        navigation.navigate('Login');
+        console.log(userID)
+        console.log(email)
+        navigation.navigate('ResetPassword', {_id: userID, email: email});
       } else {
         Alert.alert('Error', 'Invalid token.');
       }
@@ -72,7 +71,7 @@ const ForgotPasswordNative = ({ navigation }) => {
       {submitted ? (
         <View style={styles.form}>
           <Text style={styles.title}>Thank you!</Text>
-          <Text style={styles.message}>An email with the token has been sent to {email}</Text>
+          <Text style={styles.message}>An email with the token has been sent to {email}.</Text>
           <TextInput
             style={styles.input}
             placeholder="Token"

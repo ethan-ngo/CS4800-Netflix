@@ -5,7 +5,7 @@ export const getItems = async () => {
   const response = await fetch(`${API_URL}/Items?Recursive=true`.replace(/([^:]\/)\/+/g, '$1'), {
     headers: { 'X-Emby-Token': ACCESS_TOKEN },
   })
-
+  console.log("items")
   const data = await response.json()
   return data.Items
 }
@@ -16,7 +16,7 @@ export const getMovies = async () => {
       'X-Emby-Token': ACCESS_TOKEN,
     },
   })
-
+  console.log("movies")
   const data = await response.json()
   return data.Items
 }
@@ -27,7 +27,7 @@ export const getShows = async () => {
       'X-Emby-Token': ACCESS_TOKEN,
     },
   })
-
+  console.log("shows")
   const data = await response.json()
   return data.Items
 }
