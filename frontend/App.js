@@ -5,9 +5,40 @@ import SignUpPage from './pages/signUpPage'
 import HomePage from './pages/HomePage'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import MediaDetails from './pages/mediaDetails'
+
 import ForgotPassword from './pages/ForgotPassword'
+import SignUpPageNative from './pages/SignUpPageNative'
+import LoginPageNative from './pages/LoginPageNative'
+import ForgotPasswordNative from './pages/ForgotPasswordNative'
+import HomePageNative from './pages/HomePageNative'
+import ResetPasswordNative from './pages/ResetPasswordNative'
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import Header from './components/Header';
 
 export default function App() {
+  const Stack = createNativeStackNavigator();
+
+  return (
+    <NavigationContainer>
+      <View style={{ flex: 1 }}>
+        <Header/>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            gestureEnabled: false,
+          }}
+        >
+          <Stack.Screen name="Login" component={LoginPageNative} />
+          <Stack.Screen name="ResetPassword" component={ResetPasswordNative} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPasswordNative} />
+          <Stack.Screen name="Home" component={HomePageNative} />
+          <Stack.Screen name="SignUp" component={SignUpPageNative} />
+        </Stack.Navigator>
+      </View>
+    </NavigationContainer>
+  );
+
   return (
     <Router>
       <div style={styles.container}>
