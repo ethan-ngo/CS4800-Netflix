@@ -14,6 +14,7 @@ import bcrypt from 'bcrypt'
 
 // This will help us generate a new token
 import jwt from 'jsonwebtoken'
+import 'dotenv/config'
 
 // router is an instance of the express router.
 // We use it to define our routes.
@@ -98,22 +99,21 @@ router.post('/login', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) }
-    const saltRounds = 10
-    bcrypt
-    .hash(req.body.password, saltRounds)
-    .then((hashedPassword));
+    const updates = {};
 
-    const updates = {
-      $set: {
-        name: req.body.name,
-        email: req.body.email,
-        password: hashedPassword,
-        profilePic: req.body.profilePic,
-      },
+    if (req.body.password) {
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+      updates.password = hashedPassword;
     }
 
+    // Add other fields to the update object if they are provided
+    if (req.body.name) updates.name = req.body.name;
+    if (req.body.email) updates.email = req.body.email;
+    if (req.body.profilePic) updates.profilePic = req.body.profilePic;
+
     let collection = await db.collection('users')
-    let result = await collection.updateOne(query, updates)
+    let result = await collection.updateOne(query, {$set: updates})
     res.send(result).status(200)
   } catch (err) {
     console.error('Error adding newUser:', err)
