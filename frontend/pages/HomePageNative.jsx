@@ -52,6 +52,10 @@ const HomePageNative = ({ navigation }) => {
     }
   }
 
+  const handleSelectProfile = () => {
+    navigation.navigate('Profile')
+  }
+
   const renderMediaItem = ({ item }) => (
     <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
       <Image
@@ -70,6 +74,9 @@ const HomePageNative = ({ navigation }) => {
       <View style={styles.navBar}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.profileButton} onPress={handleSelectProfile}>
+          <Text style={styles.profileButtonText}>Profile</Text>
         </TouchableOpacity>
       </View>
 
@@ -165,6 +172,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   logoutButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  profileButton: {
+    backgroundColor: 'green',
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+  },
+  profileButtonText: {
     color: '#fff',
     fontWeight: 'bold',
   },
