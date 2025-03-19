@@ -69,6 +69,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    overflowX: 'auto',
+    overflowY: 'auto',
   },
   scrollContainer: {
     flexGrow: 1,

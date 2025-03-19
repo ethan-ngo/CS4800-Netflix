@@ -1,8 +1,8 @@
-const API_URL = process.env.REACT_APP_API_URL?.replace(/\/$/, '')
-const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
+const API_URL = process.env.REACT_APP_API_URL?.replace(/\/$/, "");
+const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN;
 
 export const getItems = async () => {
-  const response = await fetch(`${API_URL}/Items?Recursive=true`.replace(/([^:]\/)\/+/g, '$1'), {
+  const response = await fetch(`${API_URL}/Items?Recursive=true`.replace(/([^:]\/)\/+/g, "$1"), {
     headers: { 'X-Emby-Token': ACCESS_TOKEN },
   })
   console.log("items")
