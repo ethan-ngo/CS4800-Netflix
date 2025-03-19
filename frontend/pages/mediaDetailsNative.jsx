@@ -6,16 +6,13 @@ import {
     StyleSheet,
     TouchableOpacity,
 } from 'react-native'
-import { useNavigation, useRoute } from '@react-navigation/native'
 import Video from 'react-native-video'
 
 const API_URL = process.env.REACT_APP_API_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
 
-const MediaDetailsNative = () => {
-    const navigation = useNavigation()
-    const route = useRoute()
-    const media = route.params?.media
+const MediaDetailsNative = ({navigation, route}) => {
+    const media = route.params.media
 
     const videoRef = useRef(null)
 

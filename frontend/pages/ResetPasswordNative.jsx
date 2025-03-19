@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import theme from '../utils/theme';
 
 const ResetPasswordNative = ({ navigation, route }) => {
 	const [password, setPassword] = useState('');
@@ -103,14 +104,14 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 	},
 	button: {
-		backgroundColor: '#007BFF',
+		backgroundColor: theme.primaryColor,
 		paddingVertical: 10,
 		borderRadius: 5,
 		alignItems: 'center',
 		marginTop: 10,
 	  },
 	buttonText: {
-		color: 'white',
+		color: theme.textColor,
 		fontWeight: 'bold',
 		fontSize: 16,
 	},
