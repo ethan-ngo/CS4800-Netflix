@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -8,55 +8,52 @@ import {
   TouchableOpacity,
   Alert,
   Modal,
-} from 'react-native';
-import { getItems, getMovies, getShows } from './api';
-import Video from 'react-native-video';
+} from 'react-native'
+import { getItems, getMovies, getShows } from './api'
+import Video from 'react-native-video'
 
-const API_URL = process.env.REACT_APP_API_URL;
-const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN;
+const API_URL = process.env.REACT_APP_API_URL
+const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
 
 const HomePageNative = ({ navigation }) => {
-  const [items, setItems] = useState([]);
-  const [shows, setShows] = useState([]);
-  const [movies, setMovies] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [items, setItems] = useState([])
+  const [shows, setShows] = useState([])
+  const [movies, setMovies] = useState([])
+  const [selectedItem, setSelectedItem] = useState(null)
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const mediaItems = await getItems();
-        const showItems = await getShows();
-        const movieItems = await getMovies();
-        setItems(mediaItems);
-        setShows(showItems);
-        setMovies(movieItems);
+        const mediaItems = await getItems()
+        const showItems = await getShows()
+        const movieItems = await getMovies()
+        setItems(mediaItems)
+        setShows(showItems)
+        setMovies(movieItems)
       } catch (error) {
-        console.error('Error fetching media items:', error);
-        Alert.alert('Error', 'Failed to fetch media items.');
+        console.error('Error fetching media items:', error)
+        Alert.alert('Error', 'Failed to fetch media items.')
       }
-    };
+    }
 
-    fetchItems();
-  }, []);
+    fetchItems()
+  }, [])
 
   const handleSelectItem = (item) => {
-    setSelectedItem(item); // Set the selected item to display in the modal
-  };
+    setSelectedItem(item) // Set the selected item to display in the modal
+  }
 
   const handleLogout = async () => {
     try {
-      navigation.navigate('Login');
-      console.log('Logged out');
+      navigation.navigate('Login')
+      console.log('Logged out')
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error('Error logging out:', error)
     }
-  };
+  }
 
   const renderMediaItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.mediaItem}
-      onPress={() => handleSelectItem(item)}
-    >
+    <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
       <Image
         source={{
           uri: `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`,
@@ -65,7 +62,7 @@ const HomePageNative = ({ navigation }) => {
       />
       <Text style={styles.mediaName}>{item.Name}</Text>
     </TouchableOpacity>
-  );
+  )
 
   return (
     <View style={styles.container}>
@@ -118,22 +115,19 @@ const HomePageNative = ({ navigation }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>{selectedItem.Name}</Text>
-			  <Video
-				source={{
-				uri: `${API_URL}/Videos/${selectedItem.Id}/stream?api_key=${ACCESS_TOKEN}`,
-				}}
-				style={styles.mediaVideo}
-				resizeMode="none"
-				muted={true} // Mute the video by default
-				repeat={true} // Loop the video
-				/>
+              <Video
+                source={{
+                  uri: `${API_URL}/Videos/${selectedItem.Id}/stream?api_key=${ACCESS_TOKEN}`,
+                }}
+                style={styles.mediaVideo}
+                resizeMode="none"
+                muted={true} // Mute the video by default
+                repeat={true} // Loop the video
+              />
               <Text style={styles.modalDescription}>
                 Description: {selectedItem.Description || 'No description available.'}
               </Text>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setSelectedItem(null)}
-              >
+              <TouchableOpacity style={styles.closeButton} onPress={() => setSelectedItem(null)}>
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
             </View>
@@ -141,13 +135,13 @@ const HomePageNative = ({ navigation }) => {
         </Modal>
       )}
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121212',
+    backgroundColor: 'var(--background-color)',
     padding: 10,
   },
   navBar: {
@@ -157,11 +151,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
+    color: 'var(--primary-color)',
   },
   logo: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: 'var(--text-color)',
   },
   logoutButton: {
     backgroundColor: '#E50914',
@@ -195,7 +190,7 @@ const styles = StyleSheet.create({
   },
   mediaName: {
     color: '#fff',
-    fontSize: 14, // Adjust font size for better readability
+    fontSize: 14,
     textAlign: 'center',
     width: '100%',
   },
@@ -211,13 +206,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
-    justifyContent: 'flex-start', // Ensure content is aligned from the top
+    justifyContent: 'flex-start',
   },
   mediaVideo: {
     width: '100%',
-    height: 200, // Adjust the height of the video
+    height: 200,
     borderRadius: 10,
-    marginBottom: 20, // Add space between the video and the text
+    marginBottom: 20,
   },
   modalTitle: {
     fontSize: 20,
@@ -242,6 +237,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-});
+})
 
-export default HomePageNative;
+export default HomePageNative
