@@ -1,20 +1,13 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-} from 'react-native';
-import { validateEmail } from '../utils/validateEmail';
+import React, { useState } from 'react'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native'
+import { validateEmail } from '../utils/validateEmail'
 
 const LoginPageNative = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   const handleLogin = async () => {
-    console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`);
+    console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
 
     try {
       const res = await fetch(process.env.APP_URL + 'users/login', {
@@ -23,27 +16,27 @@ const LoginPageNative = ({ navigation }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
-      });
+      })
 
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      Alert.alert('Login successful');
-      const data = await res.json();
-      console.log('Data:', data);
+      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
+      Alert.alert('Login successful')
+      const data = await res.json()
+      console.log('Data:', data)
 
       // Store token
-    //   localStorage.setItem('token', data.token);
+      //   localStorage.setItem('token', data.token);
 
       // Navigate to homepage
-      navigation.navigate('Home'); // Use navigation prop to navigate
+      navigation.navigate('Home') // Use navigation prop to navigate
     } catch (error) {
-      console.error('Error (unable to login): ', error);
-      Alert.alert('Login failed', 'Invalid email or password');
+      console.error('Error (unable to login): ', error)
+      Alert.alert('Login failed', 'Invalid email or password')
     }
-  };
+  }
 
   const handleSignUp = () => {
-    navigation.navigate('SignUp'); // Use navigation prop to navigate
-  };
+    navigation.navigate('SignUp') // Use navigation prop to navigate
+  }
 
   return (
     <View style={styles.container}>
@@ -57,7 +50,7 @@ const LoginPageNative = ({ navigation }) => {
           onChangeText={setEmail}
           onBlur={() => {
             if (email && !validateEmail(email)) {
-              Alert.alert('Invalid Email', 'Please enter a valid email address');
+              Alert.alert('Invalid Email', 'Please enter a valid email address')
             }
           }}
         />
@@ -71,25 +64,19 @@ const LoginPageNative = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
           <Text style={styles.forgotPassword}>Forgot Password?</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleLogin}
-          style={styles.loginButton}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity onPress={handleLogin} style={styles.loginButton} activeOpacity={0.8}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <Text style={styles.signUpText}>Don't have an account yet? Sign up!</Text>
-        <TouchableOpacity
-          onPress={handleSignUp}
-          style={styles.signUpButton}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
+        <Text style={styles.signUpText}>
+          Don't have an account yet?{' '}
+          <TouchableOpacity onPress={handleSignUp} activeOpacity={0.8}>
+            <Text style={styles.signUpLink}>Sign up!</Text>
+          </TouchableOpacity>
+        </Text>
       </View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -104,12 +91,15 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     padding: 20,
     borderRadius: 10,
+    // borderColor: 'gray',
+    // borderStyle: 'solid',
+    // borderWidth: 1,
     backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.4,
     shadowRadius: 4,
-    elevation: 5,
+    elevation: 10,
   },
   title: {
     fontSize: 24,
@@ -133,17 +123,15 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   loginButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: 'var(--primary-color)',
     paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center',
     marginBottom: 10,
   },
-  signUpButton: {
-    backgroundColor: '#00008B',
-    paddingVertical: 10,
-    borderRadius: 5,
-    alignItems: 'center',
+  signUpLink: {
+    textDecorationLine: 'underline',
+    color: '#007BFF',
   },
   buttonText: {
     color: 'white',
@@ -156,6 +144,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'gray',
   },
-});
+})
 
-export default LoginPageNative;
+export default LoginPageNative
