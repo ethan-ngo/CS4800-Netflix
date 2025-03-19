@@ -60,7 +60,9 @@ const HomePageNative = () => {
         }}
         style={styles.mediaImage}
       />
-      <Text style={styles.mediaName}>{item.Name}</Text>
+      <Text style={styles.mediaName} numberOfLines={2} ellipsizeMode="tail">
+        {item.Name}
+      </Text>
     </TouchableOpacity>
   )
 
@@ -77,33 +79,33 @@ const HomePageNative = () => {
       </View>
 
       {/* Media Lists */}
+      <Text style={styles.sectionTitle}>All Items</Text>
       <FlatList
         data={items}
         keyExtractor={(item) => item.Id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
         renderItem={renderMediaItem}
-        ListHeaderComponent={<Text style={styles.sectionTitle}>All Items</Text>}
         contentContainerStyle={styles.mediaList}
       />
 
+      <Text style={styles.sectionTitle}>Movies</Text>
       <FlatList
         data={movies}
         keyExtractor={(item) => item.Id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
         renderItem={renderMediaItem}
-        ListHeaderComponent={<Text style={styles.sectionTitle}>Movies</Text>}
         contentContainerStyle={styles.mediaList}
       />
 
+      <Text style={styles.sectionTitle}>Shows</Text>
       <FlatList
         data={shows}
         keyExtractor={(item) => item.Id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
         renderItem={renderMediaItem}
-        ListHeaderComponent={<Text style={styles.sectionTitle}>Shows</Text>}
         contentContainerStyle={styles.mediaList}
       />
     </View>
