@@ -5,14 +5,15 @@ import SignUpPage from './pages/signUpPage'
 import HomePage from './pages/HomePage'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import MediaDetails from './pages/mediaDetails'
+
 import ForgotPassword from './pages/ForgotPassword'
 import SignUpPageNative from './pages/SignUpPageNative'
 import LoginPageNative from './pages/LoginPageNative'
 import ForgotPasswordNative from './pages/ForgotPasswordNative'
 import HomePageNative from './pages/HomePageNative'
+import ResetPasswordNative from './pages/ResetPasswordNative'
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import ResetPasswordNative from './pages/ResetPasswordNative'
 import Header from './components/Header';
 
 export default function App() {
