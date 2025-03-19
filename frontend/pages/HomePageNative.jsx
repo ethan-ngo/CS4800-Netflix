@@ -7,19 +7,19 @@ import {
   Image,
   TouchableOpacity,
   Alert,
-  Modal,
 } from 'react-native'
 import { getItems, getMovies, getShows } from './api'
-import Video from 'react-native-video'
+import { useNavigation } from '@react-navigation/native'
 
 const API_URL = process.env.REACT_APP_API_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
 
-const HomePageNative = ({ navigation }) => {
+const HomePageNative = () => {
   const [items, setItems] = useState([])
   const [shows, setShows] = useState([])
   const [movies, setMovies] = useState([])
-  const [selectedItem, setSelectedItem] = useState(null)
+
+  const navigation = useNavigation()
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -40,16 +40,12 @@ const HomePageNative = ({ navigation }) => {
   }, [])
 
   const handleSelectItem = (item) => {
-    setSelectedItem(item) // Set the selected item to display in the modal
+    // Navigate to the correct MediaDetailsNative component
+    navigation.navigate('MediaDetailsNative', { media: item })
   }
 
-  const handleLogout = async () => {
-    try {
-      navigation.navigate('Login')
-      console.log('Logged out')
-    } catch (error) {
-      console.error('Error logging out:', error)
-    }
+  const handleLogout = () => {
+    navigation.navigate('Login')
   }
 
   const handleSelectProfile = () => {
@@ -64,7 +60,9 @@ const HomePageNative = ({ navigation }) => {
         }}
         style={styles.mediaImage}
       />
-      <Text style={styles.mediaName}>{item.Name}</Text>
+      <Text style={styles.mediaName} numberOfLines={2} ellipsizeMode="tail">
+        {item.Name}
+      </Text>
     </TouchableOpacity>
   )
 
@@ -81,66 +79,35 @@ const HomePageNative = ({ navigation }) => {
       </View>
 
       {/* Media Lists */}
+      <Text style={styles.sectionTitle}>All Items</Text>
       <FlatList
         data={items}
         keyExtractor={(item) => item.Id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
         renderItem={renderMediaItem}
-        ListHeaderComponent={<Text style={styles.sectionTitle}>All Items</Text>}
         contentContainerStyle={styles.mediaList}
       />
 
+      <Text style={styles.sectionTitle}>Movies</Text>
       <FlatList
         data={movies}
         keyExtractor={(item) => item.Id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
         renderItem={renderMediaItem}
-        ListHeaderComponent={<Text style={styles.sectionTitle}>Movies</Text>}
         contentContainerStyle={styles.mediaList}
       />
 
+      <Text style={styles.sectionTitle}>Shows</Text>
       <FlatList
         data={shows}
         keyExtractor={(item) => item.Id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
         renderItem={renderMediaItem}
-        ListHeaderComponent={<Text style={styles.sectionTitle}>Shows</Text>}
         contentContainerStyle={styles.mediaList}
       />
-
-      {/* Modal for Selected Item */}
-      {selectedItem && (
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={!!selectedItem}
-          onRequestClose={() => setSelectedItem(null)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>{selectedItem.Name}</Text>
-              <Video
-                source={{
-                  uri: `${API_URL}/Videos/${selectedItem.Id}/stream?api_key=${ACCESS_TOKEN}`,
-                }}
-                style={styles.mediaVideo}
-                resizeMode="none"
-                muted={true} // Mute the video by default
-                repeat={true} // Loop the video
-              />
-              <Text style={styles.modalDescription}>
-                Description: {selectedItem.Description || 'No description available.'}
-              </Text>
-              <TouchableOpacity style={styles.closeButton} onPress={() => setSelectedItem(null)}>
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-      )}
     </View>
   )
 }
@@ -148,7 +115,7 @@ const HomePageNative = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'var(--background-color)',
+    backgroundColor: '#121212',
     padding: 10,
   },
   navBar: {
@@ -158,12 +125,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
-    color: 'var(--primary-color)',
-  },
-  logo: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'var(--text-color)',
   },
   logoutButton: {
     backgroundColor: '#E50914',
@@ -197,62 +158,19 @@ const styles = StyleSheet.create({
   mediaItem: {
     marginRight: 10,
     alignItems: 'center',
-    width: 120, // Set a fixed width for the media item
+    width: 120,
   },
   mediaImage: {
-    width: 120, // Adjust the width of the image
-    height: 180, // Adjust the height of the image
+    width: 120,
+    height: 180,
     borderRadius: 5,
-    marginBottom: 5, // Add space between the image and the title
+    marginBottom: 5,
   },
   mediaName: {
     color: '#fff',
     fontSize: 14,
     textAlign: 'center',
     width: '100%',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-  },
-  modalContent: {
-    width: '90%',
-    backgroundColor: '#2F2F2F',
-    borderRadius: 10,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  mediaVideo: {
-    width: '100%',
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  modalDescription: {
-    fontSize: 16,
-    color: '#D3D3D3',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  closeButton: {
-    backgroundColor: '#E50914',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
 })
 
