@@ -39,13 +39,22 @@ const HomePage = () => {
     console.log('logged out')
   }
 
+  const handleProfileNavigation = () => {
+    navigate('/profile')
+  }
+
   return (
     <div style={webStyles.container}>
       <div style={webStyles.navBar}>
         <h1 style={webStyles.title}>DomainFilms</h1>
-        <button style={webStyles.logoutButton} onClick={handleLogout}>
-          Logout
-        </button>
+        <div style={webStyles.dropdown}>
+          <button style={webStyles.logoutButton} onClick={handleProfileNavigation}>
+            Profile
+          </button>
+          <button style={webStyles.logoutButton} onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
       </div>
       <h2>All Items</h2>
       <div style={webStyles.mediaList}>
@@ -111,6 +120,28 @@ const HomePage = () => {
 }
 
 const webStyles = {
+  dropdown: {
+    position: 'relative',
+    display: 'inline-block',
+  },
+  dropdownContent: {
+    display: 'none',
+    position: 'absolute',
+    backgroundColor: '#f9f9f9',
+    minWidth: '160px',
+    boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.2)',
+    zIndex: 1,
+  },
+  dropdownContentItem: {
+    color: 'black',
+    padding: '12px 16px',
+    textDecoration: 'none',
+    display: 'block',
+    cursor: 'pointer',
+  },
+  dropdownHover: {
+    display: 'block',
+  },
   navBar: {
     top: 0,
     left: 0,
