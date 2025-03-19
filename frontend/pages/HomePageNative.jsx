@@ -11,6 +11,8 @@ import {
 } from 'react-native'
 import { getItems, getMovies, getShows } from './api'
 import Video from 'react-native-video'
+import { Dropdown } from 'react-native-element-dropdown';
+import AntDesign from "react-native-vector-icons/AntDesign"
 
 const API_URL = process.env.REACT_APP_API_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
@@ -20,7 +22,8 @@ const HomePageNative = ({ navigation }) => {
   const [shows, setShows] = useState([])
   const [movies, setMovies] = useState([])
   const [selectedItem, setSelectedItem] = useState(null)
-
+  
+  
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -37,7 +40,17 @@ const HomePageNative = ({ navigation }) => {
     }
 
     fetchItems()
+    
   }, [])
+
+  const renderItem = (item) => (
+      <TouchableOpacity
+        style={[styles.item, { backgroundColor: item.color }]}
+        onPress={() => item.action()}
+      >
+        <Text style={styles.itemText}>{item.name}</Text>
+      </TouchableOpacity>
+    )
 
   const handleSelectItem = (item) => {
     setSelectedItem(item) // Set the selected item to display in the modal
@@ -55,7 +68,10 @@ const HomePageNative = ({ navigation }) => {
   const handleSelectProfile = () => {
     navigation.navigate('Profile')
   }
-
+  const dropdownMenuItems = [
+    { id: 1, name: "Profile", color: "green", action: handleSelectProfile, },
+    { id: 3, name: "Logout", color: "red", action: handleLogout },
+  ];
   const renderMediaItem = ({ item }) => (
     <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
       <Image
@@ -72,13 +88,24 @@ const HomePageNative = ({ navigation }) => {
     <View style={styles.container}>
       {/* Navbar */}
       <View style={styles.navBar}>
+        <Dropdown
+              style={styles.dropdownButton}
+              containerStyle={styles.dropdownMenu}
+              data={dropdownMenuItems}
+              renderItem={renderItem} 
+              renderRightIcon={() => (
+                  <AntDesign name="down" size={20} color="white" /> // Custom arrow icon
+                )}
+        />
+        </View>
+      {/*<View style={styles.navBar}>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.profileButton} onPress={handleSelectProfile}>
           <Text style={styles.profileButtonText}>Profile</Text>
         </TouchableOpacity>
-      </View>
+      </View>}*/}
 
       {/* Media Lists */}
       <FlatList
@@ -154,11 +181,19 @@ const styles = StyleSheet.create({
   navBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'right',
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
     color: 'var(--primary-color)',
+  },
+  dropdown:{
+    width: 45, 
+    height: 45,
+    borderRadius: 30, 
+    backgroundColor: "#3498db", // Blue circle
+    justifyContent: "center",
+    alignItems: "center",
   },
   logo: {
     fontSize: 20,
@@ -253,6 +288,41 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  dropdownButton: {
+    width: 45, 
+    height: 45,
+    borderRadius: 25, 
+    backgroundColor: "#6200ea", 
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dropdownMenu: {
+    width: 200, 
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 10,
+    ShadowColor: "#000",
+    ShadowOpacity: 0.2,
+    ShadowRadius: 4,
+    elevation: 5,
+  },
+  item: {
+    width: "100%",
+    height: 50,
+    padding: 15,
+    marginVertical: 5,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  itemText: {
+    color: "white",
+    fontSize: 16,
+  },
+  selected: {
+    marginTop: 10,
+    fontSize: 18,
+    fontWeight: "bold",
   },
 })
 
