@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { validateEmail } from '../utils/validateEmail'
 
 const LoginPageNative = ({ navigation }) => {
@@ -24,7 +25,8 @@ const LoginPageNative = ({ navigation }) => {
       console.log('Data:', data)
 
       // Store token
-      //   localStorage.setItem('token', data.token);
+      await AsyncStorage.setItem('token', data.token);
+      await AsyncStorage.setItem('email', email); 
 
       // Navigate to homepage
       navigation.navigate('Home') // Use navigation prop to navigate

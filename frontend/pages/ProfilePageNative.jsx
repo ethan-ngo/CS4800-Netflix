@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image, ActivityIndicator } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker'
 import { validateEmail } from '../utils/validateEmail'
 
@@ -16,38 +17,55 @@ const ProfilePageNative = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!userId) {
-        console.error('Error: userId is null');
-        return;
-      }
-
-
       try {
-        const response = await fetch(`http://localhost:5050/users/${userId}`);
-        if (response.ok) {
-          const user = await response.json();
-          setUserId(user._id);
-          setProfilePic(user.profilePic);
-          setUsername(user.username);
-          setEmail(user.email);
-          setPassword(user.password);
-          
-          setOriginalProfilePic(user.profilePic);
-          setOriginalUsername(user.username);
-          setOriginalEmail(user.email);
-        } else {
-          Alert.alert('Error', 'Failed to fetch user data');
+        // Step 1: Retrieve the email from AsyncStorage
+        const email = await AsyncStorage.getItem('email');
+        if (!email) {
+          console.error('Error: Email is missing');
+          Alert.alert('Error', 'You are not authenticated');
+          setLoading(false);
+          return;
         }
+  
+        // Step 2: Fetch user details using the email
+        const userResponse = await fetch(`${process.env.APP_URL}users/getUserByEmail/${email}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+  
+        if (!userResponse.ok) {
+          const errorData = await userResponse.json();
+          console.error('Error fetching user details:', errorData.message);
+          Alert.alert('Error', errorData.message || 'Failed to fetch user details');
+          setLoading(false);
+          return;
+        }
+  
+        const user = await userResponse.json();
+        console.log('Fetched user details:', user);
+  
+        // Step 3: Set user details in state
+        setUserId(user.userId);
+        setProfilePic(user.profilePic);
+        setUsername(user.name);
+        setEmail(user.email);
+  
+        // Store the original values
+        setOriginalProfilePic(user.profilePic);
+        setOriginalUsername(user.name);
+        setOriginalEmail(user.email);
       } catch (error) {
         console.error('Error fetching user data:', error);
         Alert.alert('Error', 'An error occurred while fetching user data');
       } finally {
-        setLoading(false);
+        setLoading(false); // Ensure loading is set to false in all cases
       }
     };
-
+  
     fetchUserData();
-  }, [userId]);
+  }, []);
 
 
 
@@ -83,7 +101,7 @@ const ProfilePageNative = () => {
     };
   
     try {
-      const response = await fetch(`http://localhost:5050/users/${userId}`, {
+      const response = await fetch(process.env.APP_URL + 'users/:id/' + userId, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

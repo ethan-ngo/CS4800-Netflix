@@ -208,4 +208,29 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
+// This section will help you get a user by email
+router.get('/getUserByEmail/:email', async (req, res) => {
+  try {
+    const email = req.params.email; 
+    console.log('Fetching user for email:', email); 
+
+    const collection = await db.collection('users');
+    const user = await collection.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
+
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+
+    res.status(200).send({
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+      profilePic: user.profilePic,
+    });
+  } catch (error) {
+    console.error('Error fetching user by email:', error);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+});
+
 export default router
