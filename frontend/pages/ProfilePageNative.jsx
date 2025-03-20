@@ -1,20 +1,55 @@
-import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image, ActivityIndicator } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import { validateEmail } from '../utils/validateEmail'
 
 const ProfilePageNative = () => {
-  const user = {
-    profilePic: null,
-    username: 'JohnDoe',
-    email: 'johndoe@example.com',
-    password: 'password123',
-  }
+  const [profilePic, setProfilePic] = useState(null)
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [userId, setUserId] = useState('1')
+  const [originalProfilePic, setOriginalProfilePic] = useState(null)
+  const [originalUsername, setOriginalUsername] = useState('')
+  const [originalEmail, setOriginalEmail] = useState('')
+  const [loading, setLoading] = useState(true)
 
-  const [profilePic, setProfilePic] = useState(user.profilePic)
-  const [username, setUsername] = useState(user.username)
-  const [email, setEmail] = useState(user.email)
-  const [password, setPassword] = useState(user.password)
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!userId) {
+        console.error('Error: userId is null');
+        return;
+      }
+
+
+      try {
+        const response = await fetch(`http://localhost:5050/users/${userId}`);
+        if (response.ok) {
+          const user = await response.json();
+          setUserId(user._id);
+          setProfilePic(user.profilePic);
+          setUsername(user.username);
+          setEmail(user.email);
+          setPassword(user.password);
+          
+          setOriginalProfilePic(user.profilePic);
+          setOriginalUsername(user.username);
+          setOriginalEmail(user.email);
+        } else {
+          Alert.alert('Error', 'Failed to fetch user data');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        Alert.alert('Error', 'An error occurred while fetching user data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [userId]);
+
+
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -29,26 +64,61 @@ const ProfilePageNative = () => {
     }
   }
 
-  const handleUpdateProfile = () => {
+  const handleUpdateProfile = async () => {
     if (!username || !email || !password) {
-      Alert.alert('Error', 'Please fill in all fields')
-      return
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
     }
-
+  
     if (!validateEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address')
-      return
+      Alert.alert('Invalid Email', 'Please enter a valid email address');
+      return;
     }
-
-    Alert.alert('Success', 'Profile updated successfully')
-  }
+  
+    const updatedUserData = {
+      name: username,
+      email: email,
+      password: password,
+      profilePic: profilePic,
+    };
+  
+    try {
+      const response = await fetch(`http://localhost:5050/users/${userId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedUserData),
+      });
+  
+      if (response.ok) {
+        const responseData = await response.json();
+        Alert.alert('Success', 'Profile updated successfully');
+        console.log('Updated user data:', responseData);
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.message || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', 'An error occurred while updating the profile');
+    }
+  };
 
   const handleReset = () => {
-    setProfilePic(user.profilePic)
-    setUsername(user.username)
-    setEmail(user.email)
-    setPassword(user.password)
+    setProfilePic(originalProfilePic)
+    setUsername(originalUsername)
+    setEmail(originalEmail)
+    setPassword('')
   }
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#007BFF" />
+      </View>
+    );
+  }
+
 
   return (
     <View style={styles.container}>
@@ -63,20 +133,20 @@ const ProfilePageNative = () => {
         </TouchableOpacity>
         <TextInput
           style={styles.input}
-          placeholder={user.username}
+          placeholder={originalUsername}
           value={username}
           onChangeText={setUsername}
         />
         <TextInput
           style={styles.input}
-          placeholder={user.email}
+          placeholder={originalEmail}
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
         />
         <TextInput
           style={styles.input}
-          placeholder={user.password}
+          placeholder={'Enter your password'}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -93,8 +163,8 @@ const ProfilePageNative = () => {
         </TouchableOpacity>
       </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -176,6 +246,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-})
+});
 
 export default ProfilePageNative
