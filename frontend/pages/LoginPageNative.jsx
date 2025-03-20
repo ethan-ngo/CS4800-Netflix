@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native'
 import { validateEmail } from '../utils/validateEmail'
+import theme from '../utils/theme'
 
 const LoginPageNative = ({ navigation }) => {
   const [email, setEmail] = useState('')
@@ -69,9 +70,9 @@ const LoginPageNative = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.signUpText}>
           Don't have an account yet?{' '}
-          <TouchableOpacity onPress={handleSignUp} activeOpacity={0.8}>
-            <Text style={styles.signUpLink}>Sign up!</Text>
-          </TouchableOpacity>
+          <Text style={styles.signUpLink} onPress={handleSignUp}>
+            Sign up!
+          </Text>
         </Text>
       </View>
     </View>
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   loginButton: {
-    backgroundColor: 'var(--primary-color)',
+    backgroundColor: theme.primaryColor,
     paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center',
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
     color: '#007BFF',
   },
   buttonText: {
-    color: 'white',
+    color: theme.textColor,
     fontWeight: 'bold',
     fontSize: 16,
   },
