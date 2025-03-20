@@ -14,11 +14,10 @@ const ProfilePageNative = () => {
   const [originalUsername, setOriginalUsername] = useState('')
   const [originalEmail, setOriginalEmail] = useState('')
   const [loading, setLoading] = useState(true)
-
+// use email to fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Step 1: Retrieve the email from AsyncStorage
         const email = await AsyncStorage.getItem('email');
         if (!email) {
           console.error('Error: Email is missing');
@@ -27,7 +26,6 @@ const ProfilePageNative = () => {
           return;
         }
   
-        // Step 2: Fetch user details using the email
         const userResponse = await fetch(`${process.env.APP_URL}users/getUserByEmail/${email}`, {
           method: 'GET',
           headers: {
@@ -46,13 +44,11 @@ const ProfilePageNative = () => {
         const user = await userResponse.json();
         console.log('Fetched user details:', user);
   
-        // Step 3: Set user details in state
         setUserId(user.userId);
         setProfilePic(user.profilePic);
         setUsername(user.name);
         setEmail(user.email);
   
-        // Store the original values
         setOriginalProfilePic(user.profilePic);
         setOriginalUsername(user.name);
         setOriginalEmail(user.email);
@@ -100,6 +96,7 @@ const ProfilePageNative = () => {
       profilePic: profilePic,
     };
   
+    //use userId to update the user data
     try {
       const response = await fetch(process.env.APP_URL + 'users/:id/' + userId, {
         method: 'PATCH',
@@ -137,7 +134,7 @@ const ProfilePageNative = () => {
     );
   }
 
-
+//uses user data from the database to populate the form
   return (
     <View style={styles.container}>
       <View style={styles.form}>
