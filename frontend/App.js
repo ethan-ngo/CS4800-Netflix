@@ -31,10 +31,10 @@ export default function App() {
             gestureEnabled: false,
           }}
         >
+          <Stack.Screen name="Home" component={HomePageNative} />
           <Stack.Screen name="Login" component={LoginPageNative} />
           <Stack.Screen name="ResetPassword" component={ResetPasswordNative} />
           <Stack.Screen name="ForgotPassword" component={ForgotPasswordNative} />
-          <Stack.Screen name="Home" component={HomePageNative} />
           <Stack.Screen name="SignUp" component={SignUpPageNative} />
           <Stack.Screen name="Profile" component={ProfilePageNative} />
           <Stack.Screen name="MediaDetailsNative" component={MediaDetailsNative} />

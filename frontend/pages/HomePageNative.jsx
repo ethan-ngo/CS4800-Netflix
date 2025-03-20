@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,50 +7,46 @@ import {
   Image,
   TouchableOpacity,
   Alert,
-} from 'react-native'
-import { getItems, getMovies, getShows } from './api'
-import { useNavigation } from '@react-navigation/native'
-
-const API_URL = process.env.REACT_APP_API_URL
-const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
+} from 'react-native';
+import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api';
+import { useNavigation } from '@react-navigation/native';
 
 const HomePageNative = () => {
-  const [items, setItems] = useState([])
-  const [shows, setShows] = useState([])
-  const [movies, setMovies] = useState([])
+  const [items, setItems] = useState([]);
+  const [shows, setShows] = useState([]);
+  const [movies, setMovies] = useState([]);
 
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const mediaItems = await getItems()
-        const showItems = await getShows()
-        const movieItems = await getMovies()
-        setItems(mediaItems)
-        setShows(showItems)
-        setMovies(movieItems)
+        const mediaItems = await getItems();
+        const showItems = await getShows();
+        const movieItems = await getMovies();
+        setItems(mediaItems);
+        setShows(showItems);
+        setMovies(movieItems);
       } catch (error) {
-        console.error('Error fetching media items:', error)
-        Alert.alert('Error', 'Failed to fetch media items.')
+        console.error('Error fetching media items:', error);
+        Alert.alert('Error', 'Failed to fetch media items.');
       }
-    }
+    };
 
-    fetchItems()
-  }, [])
+    fetchItems();
+  }, []);
 
   const handleSelectItem = (item) => {
-    // Navigate to the correct MediaDetailsNative component
-    navigation.navigate('MediaDetailsNative', { media: item })
-  }
+    navigation.navigate('MediaDetailsNative', { media: item });
+  };
 
   const handleLogout = () => {
-    navigation.navigate('Login')
-  }
+    navigation.navigate('Login');
+  };
 
   const handleSelectProfile = () => {
-    navigation.navigate('Profile')
-  }
+    navigation.navigate('Profile');
+  };
 
   const renderMediaItem = ({ item }) => (
     <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
@@ -64,7 +60,7 @@ const HomePageNative = () => {
         {item.Name}
       </Text>
     </TouchableOpacity>
-  )
+  );
 
   return (
     <View style={styles.container}>
@@ -109,8 +105,8 @@ const HomePageNative = () => {
         contentContainerStyle={styles.mediaList}
       />
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -172,6 +168,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '100%',
   },
-})
+});
 
-export default HomePageNative
+export default HomePageNative;
