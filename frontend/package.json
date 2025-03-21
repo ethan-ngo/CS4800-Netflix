@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",
+    "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-navigation/native": "^7.0.15",
     "@react-navigation/native-stack": "^7.2.1",
     "@types/react-router-dom": "^5.3.3",
@@ -20,6 +21,7 @@
     "expo": "~52.0.37",
     "expo-image-picker": "^16.0.6",
     "expo-status-bar": "~2.0.1",
+    "expo-video": "^2.0.6",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-native": "0.76.7",

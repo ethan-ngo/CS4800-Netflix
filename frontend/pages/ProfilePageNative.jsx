@@ -1,20 +1,82 @@
-import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+} from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ImagePicker from 'expo-image-picker'
 import { validateEmail } from '../utils/validateEmail'
+import { useNavigation } from '@react-navigation/native'
 
 const ProfilePageNative = () => {
-  const user = {
-    profilePic: null,
-    username: 'JohnDoe',
-    email: 'johndoe@example.com',
-    password: 'password123',
-  }
+  const [profilePic, setProfilePic] = useState(null)
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [userId, setUserId] = useState('1')
+  const [originalProfilePic, setOriginalProfilePic] = useState(null)
+  const [originalUsername, setOriginalUsername] = useState('')
+  const [originalEmail, setOriginalEmail] = useState('')
+  const [loading, setLoading] = useState(true)
 
-  const [profilePic, setProfilePic] = useState(user.profilePic)
-  const [username, setUsername] = useState(user.username)
-  const [email, setEmail] = useState(user.email)
-  const [password, setPassword] = useState(user.password)
+  const navigation = useNavigation()
+
+  // use email to fetch user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const email = await AsyncStorage.getItem('email')
+        if (!email) {
+          console.error('Error: Email is missing')
+          Alert.alert('Error', 'You are not authenticated')
+          setLoading(false)
+          return
+        }
+        console.log('Fetched email:', email)
+
+        //const userResponse = await fetch(`http://localhost:5050/users/getUserByEmail/${encodeURIComponent(email)}`,{
+        const userResponse = await fetch(`${process.env.APP_URL}users/getUserByEmail/${email}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!userResponse.ok) {
+          const errorData = await userResponse.json()
+          console.error('Error fetching user details:', errorData.message)
+          Alert.alert('Error', errorData.message || 'Failed to fetch user details')
+          setLoading(false)
+          return
+        }
+
+        const user = await userResponse.json()
+        console.log('Fetched user details:', user)
+
+        setUserId(user.userId)
+        setProfilePic(user.profilePic)
+        setUsername(user.name)
+        setEmail(user.email)
+
+        setOriginalProfilePic(user.profilePic)
+        setOriginalUsername(user.name)
+        setOriginalEmail(user.email)
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+        Alert.alert('Error', 'An error occurred while fetching user data')
+      } finally {
+        setLoading(false) // Ensure loading is set to false in all cases
+      }
+    }
+
+    fetchUserData()
+  }, [])
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -29,27 +91,62 @@ const ProfilePageNative = () => {
     }
   }
 
-  const handleUpdateProfile = () => {
-    if (!username || !email || !password) {
-      Alert.alert('Error', 'Please fill in all fields')
-      return
-    }
-
+  const handleUpdateProfile = async () => {
     if (!validateEmail(email)) {
       Alert.alert('Invalid Email', 'Please enter a valid email address')
       return
     }
 
-    Alert.alert('Success', 'Profile updated successfully')
+    const updatedUserData = {}
+    if (username) updatedUserData.name = username
+    if (email) updatedUserData.email = email
+    if (password) updatedUserData.password = password
+    if (profilePic) updatedUserData.profilePic = profilePic
+
+    //use userId to update the user data
+    try {
+      const response = await fetch(`${process.env.APP_URL}users/${userId}`, {
+        //const response = await fetch(`http://localhost:5050/users/${userId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedUserData),
+      })
+
+      if (response.ok) {
+        const responseData = await response.json()
+        Alert.alert('Success', 'Profile updated successfully')
+        console.log('Updated user data:', responseData)
+      } else {
+        const errorData = await response.json()
+        Alert.alert('Error', errorData.message || 'Failed to update profile')
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      Alert.alert('Error', 'An error occurred while updating the profile')
+    }
+  }
+
+  const handleHomeButton = () => {
+    navigation.navigate('Home')
   }
 
   const handleReset = () => {
-    setProfilePic(user.profilePic)
-    setUsername(user.username)
-    setEmail(user.email)
-    setPassword(user.password)
+    setProfilePic(originalProfilePic)
+    setUsername(originalUsername)
+    setEmail(originalEmail)
+    setPassword('')
+  }
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#007BFF" />
+      </View>
+    )
   }
 
+  //uses user data from the database to populate the form
   return (
     <View style={styles.container}>
       <View style={styles.form}>
@@ -63,20 +160,20 @@ const ProfilePageNative = () => {
         </TouchableOpacity>
         <TextInput
           style={styles.input}
-          placeholder={user.username}
+          placeholder={originalUsername}
           value={username}
           onChangeText={setUsername}
         />
         <TextInput
           style={styles.input}
-          placeholder={user.email}
+          placeholder={originalEmail}
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
         />
         <TextInput
           style={styles.input}
-          placeholder={user.password}
+          placeholder={'Enter your password'}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -90,6 +187,9 @@ const ProfilePageNative = () => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.8}>
           <Text style={styles.resetButtonText}>Reset</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.homeButton} onPress={handleHomeButton} activeOpacity={0.8}>
+          <Text style={styles.homeButtonText}>Return Home</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -175,6 +275,17 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  homeButton: {
+    backgroundColor: 'green',
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  homeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 })
 

@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, FlatList } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import Video from 'react-native-video'
 import { getMovieDetails } from './api'
+import { useVideoPlayer, VideoView } from 'expo-video'
 
 const API_URL = process.env.REACT_APP_API_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
@@ -33,6 +33,14 @@ const MediaDetailsNative = () => {
         setLoading(false)
     }
 
+    const videoSource = {
+        uri: `${API_URL}/Videos/${media.Id}/stream?api_key=${ACCESS_TOKEN}`,
+    };
+    const player = useVideoPlayer(videoSource, player => {
+        player.loop = true;
+        player.play();
+    });
+    
     if (!media) {
         return (
             <View style={styles.loadingContainer}>
@@ -67,16 +75,8 @@ const MediaDetailsNative = () => {
 
             <Text style={styles.subtitle}>Now Playing:</Text>
 
-            <View style={{ width: "60%", height: 500, alignItems: 'center' }}>
-                <Video
-                    ref={videoRef}
-                    source={{
-                        uri: `${API_URL}/Videos/${media.Id}/stream?api_key=${ACCESS_TOKEN}`,
-                    }}
-                    style={styles.videoPlayer}
-                    controls={true}
-                    resizeMode="contain"
-                />
+            <View style={{ width: "70%", height: "50%", alignItems: 'center' }}>
+                <VideoView style={styles.videoPlayer} player={player} allowsFullscreen allowsPictureInPicture />
             </View>
 
             {loading ? (
