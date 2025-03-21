@@ -91,26 +91,21 @@ const ProfilePageNative = () => {
   }
 
   const handleUpdateProfile = async () => {
-    if (!username || !email || !password) {
-      Alert.alert('Error', 'Please fill in all fields')
-      return
-    }
-
     if (!validateEmail(email)) {
       Alert.alert('Invalid Email', 'Please enter a valid email address')
       return
     }
 
-    const updatedUserData = {
-      name: username,
-      email: email,
-      password: password,
-      profilePic: profilePic,
-    }
+    const updatedUserData = {}
+    if (username) updatedUserData.name = username
+    if (email) updatedUserData.email = email
+    if (password) updatedUserData.password = password
+    if (profilePic) updatedUserData.profilePic = profilePic
 
     //use userId to update the user data
     try {
       const response = await fetch(process.env.APP_URL + 'users/:id/' + userId, {
+        //const response = await fetch(`http://localhost:5050/users/${userId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

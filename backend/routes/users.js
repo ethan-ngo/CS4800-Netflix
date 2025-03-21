@@ -96,6 +96,7 @@ router.post('/login', async (req, res) => {
 
 // This section will help you update a user by id.
 router.patch('/:id', async (req, res) => {
+  console.log('Updating user:', req.params.id)
   try {
     const query = { _id: new ObjectId(req.params.id) }
     const updates = {}
