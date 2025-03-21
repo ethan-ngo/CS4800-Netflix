@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,12 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  ScrollView,
 } from 'react-native'
-import { getItems, getMovies, getShows } from './api'
+import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api'
 import Video from 'react-native-video'
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from "react-native-vector-icons/AntDesign"
-
 import { useNavigation } from '@react-navigation/native'
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -28,21 +28,20 @@ const HomePageNative = () => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const mediaItems = await getItems()
-        const showItems = await getShows()
-        const movieItems = await getMovies()
-        setItems(mediaItems)
-        setShows(showItems)
-        setMovies(movieItems)
+        const mediaItems = await getItems();
+        const showItems = await getShows();
+        const movieItems = await getMovies();
+        setItems(mediaItems);
+        setShows(showItems);
+        setMovies(movieItems);
       } catch (error) {
-        console.error('Error fetching media items:', error)
-        Alert.alert('Error', 'Failed to fetch media items.')
+        console.error('Error fetching media items:', error);
+        Alert.alert('Error', 'Failed to fetch media items.');
       }
-    }
+    };
 
-    fetchItems()
-    
-  }, [])
+    fetchItems();
+  }, []);
 
   const renderItem = (item) => (
       <TouchableOpacity
@@ -54,13 +53,12 @@ const HomePageNative = () => {
     )
 
   const handleSelectItem = (item) => {
-    // Navigate to the correct MediaDetailsNative component
-    navigation.navigate('MediaDetailsNative', { media: item })
-  }
+    navigation.navigate('MediaDetailsNative', { media: item });
+  };
 
   const handleLogout = () => {
-    navigation.navigate('Login')
-  }
+    navigation.navigate('Login');
+  };
 
   const handleSelectProfile = () => {
     navigation.navigate('Profile')
@@ -81,7 +79,7 @@ const HomePageNative = () => {
         {item.Name}
       </Text>
     </TouchableOpacity>
-  )
+  );
 
   return (
     <View style={styles.container}>
@@ -106,45 +104,53 @@ const HomePageNative = () => {
         </TouchableOpacity>
       </View>}*/}
 
-      {/* Media Lists */}
-      <Text style={styles.sectionTitle}>All Items</Text>
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.Id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        renderItem={renderMediaItem}
-        contentContainerStyle={styles.mediaList}
-      />
 
-      <Text style={styles.sectionTitle}>Movies</Text>
-      <FlatList
-        data={movies}
-        keyExtractor={(item) => item.Id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        renderItem={renderMediaItem}
-        contentContainerStyle={styles.mediaList}
-      />
+        {/* Media Lists */}
+        <View style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>All Items</Text>
+          <FlatList
+            data={items}
+            keyExtractor={(item) => item.Id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderMediaItem}
+            contentContainerStyle={styles.mediaList}
+          />
+        </View>
 
-      <Text style={styles.sectionTitle}>Shows</Text>
-      <FlatList
-        data={shows}
-        keyExtractor={(item) => item.Id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        renderItem={renderMediaItem}
-        contentContainerStyle={styles.mediaList}
-      />
-    </View>
-  )
-}
+        <View style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>Movies</Text>
+          <FlatList
+            data={movies}
+            keyExtractor={(item) => item.Id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderMediaItem}
+            contentContainerStyle={styles.mediaList}
+          /></View>
+
+        <View style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>Shows</Text>
+          <FlatList
+            data={shows}
+            keyExtractor={(item) => item.Id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderMediaItem}
+            contentContainerStyle={styles.mediaList}
+          /></View>
+      </View>
+    </ScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#121212',
     padding: 10,
+    overflowy: 'auto',
+    overflowx: 'auto',
   },
   navBar: {
     flexDirection: 'row',
@@ -194,6 +200,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 10,
+    marginLeft: "1%",
+  },
+  mediaSection: {
+    minHeight: "15%",
   },
   mediaList: {
     marginBottom: 20,
@@ -202,6 +212,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     alignItems: 'center',
     width: 120,
+    margin: 15,
   },
   mediaImage: {
     width: 120,
@@ -252,4 +263,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default HomePageNative
+export default HomePageNative;
