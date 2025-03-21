@@ -18,8 +18,8 @@ app.use('/movies', movies)
 app.use('/directors', directors)
 app.use('/actors', actors)
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`)
-})
+// app.listen(PORT, () => {
+//   console.log(`Server listening on port ${PORT}`)
+// })
 
 export default app

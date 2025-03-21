@@ -36,16 +36,13 @@ const ProfilePageNative = () => {
         }
         console.log('Fetched email:', email)
 
-        //const userResponse = await fetch(`${process.env.APP_URL}users/getUserByEmail/${email}`, {
-        const userResponse = await fetch(
-          `http://localhost:5050/users/getUserByEmail/${encodeURIComponent(email)}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        )
+        //const userResponse = await fetch(`http://localhost:5050/users/getUserByEmail/${encodeURIComponent(email)}`,{
+        const userResponse = await fetch(`${process.env.APP_URL}users/getUserByEmail/${email}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
 
         if (!userResponse.ok) {
           const errorData = await userResponse.json()
