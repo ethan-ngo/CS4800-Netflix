@@ -8,16 +8,22 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
-} from 'react-native';
-import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api';
-import { useNavigation } from '@react-navigation/native';
+} from 'react-native'
+import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api'
+import Video from 'react-native-video'
+import { Dropdown } from 'react-native-element-dropdown';
+import AntDesign from "react-native-vector-icons/AntDesign"
+import { useNavigation } from '@react-navigation/native'
+
+const API_URL = process.env.REACT_APP_API_URL
+const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
 
 const HomePageNative = () => {
-  const [items, setItems] = useState([]);
-  const [shows, setShows] = useState([]);
-  const [movies, setMovies] = useState([]);
+  const [items, setItems] = useState([])
+  const [shows, setShows] = useState([])
+  const [movies, setMovies] = useState([])
+  const navigation = useNavigation()
 
-  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -37,6 +43,15 @@ const HomePageNative = () => {
     fetchItems();
   }, []);
 
+  const renderItem = (item) => (
+      <TouchableOpacity
+        style={[styles.item, { backgroundColor: item.color }]}
+        onPress={() => item.action()}
+      >
+        <Text style={styles.itemText}>{item.name}</Text>
+      </TouchableOpacity>
+    )
+
   const handleSelectItem = (item) => {
     navigation.navigate('MediaDetailsNative', { media: item });
   };
@@ -46,9 +61,12 @@ const HomePageNative = () => {
   };
 
   const handleSelectProfile = () => {
-    navigation.navigate('Profile');
-  };
-
+    navigation.navigate('Profile')
+  }
+  const dropdownMenuItems = [
+    { id: 1, name: "Profile", color: "green", action: handleSelectProfile, },
+    { id: 3, name: "Logout", color: "red", action: handleLogout },
+  ];
   const renderMediaItem = ({ item }) => (
     <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
       <Image
@@ -64,17 +82,28 @@ const HomePageNative = () => {
   );
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={styles.container}>
-        {/* Navbar */}
-        <View style={styles.navBar}>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutButtonText}>Logout</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.profileButton} onPress={handleSelectProfile}>
-            <Text style={styles.profileButtonText}>Profile</Text>
-          </TouchableOpacity>
+    <View style={styles.container}>
+      {/* Navbar */}
+      <View style={styles.navBar}>
+        <Dropdown
+              style={styles.dropdownButton}
+              containerStyle={styles.dropdownMenu}
+              data={dropdownMenuItems}
+              renderItem={renderItem} 
+              renderRightIcon={() => (
+                  <AntDesign name="down" size={20} color="white" /> // Custom arrow icon
+                )}
+        />
         </View>
+      {/*<View style={styles.navBar}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutButtonText}>Logout</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.profileButton} onPress={handleSelectProfile}>
+          <Text style={styles.profileButtonText}>Profile</Text>
+        </TouchableOpacity>
+      </View>}*/}
+
 
         {/* Media Lists */}
         <View style={styles.mediaSection}>
@@ -126,10 +155,25 @@ const styles = StyleSheet.create({
   navBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'right',
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
+
+    color: 'var(--primary-color)',
+  },
+  dropdown:{
+    width: 45, 
+    height: 45,
+    borderRadius: 30, 
+    backgroundColor: "#3498db", // Blue circle
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  logo: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'var(--text-color)',
   },
   logoutButton: {
     backgroundColor: '#E50914',
@@ -182,6 +226,41 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '100%',
   },
-});
+  dropdownButton: {
+    width: 45, 
+    height: 45,
+    borderRadius: 25, 
+    backgroundColor: "#6200ea", 
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dropdownMenu: {
+    width: 200, 
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 10,
+    ShadowColor: "#000",
+    ShadowOpacity: 0.2,
+    ShadowRadius: 4,
+    elevation: 5,
+  },
+  item: {
+    width: "100%",
+    height: 50,
+    padding: 15,
+    marginVertical: 5,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  itemText: {
+    color: "white",
+    fontSize: 16,
+  },
+  selected: {
+    marginTop: 10,
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+})
 
 export default HomePageNative;
