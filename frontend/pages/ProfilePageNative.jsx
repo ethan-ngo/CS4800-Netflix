@@ -101,7 +101,7 @@ const ProfilePageNative = () => {
 
     //use userId to update the user data
     try {
-      const response = await fetch(process.env.APP_URL + 'users/:id/' + userId, {
+      const response = await fetch(`${process.env.APP_URL}users/${userId}`, {
         //const response = await fetch(`http://localhost:5050/users/${userId}`, {
         method: 'PATCH',
         headers: {
