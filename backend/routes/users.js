@@ -14,6 +14,7 @@ import bcrypt from 'bcrypt'
 
 // This will help us generate a new token
 import jwt from 'jsonwebtoken'
+import 'dotenv/config'
 
 // router is an instance of the express router.
 // We use it to define our routes.

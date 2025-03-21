@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native'
 import { validateEmail } from '../utils/validateEmail'
+import theme from '../utils/theme';
 
 const SignUpPageNative = ({ navigation }) => {
   const [name, setName] = useState('')
@@ -94,9 +95,12 @@ const SignUpPageNative = ({ navigation }) => {
         <TouchableOpacity style={styles.loginButton} onPress={handleSignUp} activeOpacity={0.8}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')} activeOpacity={0.8}>
-          <Text style={styles.forgotPassword}>Already have an account? Log in</Text>
-        </TouchableOpacity>
+        <Text style={styles.signUpText}>
+          Already have an account?{' '}
+          <Text style={styles.signUpLink} onPress={() => navigation.navigate('Login')}>
+            Log In!
+          </Text>
+        </Text>
       </View>
     </View>
   )
@@ -144,16 +148,26 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   loginButton: {
-    backgroundColor: 'var(--primary-color)',
+    backgroundColor: theme.primaryColor,
     paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center',
     marginBottom: 10,
   },
   buttonText: {
-    color: 'white',
+    color: theme.textColor,
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  signUpLink: {
+    textDecorationLine: 'underline',
+    color: '#007BFF',
+  },
+  signUpText: {
+    textAlign: 'center',
+    marginVertical: 10,
+    fontSize: 14,
+    color: 'gray',
   },
 })
 
