@@ -22,14 +22,14 @@ const router = express.Router()
 
 // This section will help you get a list of all the users.
 router.get('/', async (req, res) => {
-  let collection = await db.collection('users')
+  let collection = db.collection('users')
   let results = await collection.find({}).toArray()
   res.send(results).status(200)
 })
 
 // This section will help you get a single user by id
 router.get('/:id', async (req, res) => {
-  let collection = await db.collection('users')
+  let collection = db.collection('users')
   let query = { _id: new ObjectId(req.params.id) }
   let result = await collection.findOne(query)
 
@@ -98,22 +98,21 @@ router.post('/login', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   try {
     const query = { _id: new ObjectId(req.params.id) }
-    const saltRounds = 10
-    bcrypt
-    .hash(req.body.password, saltRounds)
-    .then((hashedPassword));
+    const updates = {}
 
-    const updates = {
-      $set: {
-        name: req.body.name,
-        email: req.body.email,
-        password: hashedPassword,
-        profilePic: req.body.profilePic,
-      },
+    if (req.body.password) {
+      const saltRounds = 10
+      const hashedPassword = await bcrypt.hash(req.body.password, saltRounds)
+      updates.password = hashedPassword
     }
 
+    // Add other fields to the update object if they are provided
+    if (req.body.name) updates.name = req.body.name
+    if (req.body.email) updates.email = req.body.email
+    if (req.body.profilePic) updates.profilePic = req.body.profilePic
+
     let collection = await db.collection('users')
-    let result = await collection.updateOne(query, updates)
+    let result = await collection.updateOne(query, { $set: updates })
     res.send(result).status(200)
   } catch (err) {
     console.error('Error adding newUser:', err)
@@ -123,7 +122,7 @@ router.patch('/:id', async (req, res) => {
 
 router.post('/validate-token', async (req, res) => {
   try {
-    let collection = await db.collection('users')
+    let collection = db.collection('users')
     let user = await collection.findOne({ email: req.body.email })
     if (user.token === req.body.token && user.expireDate > Date.now()) {
       res.status(200).send('Token is valid')
@@ -150,7 +149,7 @@ router.patch('/send-email/:email', async (req, res) => {
       },
     }
 
-    let collection = await db.collection('users')
+    let collection = db.collection('users')
     let result = await collection.findOneAndUpdate(query, updates)
     res.send(result).status(200)
 
@@ -210,27 +209,30 @@ router.delete('/:id', async (req, res) => {
 
 // This section will help you get a user by email
 router.get('/getUserByEmail/:email', async (req, res) => {
+  console.log('Fetching user for email:', req.params.email)
   try {
-    const email = req.params.email; 
-    console.log('Fetching user for email:', email); 
+    const email = req.params.email
+    console.log('Fetching user for email:', email)
 
-    const collection = await db.collection('users');
-    const user = await collection.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
+    const collection = db.collection('users')
+    const user = await collection.findOne({ email })
 
     if (!user) {
-      return res.status(404).send({ message: 'User not found' });
+      return res.status(404).send({ message: 'User not found' })
     }
+
+    console.log('User found:', user)
 
     res.status(200).send({
       userId: user._id,
       name: user.name,
       email: user.email,
       profilePic: user.profilePic,
-    });
+    })
   } catch (error) {
-    console.error('Error fetching user by email:', error);
-    res.status(500).send({ message: 'Internal server error' });
+    console.error('Error fetching user by email:', error)
+    res.status(500).send({ message: 'Internal server error' })
   }
-});
+})
 
 export default router

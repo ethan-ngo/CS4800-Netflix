@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image, ActivityIndicator } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+} from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ImagePicker from 'expo-image-picker'
 import { validateEmail } from '../utils/validateEmail'
 
@@ -14,56 +23,59 @@ const ProfilePageNative = () => {
   const [originalUsername, setOriginalUsername] = useState('')
   const [originalEmail, setOriginalEmail] = useState('')
   const [loading, setLoading] = useState(true)
-// use email to fetch user data
+  // use email to fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const email = await AsyncStorage.getItem('email');
+        const email = await AsyncStorage.getItem('email')
         if (!email) {
-          console.error('Error: Email is missing');
-          Alert.alert('Error', 'You are not authenticated');
-          setLoading(false);
-          return;
+          console.error('Error: Email is missing')
+          Alert.alert('Error', 'You are not authenticated')
+          setLoading(false)
+          return
         }
-  
-        const userResponse = await fetch(`${process.env.APP_URL}users/getUserByEmail/${email}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-  
+        console.log('Fetched email:', email)
+
+        //const userResponse = await fetch(`${process.env.APP_URL}users/getUserByEmail/${email}`, {
+        const userResponse = await fetch(
+          `http://localhost:5050/users/getUserByEmail/${encodeURIComponent(email)}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+
         if (!userResponse.ok) {
-          const errorData = await userResponse.json();
-          console.error('Error fetching user details:', errorData.message);
-          Alert.alert('Error', errorData.message || 'Failed to fetch user details');
-          setLoading(false);
-          return;
+          const errorData = await userResponse.json()
+          console.error('Error fetching user details:', errorData.message)
+          Alert.alert('Error', errorData.message || 'Failed to fetch user details')
+          setLoading(false)
+          return
         }
-  
-        const user = await userResponse.json();
-        console.log('Fetched user details:', user);
-  
-        setUserId(user.userId);
-        setProfilePic(user.profilePic);
-        setUsername(user.name);
-        setEmail(user.email);
-  
-        setOriginalProfilePic(user.profilePic);
-        setOriginalUsername(user.name);
-        setOriginalEmail(user.email);
+
+        const user = await userResponse.json()
+        console.log('Fetched user details:', user)
+
+        setUserId(user.userId)
+        setProfilePic(user.profilePic)
+        setUsername(user.name)
+        setEmail(user.email)
+
+        setOriginalProfilePic(user.profilePic)
+        setOriginalUsername(user.name)
+        setOriginalEmail(user.email)
       } catch (error) {
-        console.error('Error fetching user data:', error);
-        Alert.alert('Error', 'An error occurred while fetching user data');
+        console.error('Error fetching user data:', error)
+        Alert.alert('Error', 'An error occurred while fetching user data')
       } finally {
-        setLoading(false); // Ensure loading is set to false in all cases
+        setLoading(false) // Ensure loading is set to false in all cases
       }
-    };
-  
-    fetchUserData();
-  }, []);
+    }
 
-
+    fetchUserData()
+  }, [])
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -80,22 +92,22 @@ const ProfilePageNative = () => {
 
   const handleUpdateProfile = async () => {
     if (!username || !email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
+      Alert.alert('Error', 'Please fill in all fields')
+      return
     }
-  
+
     if (!validateEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address');
-      return;
+      Alert.alert('Invalid Email', 'Please enter a valid email address')
+      return
     }
-  
+
     const updatedUserData = {
       name: username,
       email: email,
       password: password,
       profilePic: profilePic,
-    };
-  
+    }
+
     //use userId to update the user data
     try {
       const response = await fetch(process.env.APP_URL + 'users/:id/' + userId, {
@@ -104,21 +116,21 @@ const ProfilePageNative = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedUserData),
-      });
-  
+      })
+
       if (response.ok) {
-        const responseData = await response.json();
-        Alert.alert('Success', 'Profile updated successfully');
-        console.log('Updated user data:', responseData);
+        const responseData = await response.json()
+        Alert.alert('Success', 'Profile updated successfully')
+        console.log('Updated user data:', responseData)
       } else {
-        const errorData = await response.json();
-        Alert.alert('Error', errorData.message || 'Failed to update profile');
+        const errorData = await response.json()
+        Alert.alert('Error', errorData.message || 'Failed to update profile')
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
-      Alert.alert('Error', 'An error occurred while updating the profile');
+      console.error('Error updating profile:', error)
+      Alert.alert('Error', 'An error occurred while updating the profile')
     }
-  };
+  }
 
   const handleReset = () => {
     setProfilePic(originalProfilePic)
@@ -131,10 +143,10 @@ const ProfilePageNative = () => {
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#007BFF" />
       </View>
-    );
+    )
   }
 
-//uses user data from the database to populate the form
+  //uses user data from the database to populate the form
   return (
     <View style={styles.container}>
       <View style={styles.form}>
@@ -178,8 +190,8 @@ const ProfilePageNative = () => {
         </TouchableOpacity>
       </View>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -261,6 +273,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-});
+})
 
 export default ProfilePageNative
