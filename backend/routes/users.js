@@ -38,6 +38,19 @@ router.get('/:id', async (req, res) => {
   else res.send(result).status(200)
 })
 
+// This will check to see if the user is authenticated.
+router.post('/auth-session', async (req, res) => {
+  const token = req.body.token;
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        res.status(500).send('Token is invalid');
+      } else {
+        console.log(decoded);
+        res.status(200).json(decoded); // Send success response
+      }
+    });
+})
+
 // This section will help you create a new user.
 router.post('/', (req, res) => {
   const saltRounds = 10
@@ -84,8 +97,8 @@ router.post('/login', async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password)
 
     if (isPasswordValid) {
-      const token = jwt.sign({ userId: user._id, email: user.email }, 'token')
-      res.status(200).json({ message: 'Login successful', token, user: { email: user.email } })
+      const token = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {expiresIn: '7d'})
+      res.status(200).json({ message: 'Login successful', token: token, user: { email: user.email }, userID: user._id })
     } else {
       res.status(401).json({ message: 'Invalid password' })
     }
@@ -140,7 +153,7 @@ router.post('/validate-token', async (req, res) => {
 router.patch('/send-email/:email', async (req, res) => {
   try {
     const resetToken = crypto.randomBytes(20).toString('hex')
-    const resetTokenExpiry = Date.now() + 3600000 // 1 hour from now
+    const resetTokenExpiry = Date.now() + 15 * 60 * 1000;
 
     const query = { email: req.params.email }
     const updates = {
@@ -172,7 +185,7 @@ router.patch('/send-email/:email', async (req, res) => {
           <div style="padding: 10px; border: 2px solid black; border-radius: 5px; display: inline-block; margin: 10px 0;">
             <p style="font-size: 1.2em; font-weight: bold; color: #6200ea; margin: 0;">${resetToken}</p>
           </div>
-          <p>This token is valid for 1 hour.</p>
+          <p>This token is valid for 15 minutes.</p>
           <p>If you did not request a password reset, please ignore this email.</p>
           <p>Thank you,</p>
           <p>The Nameless Team</p>

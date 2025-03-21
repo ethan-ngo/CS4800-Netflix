@@ -7,22 +7,21 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  Platform,
 } from 'react-native'
 import { getItems, getMovies, getShows } from './api'
 import Video from 'react-native-video'
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from "react-native-vector-icons/AntDesign"
 
-import { useNavigation } from '@react-navigation/native'
-
 const API_URL = process.env.REACT_APP_API_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
 
-const HomePageNative = () => {
+const HomePageNative = ({navigation, route}) => {
   const [items, setItems] = useState([])
   const [shows, setShows] = useState([])
   const [movies, setMovies] = useState([])
-  const navigation = useNavigation()
+  const userID = route.params.userID;
 
 
   useEffect(() => {
@@ -39,7 +38,7 @@ const HomePageNative = () => {
         Alert.alert('Error', 'Failed to fetch media items.')
       }
     }
-
+    console.log('User ID: ' + userID);
     fetchItems()
     
   }, [])
@@ -59,7 +58,10 @@ const HomePageNative = () => {
   }
 
   const handleLogout = () => {
-    navigation.navigate('Login')
+    if(Platform.OS === "web"){
+      localStorage.clear();
+    }
+    navigation.navigate('Login');
   }
 
   const handleSelectProfile = () => {

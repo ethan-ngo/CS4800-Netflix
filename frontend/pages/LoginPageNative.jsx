@@ -1,15 +1,35 @@
 import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native'
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
+import { useEffect } from 'react'
 
 const LoginPageNative = ({ navigation }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
+  const authUser = async () =>{
+    const token = localStorage.getItem("token");
+    const response = await fetch(process.env.APP_URL + 'users/auth-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token: token }),
+    })
+    if(response.ok) {
+      const data = await response.json();
+      navigation.navigate("Home", { userID: data.userId });
+    }
+  }
+
+  if(Platform.OS === "web"){
+    useEffect(() =>{authUser();}, [])
+  }
+
   const handleLogin = async () => {
     console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
-
+    
     try {
       const res = await fetch(process.env.APP_URL + 'users/login', {
         method: 'POST',
@@ -25,10 +45,12 @@ const LoginPageNative = ({ navigation }) => {
       console.log('Data:', data)
 
       // Store token
-      //   localStorage.setItem('token', data.token);
+      if(Platform.OS === "web"){
+        localStorage.setItem('token', data.token);
+      }
 
       // Navigate to homepage
-      navigation.navigate('Home') // Use navigation prop to navigate
+      navigation.navigate('Home', {userID: data.userID}) // Use navigation prop to navigate
     } catch (error) {
       console.error('Error (unable to login): ', error)
       Alert.alert('Login failed', 'Invalid email or password')
