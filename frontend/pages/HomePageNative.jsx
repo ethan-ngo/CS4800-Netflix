@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  ScrollView,
 } from 'react-native';
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api';
 import { useNavigation } from '@react-navigation/native';
@@ -63,48 +64,54 @@ const HomePageNative = () => {
   );
 
   return (
-    <View style={styles.container}>
-      {/* Navbar */}
-      <View style={styles.navBar}>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.profileButton} onPress={handleSelectProfile}>
-          <Text style={styles.profileButtonText}>Profile</Text>
-        </TouchableOpacity>
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View style={styles.container}>
+        {/* Navbar */}
+        <View style={styles.navBar}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutButtonText}>Logout</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.profileButton} onPress={handleSelectProfile}>
+            <Text style={styles.profileButtonText}>Profile</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Media Lists */}
+        <View style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>All Items</Text>
+          <FlatList
+            data={items}
+            keyExtractor={(item) => item.Id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderMediaItem}
+            contentContainerStyle={styles.mediaList}
+          />
+        </View>
+
+        <View style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>Movies</Text>
+          <FlatList
+            data={movies}
+            keyExtractor={(item) => item.Id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderMediaItem}
+            contentContainerStyle={styles.mediaList}
+          /></View>
+
+        <View style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>Shows</Text>
+          <FlatList
+            data={shows}
+            keyExtractor={(item) => item.Id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderMediaItem}
+            contentContainerStyle={styles.mediaList}
+          /></View>
       </View>
-
-      {/* Media Lists */}
-      <Text style={styles.sectionTitle}>All Items</Text>
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.Id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        renderItem={renderMediaItem}
-        contentContainerStyle={styles.mediaList}
-      />
-
-      <Text style={styles.sectionTitle}>Movies</Text>
-      <FlatList
-        data={movies}
-        keyExtractor={(item) => item.Id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        renderItem={renderMediaItem}
-        contentContainerStyle={styles.mediaList}
-      />
-
-      <Text style={styles.sectionTitle}>Shows</Text>
-      <FlatList
-        data={shows}
-        keyExtractor={(item) => item.Id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        renderItem={renderMediaItem}
-        contentContainerStyle={styles.mediaList}
-      />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -113,6 +120,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212',
     padding: 10,
+    overflowy: 'auto',
+    overflowx: 'auto',
   },
   navBar: {
     flexDirection: 'row',
@@ -147,6 +156,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 10,
+    marginLeft: "1%",
+  },
+  mediaSection: {
+    minHeight: "15%",
   },
   mediaList: {
     marginBottom: 20,
@@ -155,6 +168,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     alignItems: 'center',
     width: 120,
+    margin: 15,
   },
   mediaImage: {
     width: 120,
