@@ -12,6 +12,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ImagePicker from 'expo-image-picker'
 import { validateEmail } from '../utils/validateEmail'
+import { useNavigation } from '@react-navigation/native'
 
 const ProfilePageNative = () => {
   const [profilePic, setProfilePic] = useState(null)
@@ -23,6 +24,9 @@ const ProfilePageNative = () => {
   const [originalUsername, setOriginalUsername] = useState('')
   const [originalEmail, setOriginalEmail] = useState('')
   const [loading, setLoading] = useState(true)
+
+  const navigation = useNavigation()
+
   // use email to fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
@@ -124,6 +128,10 @@ const ProfilePageNative = () => {
     }
   }
 
+  const handleHomeButton = () => {
+    navigation.navigate('Home')
+  }
+
   const handleReset = () => {
     setProfilePic(originalProfilePic)
     setUsername(originalUsername)
@@ -179,6 +187,9 @@ const ProfilePageNative = () => {
         </TouchableOpacity>
         <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.8}>
           <Text style={styles.resetButtonText}>Reset</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.homeButton} onPress={handleHomeButton} activeOpacity={0.8}>
+          <Text style={styles.homeButtonText}>Return Home</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -264,6 +275,17 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  homeButton: {
+    backgroundColor: 'green',
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  homeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 })
 
