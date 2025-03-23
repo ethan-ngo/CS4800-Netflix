@@ -15,8 +15,8 @@ import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from "react-native-vector-icons/AntDesign"
 import { useNavigation } from '@react-navigation/native'
 
-const API_URL = process.env.REACT_APP_API_URL
-const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
+//const API_URL = process.env.REACT_APP_API_URL
+//const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
 
 const HomePageNative = () => {
   const [items, setItems] = useState([])
@@ -140,9 +140,9 @@ const HomePageNative = () => {
             contentContainerStyle={styles.mediaList}
           /></View>
       </View>
-    </ScrollView>
-  );
-};
+    //</ScrollView>
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
