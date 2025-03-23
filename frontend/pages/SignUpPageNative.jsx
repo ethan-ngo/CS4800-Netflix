@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native'
 import { validateEmail } from '../utils/validateEmail'
-import theme from '../utils/theme';
+import theme from '../utils/theme'
 
 const SignUpPageNative = ({ navigation }) => {
   const [name, setName] = useState('')
@@ -116,8 +116,8 @@ const styles = StyleSheet.create({
   },
   form: {
     width: '100%',
-    maxWidth: 400,
-    padding: 20,
+    maxWidth: 500,
+    padding: 50,
     borderRadius: 10,
     backgroundColor: 'white',
     shadowColor: '#000',
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
-    marginBottom: 15,
+    marginBottom: 20,
     paddingHorizontal: 10,
   },
   forgotPassword: {
