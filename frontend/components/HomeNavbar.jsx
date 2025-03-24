@@ -1,9 +1,12 @@
-import React from 'react'
-import { View, Text, StyleSheet, Platform } from 'react-native'
+import React, { useState } from 'react'
+import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native'
 import ProfileDropdown from './ProfileDropdown'
 import '../globals.css'
+import Icon from 'react-native-vector-icons/EvilIcons'
 
 const HomeNavbar = () => {
+  const [hoveredButton, setHoveredButton] = useState(null)
+
   return (
     <View style={styles.header}>
       {/* leftmost: title */}
@@ -11,22 +14,40 @@ const HomeNavbar = () => {
 
       {/* middle: home, shows, movies */}
       <View style={styles.middleGroup}>
-        <View style={styles.button}>
-          <Text style={styles.buttonText}>Home</Text>
+        <View
+          style={styles.button}
+          onMouseEnter={() => setHoveredButton('home')}
+          onMouseLeave={() => setHoveredButton(null)}
+        >
+          <Text style={[styles.buttonText, hoveredButton === 'home' && styles.hoveredButtonText]}>
+            Home
+          </Text>
         </View>
-        <View style={styles.button}>
-          <Text style={styles.buttonText}>Shows</Text>
+        <View
+          style={styles.button}
+          onMouseEnter={() => setHoveredButton('movies')}
+          onMouseLeave={() => setHoveredButton(null)}
+        >
+          <Text style={[styles.buttonText, hoveredButton === 'movies' && styles.hoveredButtonText]}>
+            Movies
+          </Text>
         </View>
-        <View style={styles.button}>
-          <Text style={styles.buttonText}>Movies</Text>
+        <View
+          style={styles.button}
+          onMouseEnter={() => setHoveredButton('shows')}
+          onMouseLeave={() => setHoveredButton(null)}
+        >
+          <Text style={[styles.buttonText, hoveredButton === 'shows' && styles.hoveredButtonText]}>
+            Shows
+          </Text>
         </View>
       </View>
 
       {/* rightmost: search, profile icon image */}
       <View style={styles.rightGroup}>
-        <View style={styles.button}>
-          <Text style={styles.buttonText}>Search</Text>
-        </View>
+        <TouchableOpacity style={styles.searchButton}>
+          <Icon name="search" size={24} color={'white'} />
+        </TouchableOpacity>
         <View style={styles.button}>
           <ProfileDropdown />
         </View>
@@ -63,17 +84,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
+    position: 'relative',
     backgroundColor: 'transparent',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
     marginHorizontal: 5,
-    position: 'relative',
     zIndex: 1001,
+    cursor: 'pointer',
   },
   buttonText: {
     color: 'var(--text-color)',
     fontSize: 16,
+  },
+  hoveredButtonText: {
+    transform: [{ scale: 1.2 }],
+  },
+  searchButton: {
+    padding: 10,
+    cursor: 'pointer',
+    color: 'var(--text-color)',
   },
 })
 
