@@ -74,17 +74,6 @@ const HomePageNative = () => {
     <ScrollView showsVerticalScrollIndicator={false}>
       <HomeNavbar />
       <View style={styles.container}>
-        {/* Navbar */}
-        <View style={styles.navBar}>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutButtonText}>Logout</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.profileButton} onPress={handleSelectProfile}>
-            <Text style={styles.profileButtonText}>Profile</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Media Lists */}
         <View style={styles.mediaSection}>
           <Text style={styles.sectionTitle}>All Items</Text>
           <FlatList
@@ -140,26 +129,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#333',
-  },
-  logoutButton: {
-    backgroundColor: '#E50914',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-  },
-  logoutButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  profileButton: {
-    backgroundColor: 'green',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-  },
-  profileButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
   sectionTitle: {
     fontSize: 18,
