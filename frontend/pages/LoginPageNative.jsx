@@ -1,8 +1,17 @@
 import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native'
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
+import Header from '../components/Header'
 
 const LoginPageNative = ({ navigation }) => {
   const [email, setEmail] = useState('')
@@ -43,40 +52,43 @@ const LoginPageNative = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.title}>Login</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-          onBlur={() => {
-            if (email && !validateEmail(email)) {
-              Alert.alert('Invalid Email', 'Please enter a valid email address')
-            }
-          }}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-          <Text style={styles.forgotPassword}>Forgot Password?</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleLogin} style={styles.loginButton} activeOpacity={0.8}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <Text style={styles.signUpText}>
-          Don't have an account yet?{' '}
-          <Text style={styles.signUpLink} onPress={handleSignUp}>
-            Sign up!
+      <Header />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.form}>
+          <Text style={styles.title}>Login</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+            onBlur={() => {
+              if (email && !validateEmail(email)) {
+                Alert.alert('Invalid Email', 'Please enter a valid email address')
+              }
+            }}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+            <Text style={styles.forgotPassword}>Forgot Password?</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleLogin} style={styles.loginButton} activeOpacity={0.8}>
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+          <Text style={styles.signUpText}>
+            Don't have an account yet?{' '}
+            <Text style={styles.signUpLink} onPress={handleSignUp}>
+              Sign up!
+            </Text>
           </Text>
-        </Text>
-      </View>
+        </View>
+      </ScrollView>
     </View>
   )
 }
@@ -84,19 +96,19 @@ const LoginPageNative = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'white',
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'white',
   },
   form: {
     width: '100%',
     maxWidth: 500,
     padding: 50,
     borderRadius: 10,
-    // borderColor: 'gray',
-    // borderStyle: 'solid',
-    // borderWidth: 1,
     backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

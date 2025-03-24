@@ -14,6 +14,7 @@ import Video from 'react-native-video'
 import { Dropdown } from 'react-native-element-dropdown'
 import AntDesign from 'react-native-vector-icons/AntDesign'
 import { useNavigation } from '@react-navigation/native'
+import HomeNavbar from '../components/HomeNavbar'
 
 //const API_URL = process.env.REACT_APP_API_URL
 //const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
@@ -71,6 +72,7 @@ const HomePageNative = () => {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
+      <HomeNavbar />
       <View style={styles.container}>
         {/* Navbar */}
         <View style={styles.navBar}>

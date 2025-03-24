@@ -1,7 +1,16 @@
 import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native'
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  ScrollView,
+} from 'react-native'
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
+import Header from '../components/Header'
 
 const SignUpPageNative = ({ navigation }) => {
   const [name, setName] = useState('')
@@ -63,45 +72,48 @@ const SignUpPageNative = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.title}>Sign Up</Text>
-        <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-          onBlur={() => {
-            if (email && !validateEmail(email)) {
-              Alert.alert('Invalid Email', 'Please enter a valid email address')
-            }
-          }}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm Password"
-          secureTextEntry
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-        />
-        <TouchableOpacity style={styles.loginButton} onPress={handleSignUp} activeOpacity={0.8}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-        <Text style={styles.signUpText}>
-          Already have an account?{' '}
-          <Text style={styles.signUpLink} onPress={() => navigation.navigate('Login')}>
-            Log In!
+      <Header />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.form}>
+          <Text style={styles.title}>Sign Up</Text>
+          <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+            onBlur={() => {
+              if (email && !validateEmail(email)) {
+                Alert.alert('Invalid Email', 'Please enter a valid email address')
+              }
+            }}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+          <TouchableOpacity style={styles.loginButton} onPress={handleSignUp} activeOpacity={0.8}>
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+          <Text style={styles.signUpText}>
+            Already have an account?{' '}
+            <Text style={styles.signUpLink} onPress={() => navigation.navigate('Login')}>
+              Log In!
+            </Text>
           </Text>
-        </Text>
-      </View>
+        </View>
+      </ScrollView>
     </View>
   )
 }
@@ -109,10 +121,13 @@ const SignUpPageNative = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'white',
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'white',
   },
   form: {
     width: '100%',
@@ -140,12 +155,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 20,
     paddingHorizontal: 10,
-  },
-  forgotPassword: {
-    color: '#007BFF',
-    textAlign: 'center',
-    marginTop: 10,
-    textDecorationLine: 'underline',
   },
   loginButton: {
     backgroundColor: theme.primaryColor,

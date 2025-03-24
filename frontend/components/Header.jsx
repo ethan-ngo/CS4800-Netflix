@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#333',
+    position: 'absolute',
   },
   title: {
     fontSize: 20,
