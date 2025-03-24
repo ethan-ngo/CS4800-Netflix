@@ -58,7 +58,7 @@ const LoginPageNative = ({ navigation }) => {
   }
 
   const handleSignUp = () => {
-    navigation.navigate('SignUp') // Use navigation prop to navigate
+    navigation.navigate('SignUp')
   }
 
   return (

@@ -18,7 +18,6 @@ app.use('/movies', movies)
 app.use('/directors', directors)
 app.use('/actors', actors)
 
-// start the express server (uncomment when running locally)
 // app.listen(PORT, () => {
 //   console.log(`Server listening on port ${PORT}`)
 // })

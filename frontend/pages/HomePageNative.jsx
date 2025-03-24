@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,15 +7,10 @@ import {
   Image,
   TouchableOpacity,
   Alert,
-  Platform,
-} from 'react-native'
-import { getItems, getMovies, getShows } from './api'
-import Video from 'react-native-video'
-import { Dropdown } from 'react-native-element-dropdown';
-import AntDesign from "react-native-vector-icons/AntDesign"
-
-const API_URL = process.env.REACT_APP_API_URL
-const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
+  ScrollView,
+} from 'react-native';
+import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api';
+import { useNavigation } from '@react-navigation/native';
 
 const HomePageNative = ({navigation, route}) => {
   const [items, setItems] = useState([])
@@ -27,21 +22,20 @@ const HomePageNative = ({navigation, route}) => {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const mediaItems = await getItems()
-        const showItems = await getShows()
-        const movieItems = await getMovies()
-        setItems(mediaItems)
-        setShows(showItems)
-        setMovies(movieItems)
+        const mediaItems = await getItems();
+        const showItems = await getShows();
+        const movieItems = await getMovies();
+        setItems(mediaItems);
+        setShows(showItems);
+        setMovies(movieItems);
       } catch (error) {
-        console.error('Error fetching media items:', error)
-        Alert.alert('Error', 'Failed to fetch media items.')
+        console.error('Error fetching media items:', error);
+        Alert.alert('Error', 'Failed to fetch media items.');
       }
-    }
-    console.log('User ID: ' + userID);
-    fetchItems()
-    
-  }, [])
+    };
+
+    fetchItems();
+  }, []);
 
   const renderItem = (item) => (
       <TouchableOpacity
@@ -53,9 +47,8 @@ const HomePageNative = ({navigation, route}) => {
     )
 
   const handleSelectItem = (item) => {
-    // Navigate to the correct MediaDetailsNative component
-    navigation.navigate('MediaDetailsNative', { media: item })
-  }
+    navigation.navigate('MediaDetailsNative', { media: item });
+  };
 
   const handleLogout = () => {
     if(Platform.OS === "web"){
@@ -65,12 +58,9 @@ const HomePageNative = ({navigation, route}) => {
   }
 
   const handleSelectProfile = () => {
-    navigation.navigate('Profile')
-  }
-  const dropdownMenuItems = [
-    { id: 1, name: "Profile", color: "green", action: handleSelectProfile, },
-    { id: 3, name: "Logout", color: "red", action: handleLogout },
-  ];
+    navigation.navigate('Profile');
+  };
+
   const renderMediaItem = ({ item }) => (
     <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
       <Image
@@ -83,70 +73,67 @@ const HomePageNative = ({navigation, route}) => {
         {item.Name}
       </Text>
     </TouchableOpacity>
-  )
+  );
 
   return (
-    <View style={styles.container}>
-      {/* Navbar */}
-      <View style={styles.navBar}>
-        <Dropdown
-              style={styles.dropdownButton}
-              containerStyle={styles.dropdownMenu}
-              data={dropdownMenuItems}
-              renderItem={renderItem} 
-              renderRightIcon={() => (
-                  <AntDesign name="down" size={20} color="white" /> // Custom arrow icon
-                )}
-        />
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View style={styles.container}>
+        {/* Navbar */}
+        <View style={styles.navBar}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutButtonText}>Logout</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.profileButton} onPress={handleSelectProfile}>
+            <Text style={styles.profileButtonText}>Profile</Text>
+          </TouchableOpacity>
         </View>
-      {/*<View style={styles.navBar}>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.profileButton} onPress={handleSelectProfile}>
-          <Text style={styles.profileButtonText}>Profile</Text>
-        </TouchableOpacity>
-      </View>}*/}
 
-      {/* Media Lists */}
-      <Text style={styles.sectionTitle}>All Items</Text>
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.Id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        renderItem={renderMediaItem}
-        contentContainerStyle={styles.mediaList}
-      />
+        {/* Media Lists */}
+        <View style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>All Items</Text>
+          <FlatList
+            data={items}
+            keyExtractor={(item) => item.Id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderMediaItem}
+            contentContainerStyle={styles.mediaList}
+          />
+        </View>
 
-      <Text style={styles.sectionTitle}>Movies</Text>
-      <FlatList
-        data={movies}
-        keyExtractor={(item) => item.Id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        renderItem={renderMediaItem}
-        contentContainerStyle={styles.mediaList}
-      />
+        <View style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>Movies</Text>
+          <FlatList
+            data={movies}
+            keyExtractor={(item) => item.Id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderMediaItem}
+            contentContainerStyle={styles.mediaList}
+          /></View>
 
-      <Text style={styles.sectionTitle}>Shows</Text>
-      <FlatList
-        data={shows}
-        keyExtractor={(item) => item.Id.toString()}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        renderItem={renderMediaItem}
-        contentContainerStyle={styles.mediaList}
-      />
-    </View>
-  )
-}
+        <View style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>Shows</Text>
+          <FlatList
+            data={shows}
+            keyExtractor={(item) => item.Id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={renderMediaItem}
+            contentContainerStyle={styles.mediaList}
+          /></View>
+      </View>
+    </ScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#121212',
     padding: 10,
+    overflowy: 'auto',
+    overflowx: 'auto',
   },
   navBar: {
     flexDirection: 'row',
@@ -196,6 +183,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 10,
+    marginLeft: "1%",
+  },
+  mediaSection: {
+    minHeight: "15%",
   },
   mediaList: {
     marginBottom: 20,
@@ -204,6 +195,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     alignItems: 'center',
     width: 120,
+    margin: 15,
   },
   mediaImage: {
     width: 120,
@@ -217,41 +209,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '100%',
   },
-  dropdownButton: {
-    width: 45, 
-    height: 45,
-    borderRadius: 25, 
-    backgroundColor: "#6200ea", 
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  dropdownMenu: {
-    width: 200, 
-    backgroundColor: "white",
-    borderRadius: 10,
-    padding: 10,
-    ShadowColor: "#000",
-    ShadowOpacity: 0.2,
-    ShadowRadius: 4,
-    elevation: 5,
-  },
-  item: {
-    width: "100%",
-    height: 50,
-    padding: 15,
-    marginVertical: 5,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  itemText: {
-    color: "white",
-    fontSize: 16,
-  },
-  selected: {
-    marginTop: 10,
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-})
+});
 
-export default HomePageNative
+export default HomePageNative;
