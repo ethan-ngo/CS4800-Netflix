@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
-<<<<<<< HEAD
 } from 'react-native'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api'
 import Video from 'react-native-video'
@@ -18,11 +17,6 @@ import { useNavigation } from '@react-navigation/native'
 
 //const API_URL = process.env.REACT_APP_API_URL
 //const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
-=======
-} from 'react-native';
-import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api';
-import { useNavigation } from '@react-navigation/native';
->>>>>>> 0bde6efc46f5fb16c8b734b373c5fc9f370b1554
 
 const HomePageNative = () => {
   const [items, setItems] = useState([]);
