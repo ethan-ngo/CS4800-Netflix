@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     padding: 5,
     fontWeight: 'bold',
     color: '#fff',

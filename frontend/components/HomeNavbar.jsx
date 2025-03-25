@@ -50,9 +50,7 @@ const HomeNavbar = () => {
         <TouchableOpacity style={styles.searchButton}>
           <Icon name="search" size={24} color={'white'} />
         </TouchableOpacity>
-        <View style={styles.button}>
-          <ProfileDropdown />
-        </View>
+        <ProfileDropdown />
       </View>
     </View>
   )
@@ -72,10 +70,10 @@ const styles = StyleSheet.create({
     zIndex: 1000,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     padding: 5,
     fontWeight: 'bold',
-    color: '#fff',
+    color: 'var(--text-color)',
   },
   leftGroup: {
     flex: 1,
@@ -93,6 +91,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-end',
+    marginHorizontal: 10,
   },
   button: {
     position: 'relative',

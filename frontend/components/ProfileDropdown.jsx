@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Pressable } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { jwtDecode } from 'jwt-decode'
@@ -10,6 +10,7 @@ const ProfileDropdown = () => {
   const [hoveredButton, setHoveredButton] = useState(null)
   const [username, setUsername] = useState('User')
   const navigation = useNavigation()
+  const dropdownRef = useRef(null)
 
   const handleLogout = async () => {
     try {
@@ -49,8 +50,25 @@ const ProfileDropdown = () => {
     fetchUsername()
   }, [])
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false)
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleOutsideClick)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick)
+    }
+  }, [isOpen])
+
   return (
-    <View style={styles.container}>
+    <View style={styles.container} ref={dropdownRef}>
       <TouchableOpacity style={styles.profileButton} onPress={toggleDropdown} activeOpacity={0.8}>
         <Text style={styles.profileButtonText}>Welcome, {username}</Text>
         <Icon name={isOpen ? 'arrow-drop-up' : 'arrow-drop-down'} size={18} color="#fff" />
@@ -102,6 +120,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 4,
+    cursor: 'pointer',
   },
   profileButtonText: {
     color: '#fff',
