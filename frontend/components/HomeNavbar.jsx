@@ -10,7 +10,9 @@ const HomeNavbar = () => {
   return (
     <View style={styles.header}>
       {/* leftmost: title */}
-      <Text style={styles.title}>DomainFilms</Text>
+      <View style={styles.leftGroup}>
+        <Text style={styles.title}>DomainFilms</Text>
+      </View>
 
       {/* middle: home, shows, movies */}
       <View style={styles.middleGroup}>
@@ -75,13 +77,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
+  leftGroup: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginHorizontal: 10,
+  },
   middleGroup: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   rightGroup: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-end',
   },
   button: {
     position: 'relative',
@@ -89,13 +100,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
-    marginHorizontal: 5,
+    marginHorizontal: 10,
     zIndex: 1001,
     cursor: 'pointer',
   },
   buttonText: {
     color: 'var(--text-color)',
-    fontSize: 16,
+    fontSize: 18,
   },
   hoveredButtonText: {
     transform: [{ scale: 1.2 }],

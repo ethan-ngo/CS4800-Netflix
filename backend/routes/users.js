@@ -76,6 +76,8 @@ router.post('/login', async (req, res) => {
   console.log('Login attempt:', `Email: ${email}, Password: ${password}`)
   try {
     const user = await db.collection('users').findOne({ email })
+    console.log('User:', user)
+    console.log(user)
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
@@ -84,8 +86,10 @@ router.post('/login', async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password)
 
     if (isPasswordValid) {
-      const token = jwt.sign({ userId: user._id, email: user.email }, 'token')
-      res.status(200).json({ message: 'Login successful', token, user: { email: user.email } })
+      const token = jwt.sign({ userId: user._id, name: user.name, email: user.email }, 'token')
+      res
+        .status(200)
+        .json({ message: 'Login successful', token, user: { email: user.email, name: user.name } })
     } else {
       res.status(401).json({ message: 'Invalid password' })
     }
