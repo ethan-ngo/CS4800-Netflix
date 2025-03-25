@@ -1,17 +1,26 @@
 import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native'
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
 import { useEffect } from 'react'
+import Header from '../components/Header'
 
 const LoginPageNative = ({ navigation }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const app_url = process.env.LOCAL_URL;
-  
-  const authUser = async () =>{
-    const token = await AsyncStorage.getItem("token");
+  const app_url = process.env.APP_URL
+
+  const authUser = async () => {
+    const token = await AsyncStorage.getItem('token')
     const response = await fetch(app_url + 'users/auth-session', {
       method: 'POST',
       headers: {
@@ -19,13 +28,15 @@ const LoginPageNative = ({ navigation }) => {
       },
       body: JSON.stringify({ token: token }),
     })
-    if(response.ok) {
-      const data = await response.json();
-      navigation.navigate("Home", { userID: data.userId });
+    if (response.ok) {
+      const data = await response.json()
+      navigation.navigate('Home', { userID: data.userId })
     }
   }
 
-  useEffect(() =>{authUser();}, [])
+  useEffect(() => {
+    authUser()
+  }, [])
 
   const handleLogin = async () => {
     console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
@@ -49,7 +60,7 @@ const LoginPageNative = ({ navigation }) => {
       await AsyncStorage.setItem('email', email)
 
       // Navigate to homepage
-      navigation.navigate('Home', {userID: data.userID})
+      navigation.navigate('Home', { userID: data.userID })
     } catch (error) {
       console.error('Error (unable to login): ', error)
       Alert.alert('Login failed', 'Invalid email or password')
@@ -62,40 +73,43 @@ const LoginPageNative = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.title}>Login</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-          onBlur={() => {
-            if (email && !validateEmail(email)) {
-              Alert.alert('Invalid Email', 'Please enter a valid email address')
-            }
-          }}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-          <Text style={styles.forgotPassword}>Forgot Password?</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleLogin} style={styles.loginButton} activeOpacity={0.8}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <Text style={styles.signUpText}>
-          Don't have an account yet?{' '}
-          <Text style={styles.signUpLink} onPress={handleSignUp}>
-            Sign up!
+      <Header />
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.form}>
+          <Text style={styles.title}>Login</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+            onBlur={() => {
+              if (email && !validateEmail(email)) {
+                Alert.alert('Invalid Email', 'Please enter a valid email address')
+              }
+            }}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
+            <Text style={styles.forgotPassword}>Forgot Password?</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleLogin} style={styles.loginButton} activeOpacity={0.8}>
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+          <Text style={styles.signUpText}>
+            Don't have an account yet?{' '}
+            <Text style={styles.signUpLink} onPress={handleSignUp}>
+              Sign up!
+            </Text>
           </Text>
-        </Text>
-      </View>
+        </View>
+      </ScrollView>
     </View>
   )
 }
@@ -103,19 +117,19 @@ const LoginPageNative = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'white',
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'white',
   },
   form: {
     width: '100%',
-    maxWidth: 400,
-    padding: 20,
+    maxWidth: 500,
+    padding: 50,
     borderRadius: 10,
-    // borderColor: 'gray',
-    // borderStyle: 'solid',
-    // borderWidth: 1,
     backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -124,7 +138,7 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
@@ -135,7 +149,7 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
-    marginBottom: 15,
+    marginBottom: 20,
     paddingHorizontal: 10,
   },
   forgotPassword: {

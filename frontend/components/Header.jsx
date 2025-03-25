@@ -18,9 +18,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#333',
+    position: 'absolute',
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     padding: 5,
     fontWeight: 'bold',
     color: '#fff',

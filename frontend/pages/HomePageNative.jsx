@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -8,48 +8,56 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
-  Platform,
-} from 'react-native';
+} from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api';
+import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api'
+import Video from 'react-native-video'
+import { Dropdown } from 'react-native-element-dropdown'
+import AntDesign from 'react-native-vector-icons/AntDesign'
+import { useNavigation } from '@react-navigation/native'
+import HomeNavbar from '../components/HomeNavbar'
 
-const HomePageNative = ({navigation, route}) => {
-  const [items, setItems] = useState([]);
-  const [shows, setShows] = useState([]);
-  const [movies, setMovies] = useState([]);
+//const API_URL = process.env.REACT_APP_API_URL
+//const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
 
-  const userID = route.params.userID;
+const HomePageNative = ({ route }) => {
+  const [items, setItems] = useState([])
+  const [shows, setShows] = useState([])
+  const [movies, setMovies] = useState([])
+
+  const userID = route.params.userID
+  const navigation = useNavigation()
 
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const mediaItems = await getItems();
-        const showItems = await getShows();
-        const movieItems = await getMovies();
-        setItems(mediaItems);
-        setShows(showItems);
-        setMovies(movieItems);
+        const mediaItems = await getItems()
+        const showItems = await getShows()
+        const movieItems = await getMovies()
+        setItems(mediaItems)
+        setShows(showItems)
+        setMovies(movieItems)
       } catch (error) {
-        console.error('Error fetching media items:', error);
-        Alert.alert('Error', 'Failed to fetch media items.');
+        console.error('Error fetching media items:', error)
+        Alert.alert('Error', 'Failed to fetch media items.')
       }
-    };
+    }
 
-    fetchItems();
-  }, []);
+    fetchItems()
+  }, [])
 
   const handleSelectItem = (item) => {
-    navigation.navigate('MediaDetailsNative', { media: item });
-  };
+    navigation.navigate('MediaDetailsNative', { media: item })
+  }
 
   const handleLogout = () => {
-    AsyncStorage.clear();
-    navigation.navigate('Login');
-  };
+    AsyncStorage.clear()
+    navigation.navigate('Login')
+  }
 
   const handleSelectProfile = () => {
-    navigation.navigate('Profile');
-  };
+    navigation.navigate('Profile')
+  }
 
   const renderMediaItem = ({ item }) => (
     <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
@@ -63,22 +71,12 @@ const HomePageNative = ({navigation, route}) => {
         {item.Name}
       </Text>
     </TouchableOpacity>
-  );
+  )
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
+      <HomeNavbar />
       <View style={styles.container}>
-        {/* Navbar */}
-        <View style={styles.navBar}>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutButtonText}>Logout</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.profileButton} onPress={handleSelectProfile}>
-            <Text style={styles.profileButtonText}>Profile</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Media Lists */}
         <View style={styles.mediaSection}>
           <Text style={styles.sectionTitle}>All Items</Text>
           <FlatList
@@ -100,7 +98,8 @@ const HomePageNative = ({navigation, route}) => {
             showsHorizontalScrollIndicator={false}
             renderItem={renderMediaItem}
             contentContainerStyle={styles.mediaList}
-          /></View>
+          />
+        </View>
 
         <View style={styles.mediaSection}>
           <Text style={styles.sectionTitle}>Shows</Text>
@@ -111,11 +110,12 @@ const HomePageNative = ({navigation, route}) => {
             showsHorizontalScrollIndicator={false}
             renderItem={renderMediaItem}
             contentContainerStyle={styles.mediaList}
-          /></View>
+          />
+        </View>
       </View>
     </ScrollView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -133,35 +133,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#333',
   },
-  logoutButton: {
-    backgroundColor: '#E50914',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-  },
-  logoutButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  profileButton: {
-    backgroundColor: 'green',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-  },
-  profileButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 10,
-    marginLeft: "1%",
+    marginLeft: '1%',
   },
   mediaSection: {
-    minHeight: "15%",
+    minHeight: '15%',
   },
   mediaList: {
     marginBottom: 20,
@@ -184,6 +164,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '100%',
   },
-});
+})
 
-export default HomePageNative;
+export default HomePageNative

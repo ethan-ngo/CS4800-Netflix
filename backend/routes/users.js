@@ -70,17 +70,17 @@ router.post('/', (req, res) => {
     })
 })
 
- // This will check to see if the user is authenticated.
- router.post('/auth-session', async (req, res) => {
-  const token = req.body.token;
+// This will check to see if the user is authenticated.
+router.post('/auth-session', async (req, res) => {
+  const token = req.body.token
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) {
-        res.status(500).send('Token is invalid');
-      } else {
-        console.log(decoded);
-        res.status(200).json(decoded); // Send success response
-      }
-    });
+    if (err) {
+      res.status(500).send('Token is invalid')
+    } else {
+      console.log(decoded)
+      res.status(200).json(decoded) // Send success response
+    }
+  })
 })
 
 // This section is for logging in
@@ -89,6 +89,8 @@ router.post('/login', async (req, res) => {
   console.log('Login attempt:', `Email: ${email}, Password: ${password}`)
   try {
     const user = await db.collection('users').findOne({ email })
+    console.log('User:', user)
+    console.log(user)
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
@@ -97,8 +99,18 @@ router.post('/login', async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password)
 
     if (isPasswordValid) {
-      const token = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {expiresIn: '7d'})
-      res.status(200).json({ message: 'Login successful', token: token, user: { email: user.email }, userID: user._id })
+      const token = jwt.sign(
+        { userId: user._id, name: user.name, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' },
+        'token'
+      )
+      res.status(200).json({
+        message: 'Login successful',
+        token: token,
+        user: { email: user.email, name: user.name },
+        userID: user._id,
+      })
     } else {
       res.status(401).json({ message: 'Invalid password' })
     }
@@ -154,7 +166,7 @@ router.post('/validate-token', async (req, res) => {
 router.patch('/send-email/:email', async (req, res) => {
   try {
     const resetToken = crypto.randomBytes(20).toString('hex')
-    const resetTokenExpiry = Date.now() + 15 * 60 * 1000;
+    const resetTokenExpiry = Date.now() + 15 * 60 * 1000
 
     const query = { email: req.params.email }
     const updates = {
