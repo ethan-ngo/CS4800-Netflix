@@ -11,17 +11,36 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
+import { useEffect } from 'react'
 import Header from '../components/Header'
 
 const LoginPageNative = ({ navigation }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const app_url = process.env.LOCAL_URL;
+  
+  const authUser = async () =>{
+    const token = await AsyncStorage.getItem("token");
+    const response = await fetch(app_url + 'users/auth-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token: token }),
+    })
+    if(response.ok) {
+      const data = await response.json();
+      navigation.navigate("Home", { userID: data.userId });
+    }
+  }
+
+  useEffect(() =>{authUser();}, [])
 
   const handleLogin = async () => {
     console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
 
     try {
-      const res = await fetch(process.env.APP_URL + 'users/login', {
+      const res = await fetch(app_url + 'users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,7 +58,7 @@ const LoginPageNative = ({ navigation }) => {
       await AsyncStorage.setItem('email', email)
 
       // Navigate to homepage
-      navigation.navigate('Home')
+      navigation.navigate('Home', {userID: data.userID})
     } catch (error) {
       console.error('Error (unable to login): ', error)
       Alert.alert('Login failed', 'Invalid email or password')

@@ -9,6 +9,7 @@ import {
   Alert,
   ScrollView,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api'
 import Video from 'react-native-video'
 import { Dropdown } from 'react-native-element-dropdown'
@@ -19,11 +20,12 @@ import HomeNavbar from '../components/HomeNavbar'
 //const API_URL = process.env.REACT_APP_API_URL
 //const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
 
-const HomePageNative = () => {
+const HomePageNative = ({ route }) => {
   const [items, setItems] = useState([])
   const [shows, setShows] = useState([])
   const [movies, setMovies] = useState([])
 
+  const userID = route.params.userID
   const navigation = useNavigation()
 
   useEffect(() => {
@@ -49,6 +51,7 @@ const HomePageNative = () => {
   }
 
   const handleLogout = () => {
+    AsyncStorage.clear()
     navigation.navigate('Login')
   }
 
