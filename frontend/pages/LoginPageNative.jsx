@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -7,19 +7,22 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
-import { useEffect } from 'react'
 import Header from '../components/Header'
+import LoadingOverlay from '../components/LoadingOverlay'
 
 const LoginPageNative = ({ navigation }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
   const app_url = process.env.APP_URL
 
   const authUser = async () => {
+    setLoading(true)
     const token = await AsyncStorage.getItem('token')
     const response = await fetch(app_url + 'users/auth-session', {
       method: 'POST',
@@ -32,6 +35,7 @@ const LoginPageNative = ({ navigation }) => {
       const data = await response.json()
       navigation.navigate('Home', { userID: data.userId })
     }
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -40,7 +44,7 @@ const LoginPageNative = ({ navigation }) => {
 
   const handleLogin = async () => {
     console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
-
+    setLoading(true)
     try {
       const res = await fetch(app_url + 'users/login', {
         method: 'POST',
@@ -65,6 +69,7 @@ const LoginPageNative = ({ navigation }) => {
       console.error('Error (unable to login): ', error)
       Alert.alert('Login failed', 'Invalid email or password')
     }
+    setLoading(false)
   }
 
   const handleSignUp = () => {
@@ -73,6 +78,7 @@ const LoginPageNative = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {loading && <LoadingOverlay visible={loading} />}
       <Header />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.form}>
@@ -99,7 +105,12 @@ const LoginPageNative = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleLogin} style={styles.loginButton} activeOpacity={0.8}>
+          <TouchableOpacity
+            onPress={handleLogin}
+            style={styles.loginButton}
+            activeOpacity={0.8}
+            disabled={loading}
+          >
             <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
           <Text style={styles.signUpText}>
