@@ -17,10 +17,10 @@ import Header from '../components/Header'
 const LoginPageNative = ({ navigation }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const app_url = process.env.LOCAL_URL;
-  
-  const authUser = async () =>{
-    const token = await AsyncStorage.getItem("token");
+  const app_url = process.env.APP_URL
+
+  const authUser = async () => {
+    const token = await AsyncStorage.getItem('token')
     const response = await fetch(app_url + 'users/auth-session', {
       method: 'POST',
       headers: {
@@ -28,13 +28,15 @@ const LoginPageNative = ({ navigation }) => {
       },
       body: JSON.stringify({ token: token }),
     })
-    if(response.ok) {
-      const data = await response.json();
-      navigation.navigate("Home", { userID: data.userId });
+    if (response.ok) {
+      const data = await response.json()
+      navigation.navigate('Home', { userID: data.userId })
     }
   }
 
-  useEffect(() =>{authUser();}, [])
+  useEffect(() => {
+    authUser()
+  }, [])
 
   const handleLogin = async () => {
     console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
@@ -58,7 +60,7 @@ const LoginPageNative = ({ navigation }) => {
       await AsyncStorage.setItem('email', email)
 
       // Navigate to homepage
-      navigation.navigate('Home', {userID: data.userID})
+      navigation.navigate('Home', { userID: data.userID })
     } catch (error) {
       console.error('Error (unable to login): ', error)
       Alert.alert('Login failed', 'Invalid email or password')
