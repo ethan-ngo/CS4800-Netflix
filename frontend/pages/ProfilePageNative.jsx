@@ -12,9 +12,9 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ImagePicker from 'expo-image-picker'
 import { validateEmail } from '../utils/validateEmail'
-import { useNavigation } from '@react-navigation/native'
+import theme from '../utils/theme'
 
-const ProfilePageNative = () => {
+const ProfilePageNative = ({navigation}) => {
   const [profilePic, setProfilePic] = useState(null)
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
@@ -25,7 +25,6 @@ const ProfilePageNative = () => {
   const [originalEmail, setOriginalEmail] = useState('')
   const [loading, setLoading] = useState(true)
 
-  const navigation = useNavigation()
 
   // use email to fetch user data
   useEffect(() => {
@@ -129,7 +128,7 @@ const ProfilePageNative = () => {
   }
 
   const handleHomeButton = () => {
-    navigation.navigate('Home')
+    navigation.navigate('Home', {userID: userId})
   }
 
   const handleReset = () => {
@@ -178,11 +177,7 @@ const ProfilePageNative = () => {
           value={password}
           onChangeText={setPassword}
         />
-        <TouchableOpacity
-          style={styles.updateButton}
-          onPress={handleUpdateProfile}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile} activeOpacity={0.8}>
           <Text style={styles.buttonText}>Update Profile</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.8}>
@@ -252,7 +247,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   updateButton: {
-    backgroundColor: 'var(--primary-color)',
+    backgroundColor: theme.primaryColor,
     paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center',

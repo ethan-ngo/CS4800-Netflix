@@ -8,16 +8,17 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
+  Platform,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api';
-import { useNavigation } from '@react-navigation/native';
 
-const HomePageNative = () => {
+const HomePageNative = ({navigation, route}) => {
   const [items, setItems] = useState([]);
   const [shows, setShows] = useState([]);
   const [movies, setMovies] = useState([]);
 
-  const navigation = useNavigation();
+  const userID = route.params.userID;
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -42,6 +43,7 @@ const HomePageNative = () => {
   };
 
   const handleLogout = () => {
+    AsyncStorage.clear();
     navigation.navigate('Login');
   };
 
