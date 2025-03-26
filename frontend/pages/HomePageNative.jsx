@@ -31,6 +31,7 @@ const HomePageNative = ({ route }) => {
         setItems(mediaItems)
         setShows(showItems)
         setMovies(movieItems)
+        console.log(mediaItems)
       } catch (error) {
         console.error('Error fetching media items:', error)
         Alert.alert('Error', 'Failed to fetch media items.')
@@ -53,19 +54,24 @@ const HomePageNative = ({ route }) => {
     navigation.navigate('Profile')
   }
 
-  const renderMediaItem = ({ item }) => (
-    <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
-      <Image
-        source={{
-          uri: `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`,
-        }}
-        style={styles.mediaImage}
-      />
-      <Text style={styles.mediaName} numberOfLines={2} ellipsizeMode="tail">
-        {item.Name}
-      </Text>
-    </TouchableOpacity>
-  )
+  const renderMediaItem = ({ item }) => {
+    const hasImage = item.ImageTags?.Primary;
+    const imageUrl = `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`;
+
+    if(!hasImage){return null};
+
+    return (
+      <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
+        <Image
+          source={{uri: imageUrl,}}
+          style={styles.mediaImage}
+        />
+        <Text style={styles.mediaName} numberOfLines={2} ellipsizeMode="tail">
+          {item.Name}
+        </Text>
+      </TouchableOpacity>
+    )
+  };
 
   return (
     <ScrollView
@@ -121,8 +127,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212',
     padding: 10,
-    overflowy: 'auto',
-    overflowx: 'auto',
+    overflowY: 'auto',
+    overflowX: 'auto',
   },
   navBar: {
     flexDirection: 'row',
