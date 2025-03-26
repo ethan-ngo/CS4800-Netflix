@@ -13,9 +13,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ImagePicker from 'expo-image-picker'
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
+import { s3, BUCKET_NAME } from '../aws-config'
 
 const ProfilePageNative = ({navigation}) => {
   const [profilePic, setProfilePic] = useState(null)
+  const [profilePicURI, setProfilePicURI] = useState(null)
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -24,7 +26,6 @@ const ProfilePageNative = ({navigation}) => {
   const [originalUsername, setOriginalUsername] = useState('')
   const [originalEmail, setOriginalEmail] = useState('')
   const [loading, setLoading] = useState(true)
-
 
   // use email to fetch user data
   useEffect(() => {
@@ -59,7 +60,7 @@ const ProfilePageNative = ({navigation}) => {
         console.log('Fetched user details:', user)
 
         setUserId(user.userId)
-        setProfilePic(user.profilePic)
+        setProfilePicURI(user.profilePic)
         setUsername(user.name)
         setEmail(user.email)
 
@@ -76,7 +77,7 @@ const ProfilePageNative = ({navigation}) => {
 
     fetchUserData()
   }, [])
-
+  
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -86,9 +87,16 @@ const ProfilePageNative = ({navigation}) => {
     })
 
     if (!result.canceled) {
-      setProfilePic(result.assets[0].uri)
+      setProfilePic(result.assets[0])
+      setProfilePicURI(result.assets[0].uri)
     }
   }
+
+  const getBlobFromUri = async (uri) => {
+    const response = await fetch(uri); // Fetch the file from the URI
+    const blob = await response.blob(); // Convert the response to a blob
+    return blob;
+  };
 
   const handleUpdateProfile = async () => {
     if (!validateEmail(email)) {
@@ -100,7 +108,21 @@ const ProfilePageNative = ({navigation}) => {
     if (username) updatedUserData.name = username
     if (email) updatedUserData.email = email
     if (password) updatedUserData.password = password
-    if (profilePic) updatedUserData.profilePic = profilePic
+
+    const blob = await getBlobFromUri(profilePic.uri);
+    const params = {
+      Bucket: BUCKET_NAME,
+      Key: userId, 
+      Body: blob,
+      ContentType: profilePic.mimeType,
+    };
+
+    try {
+      const { Location } = await s3.upload(params).promise();
+      if (profilePic) updatedUserData.profilePic = Location
+    } catch (err) {
+      console.error("Upload failed:", err);
+    }
 
     //use userId to update the user data
     try {
@@ -132,7 +154,7 @@ const ProfilePageNative = ({navigation}) => {
   }
 
   const handleReset = () => {
-    setProfilePic(originalProfilePic)
+    setProfilePicURI(originalProfilePic)
     setUsername(originalUsername)
     setEmail(originalEmail)
     setPassword('')
@@ -151,8 +173,8 @@ const ProfilePageNative = ({navigation}) => {
       <View style={styles.form}>
         <Text style={styles.title}>Edit Profile</Text>
         <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
-          {profilePic ? (
-            <Image source={{ uri: profilePic }} style={styles.profileImage} />
+          {profilePicURI ? (
+            <Image source={{ uri: profilePicURI}} style={styles.profileImage} />
           ) : (
             <Text style={styles.imageText}>Upload profile picture</Text>
           )}
