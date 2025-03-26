@@ -11,14 +11,8 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api'
-import Video from 'react-native-video'
-import { Dropdown } from 'react-native-element-dropdown'
-import AntDesign from 'react-native-vector-icons/AntDesign'
 import { useNavigation } from '@react-navigation/native'
 import HomeNavbar from '../components/HomeNavbar'
-
-//const API_URL = process.env.REACT_APP_API_URL
-//const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
 
 const HomePageNative = ({ route }) => {
   const [items, setItems] = useState([])
@@ -74,7 +68,9 @@ const HomePageNative = ({ route }) => {
   )
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContainer}>
       <HomeNavbar />
       <View style={styles.container}>
         <View style={styles.mediaSection}>
@@ -118,6 +114,9 @@ const HomePageNative = ({ route }) => {
 }
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: '#121212',
