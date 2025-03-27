@@ -13,17 +13,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api'
 import { useNavigation } from '@react-navigation/native'
 import HomeNavbar from '../components/HomeNavbar'
+import LoadingOverlay from '../components/LoadingOverlay'
 
 const HomePageNative = ({ route }) => {
   const [items, setItems] = useState([])
   const [shows, setShows] = useState([])
   const [movies, setMovies] = useState([])
+  const [loading, setLoading] = useState(false)
 
   const userID = route.params.userID
   const navigation = useNavigation()
 
   useEffect(() => {
     const fetchItems = async () => {
+      setLoading(true)
       try {
         const mediaItems = await getItems()
         const showItems = await getShows()
@@ -36,6 +39,7 @@ const HomePageNative = ({ route }) => {
         console.error('Error fetching media items:', error)
         Alert.alert('Error', 'Failed to fetch media items.')
       }
+      setLoading(false)
     }
 
     fetchItems()
@@ -46,29 +50,26 @@ const HomePageNative = ({ route }) => {
   }
 
   const renderMediaItem = ({ item }) => {
-    const hasImage = item.ImageTags?.Primary;
-    const imageUrl = `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`;
+    const hasImage = item.ImageTags?.Primary
+    const imageUrl = `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`
 
-    if (!hasImage) { return null };
+    if (!hasImage) {
+      return null
+    }
 
     return (
       <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
-        <Image
-          source={{ uri: imageUrl, }}
-          style={styles.mediaImage}
-        />
+        <Image source={{ uri: imageUrl }} style={styles.mediaImage} />
         <Text style={styles.mediaName} numberOfLines={2} ellipsizeMode="tail">
           {item.Name}
         </Text>
       </TouchableOpacity>
     )
-  };
-
+  }
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.scrollContainer}>
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
+      {loading && <LoadingOverlay visible={loading} />}
       <HomeNavbar userID={userID} />
       <View style={styles.container}>
         <View style={styles.mediaSection}>
