@@ -11,14 +11,17 @@ import {
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
 import Header from '../components/Header'
+import LoadingOverlay from '../components/LoadingOverlay'
 
 const SignUpPageNative = ({ navigation }) => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleSignUp = async () => {
+    setLoading(true)
     if (!name || !email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields')
       return
@@ -68,10 +71,12 @@ const SignUpPageNative = ({ navigation }) => {
       console.error('Error creating user:', error)
       Alert.alert('Error', 'Failed to create account')
     }
+    setLoading(false)
   }
 
   return (
     <View style={styles.container}>
+      {loading && <LoadingOverlay visible={loading} />}
       <Header />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.form}>
@@ -102,6 +107,7 @@ const SignUpPageNative = ({ navigation }) => {
             secureTextEntry
             value={confirmPassword}
             onChangeText={setConfirmPassword}
+            onSubmitEditing={handleSignUp} // after password is enterd, submit on enter
           />
           <TouchableOpacity style={styles.loginButton} onPress={handleSignUp} activeOpacity={0.8}>
             <Text style={styles.buttonText}>Sign Up</Text>
