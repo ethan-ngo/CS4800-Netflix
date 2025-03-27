@@ -45,28 +45,25 @@ const HomePageNative = ({ route }) => {
     navigation.navigate('MediaDetailsNative', { media: item })
   }
 
-  const handleLogout = () => {
-    AsyncStorage.clear()
-    navigation.navigate('Login')
-  }
+  const renderMediaItem = ({ item }) => {
+    const hasImage = item.ImageTags?.Primary;
+    const imageUrl = `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`;
 
-  const handleSelectProfile = () => {
-    navigation.navigate('Profile')
-  }
+    if (!hasImage) { return null };
 
-  const renderMediaItem = ({ item }) => (
-    <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
-      <Image
-        source={{
-          uri: `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`,
-        }}
-        style={styles.mediaImage}
-      />
-      <Text style={styles.mediaName} numberOfLines={2} ellipsizeMode="tail">
-        {item.Name}
-      </Text>
-    </TouchableOpacity>
-  )
+    return (
+      <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
+        <Image
+          source={{ uri: imageUrl, }}
+          style={styles.mediaImage}
+        />
+        <Text style={styles.mediaName} numberOfLines={2} ellipsizeMode="tail">
+          {item.Name}
+        </Text>
+      </TouchableOpacity>
+    )
+  };
+
 
   return (
     <ScrollView
@@ -122,8 +119,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212',
     padding: 10,
-    overflowY: 'auto',
-    overflowX: 'auto',
+    overflowy: 'auto',
+    overflowx: 'auto',
   },
   navBar: {
     flexDirection: 'row',
