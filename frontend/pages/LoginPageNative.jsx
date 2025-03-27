@@ -101,6 +101,7 @@ const LoginPageNative = ({ navigation }) => {
             secureTextEntry
             value={password}
             onChangeText={setPassword}
+            onSubmitEditing={handleLogin} // after password is enterd, submit on enter
           />
           <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
