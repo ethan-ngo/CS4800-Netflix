@@ -50,15 +50,6 @@ const HomePageNative = ({ route }) => {
     navigation.navigate('MediaDetailsNative', { media: item })
   }
 
-  const handleLogout = () => {
-    AsyncStorage.clear()
-    navigation.navigate('Login')
-  }
-
-  const handleSelectProfile = () => {
-    navigation.navigate('Profile')
-  }
-
   const renderMediaItem = ({ item }) => (
     <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
       <Image
@@ -75,7 +66,7 @@ const HomePageNative = ({ route }) => {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      <HomeNavbar />
+      <HomeNavbar userID={userID}/>
       <View style={styles.container}>
         <View style={styles.mediaSection}>
           <Text style={styles.sectionTitle}>All Items</Text>

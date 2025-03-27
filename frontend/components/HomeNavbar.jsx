@@ -4,7 +4,7 @@ import ProfileDropdown from './ProfileDropdown'
 import '../globals.css'
 import Icon from 'react-native-vector-icons/EvilIcons'
 
-const HomeNavbar = () => {
+const HomeNavbar = ({userID}) => {
   const [hoveredButton, setHoveredButton] = useState(null)
 
   return (
@@ -50,7 +50,7 @@ const HomeNavbar = () => {
         <TouchableOpacity style={styles.searchButton}>
           <Icon name="search" size={24} color={'white'} />
         </TouchableOpacity>
-        <ProfileDropdown />
+        <ProfileDropdown userID={userID}/>
       </View>
     </View>
   )
