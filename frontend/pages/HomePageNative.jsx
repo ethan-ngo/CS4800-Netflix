@@ -54,30 +54,25 @@ const HomePageNative = ({ route }) => {
     navigation.navigate('Profile')
   }
 
-  const renderMediaItem = ({ item }) => {
-    const hasImage = item.ImageTags?.Primary;
-    const imageUrl = `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`;
-
-    if(!hasImage){return null};
-
-    return (
-      <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
-        <Image
-          source={{uri: imageUrl,}}
-          style={styles.mediaImage}
-        />
-        <Text style={styles.mediaName} numberOfLines={2} ellipsizeMode="tail">
-          {item.Name}
-        </Text>
-      </TouchableOpacity>
-    )
-  };
+  const renderMediaItem = ({ item }) => (
+    <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectItem(item)}>
+      <Image
+        source={{
+          uri: `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`,
+        }}
+        style={styles.mediaImage}
+      />
+      <Text style={styles.mediaName} numberOfLines={2} ellipsizeMode="tail">
+        {item.Name}
+      </Text>
+    </TouchableOpacity>
+  )
 
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContainer}>
-      <HomeNavbar />
+      <HomeNavbar userID={userID} />
       <View style={styles.container}>
         <View style={styles.mediaSection}>
           <Text style={styles.sectionTitle}>All Items</Text>
