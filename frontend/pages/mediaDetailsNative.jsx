@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator, Scr
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { getMovieDetails } from './api'
 import { useVideoPlayer, VideoView } from 'expo-video'
+import Video from 'react-native-video';
 
 const API_URL = process.env.REACT_APP_API_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
@@ -28,18 +29,19 @@ const MediaDetailsNative = () => {
         const data = await getMovieDetails(movieName)
         if (data) {
             setMovieData(data.movieDetails)
-            setCast(data.cast)  // Set cast data
+            setCast(data.cast)  
         }
         setLoading(false)
     }
 
     const videoSource = {
-        uri: `${API_URL}/Videos/${media.Id}/stream?api_key=${ACCESS_TOKEN}`,
+        uri: `${API_URL}/Videos/${media.Id}/stream?api_key=${ACCESS_TOKEN}&DirectPlay=true&Static=true`,
     };
-    const player = useVideoPlayer(videoSource, player => {
-        player.loop = true;
-        player.play();
-    });
+
+    // const player = useVideoPlayer(videoSource, player => {
+    //     player.loop = true;
+    //     player.play();
+    // });
     
     if (!media) {
         return (
@@ -75,8 +77,13 @@ const MediaDetailsNative = () => {
 
             <Text style={styles.subtitle}>Now Playing:</Text>
 
-            <View style={{ width: "70%", height: "50%", alignItems: 'center' }}>
-                <VideoView style={styles.videoPlayer} player={player} allowsFullscreen allowsPictureInPicture />
+            <View style={styles.videoContainer}>
+                <Video
+                    ref={videoRef}
+                    source={videoSource}
+                    style={styles.videoPlayer}
+                    controls={true}  // Enables default seek slider
+                />
             </View>
 
             {loading ? (
@@ -185,6 +192,13 @@ const styles = StyleSheet.create({
         height: 250,
         borderRadius: 10,
     },
+    videoContainer: {
+        width: '60%',
+        height: 500,
+        aspectRatio: 16/9, 
+        backgroundColor: 'black',
+        marginVertical: 10,
+      },
     tmdbContainer: {
         marginTop: 20,
         width: '100%',
