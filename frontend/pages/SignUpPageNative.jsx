@@ -7,6 +7,7 @@ import {
   Alert,
   StyleSheet,
   ScrollView,
+  Image,
 } from 'react-native'
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
@@ -77,6 +78,12 @@ const SignUpPageNative = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {loading && <LoadingOverlay visible={loading} />}
+      <View style={styles.overlay} />
+      <Image 
+          source={{ uri: "https://wallpapers.com/images/hd/movie-poster-background-wg5mxe6b7djul0a8.jpg" }} 
+          style={styles.backgroundImage} 
+          resizeMode="cover"
+        />
       <Header />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.form}>
@@ -183,6 +190,16 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     fontSize: 14,
     color: 'gray',
+  },
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    opacity: 0.7,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject, 
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
 })
 
