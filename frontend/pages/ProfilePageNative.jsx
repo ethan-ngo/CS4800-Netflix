@@ -170,11 +170,6 @@ const ProfilePageNative = ({navigation}) => {
   //uses user data from the database to populate the form
   return (
     <View style={styles.container}>
-      <Image 
-        source={{ uri: "https://wallpapers.com/images/hd/movie-poster-background-wg5mxe6b7djul0a8.jpg" }} 
-        style={styles.backgroundImage} 
-        resizeMode="cover"
-      />
       <View style={styles.form}>
         <Text style={styles.title}>Edit Profile</Text>
         <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
@@ -308,12 +303,6 @@ const styles = StyleSheet.create({
   homeButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-  },
-  backgroundImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    opacity: 0.7,
   },
 })
 
