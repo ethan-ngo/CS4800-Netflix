@@ -80,11 +80,12 @@ const LoginPageNative = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {loading && <LoadingOverlay visible={loading} />}
-      <Image 
-        source={{ uri: "https://wallpapers.com/images/hd/movie-poster-background-wg5mxe6b7djul0a8.jpg" }} 
-        style={styles.backgroundImage} 
-        resizeMode="cover"
-      />
+      <View style={styles.overlay} />
+        <Image 
+          source={{ uri: "https://wallpapers.com/images/hd/movie-poster-background-wg5mxe6b7djul0a8.jpg" }} 
+          style={styles.backgroundImage} 
+          resizeMode="cover"
+        />
       <Header />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.form}>
@@ -204,6 +205,10 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
     opacity: 0.7,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject, 
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
 })
 
