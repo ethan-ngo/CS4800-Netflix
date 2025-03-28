@@ -72,6 +72,11 @@ const HomePageNative = ({ route }) => {
       {loading && <LoadingOverlay visible={loading} />}
       <HomeNavbar userID={userID} />
       <View style={styles.container}>
+      <Image 
+        source={{ uri: "https://static.vecteezy.com/system/resources/thumbnails/013/630/282/small/interesting-gradient-design-purple-black-free-photo.jpg" }} 
+        style={styles.backgroundImage} 
+        resizeMode="cover"
+      />
         <View style={styles.mediaSection}>
           <Text style={styles.sectionTitle}>All Items</Text>
           <FlatList
@@ -161,6 +166,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     width: '100%',
+  },
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+
   },
 })
 
