@@ -1,41 +1,131 @@
 import React, { useState, useEffect } from 'react'
-import { View, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native'
 import Icon from 'react-native-vector-icons/EvilIcons'
+import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from '../pages/api'
+import '../globals.css'
 
 const Searchbar = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchBarOpen, setSearchBarOpen] = useState(false)
+  const [hoveredItem, setHoveredItem] = useState(null)
+  const [filteredMovies, setFilteredMovies] = useState([])
+  const [filteredShows, setFilteredShows] = useState([])
+  const [filteredMedia, setFilteredMedia] = useState([])
 
   const onClickSearch = () => {
     setSearchBarOpen(!searchBarOpen)
+    setSearchTerm('')
     console.log('Search bar clicked')
   }
 
-  //   useEffect(() => {
-  //     const delayDebounceFn = setTimeout(() => {
-  //       handleSearch()
-  //     }, 300)
+  const handleType = async (text) => {
+    console.log('Search term:', text)
+    setSearchTerm(text)
+    const movieItems = await getMovies()
+    const showItems = await getShows()
+    const mediaItems = await getItems()
 
-  //     return () => clearTimeout(delayDebounceFn)
-  //   }, [searchTerm])
+    const filteredMovies = movieItems.filter((item) =>
+      item.Name.toLowerCase().includes(text.toLowerCase())
+    )
+    const filteredShows = showItems.filter((item) =>
+      item.Name.toLowerCase().includes(text.toLowerCase())
+    )
+    const filteredMedia = mediaItems.filter((item) =>
+      item.Name.toLowerCase().includes(text.toLowerCase())
+    )
+    console.log('Filtered Movies:', filteredMovies)
+    console.log('Filtered Shows:', filteredShows)
+    console.log('Filtered Media:', filteredMedia)
+
+    setFilteredMovies(filteredMovies)
+    setFilteredShows(filteredShows)
+    setFilteredMedia(filteredMedia)
+  }
+
+  const handleSearch = async () => {
+    // if enter is pressed, redirect to a2 page with the search results
+  }
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      handleSearch()
+    }, 300)
+
+    return () => clearTimeout(delayDebounceFn)
+  }, [searchTerm])
 
   return (
-    <TouchableOpacity style={styles.searchButton}>
-      <Icon name="search" size={24} color="white" style={styles.icon} onPress={onClickSearch} />
-
+    <View style={styles.container}>
       {searchBarOpen && (
-        <TextInput
-          style={styles.searchBarInput}
-          placeholder="Search"
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-        />
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchBarInput}
+            placeholder="Search"
+            value={searchTerm}
+            onChangeText={handleType}
+          />
+          {searchTerm && (
+            <View style={styles.searchResultContainer}>
+              {filteredMovies.length > 0 && (
+                <View>
+                  <Text style={styles.searchResultCategory}> Movies </Text>
+                  {filteredMovies.map((item) => (
+                    <TouchableOpacity
+                      key={item.Id}
+                      style={[
+                        styles.searchResultItem,
+                        hoveredItem === item.Id && styles.hoveredSearchResultItem,
+                      ]}
+                      onMouseEnter={() => setHoveredItem(item.Id)}
+                      onMouseExit={() => setHoveredItem(null)}
+                    >
+                      <Text style={[hoveredItem === item.Id && styles.hoveredSearchResultItemText]}>
+                        {item.Name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+              {filteredShows.length > 0 && (
+                <View>
+                  <Text style={styles.searchResultCategory}> Shows </Text>
+                  {filteredShows.map((item) => (
+                    <TouchableOpacity
+                      key={item.Id}
+                      style={[
+                        styles.searchResultItem,
+                        hoveredItem === item.Id && styles.hoveredSearchResultItem,
+                      ]}
+                      onMouseEnter={() => setHoveredItem(item.Id)}
+                      onMouseExit={() => setHoveredItem(null)}
+                    >
+                      <Text style={[hoveredItem === item.Id && styles.hoveredSearchResultItemText]}>
+                        {item.Name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
+          )}
+        </View>
       )}
-    </TouchableOpacity>
+      <TouchableOpacity style={styles.searchButton} onPress={onClickSearch}>
+        <Icon name="search" size={24} color="white" />
+      </TouchableOpacity>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  searchContainer: {
+    position: 'relative',
+  },
   searchButton: {
     padding: 10,
     margin: 10,
@@ -47,16 +137,44 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   searchBarInput: {
-    position: 'absolute',
     height: 40,
     width: 300,
-    right: '100%',
     backgroundColor: 'white',
     borderRadius: 20,
     fontSize: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingLeft: 20,
+  },
+  searchResultContainer: {
+    position: 'absolute',
+    top: 45,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    paddingLeft: 10,
+    paddingRight: 10,
+    zIndex: 1001,
+    overflow: 'hidden',
+  },
+  searchResultItem: {
     padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  hoveredSearchResultItem: {
+    backgroundColor: 'rgba(98, 0, 234, 0.1)',
+  },
+  hoveredSearchResultItemText: {
+    fontWeight: 'bold',
+  },
+  searchResultCategory: {
+    fontWeight: 'bold',
+    marginTop: 5,
+    marginBottom: 5,
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'var(--background-color)',
+    width: '100%',
   },
 })
 
