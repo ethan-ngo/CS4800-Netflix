@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native
 import ProfileDropdown from './ProfileDropdown'
 import '../globals.css'
 import Icon from 'react-native-vector-icons/EvilIcons'
+import Searchbar from './Searchbar'
 
-const HomeNavbar = ({userID}) => {
+const HomeNavbar = ({ userID }) => {
   const [hoveredButton, setHoveredButton] = useState(null)
 
   return (
@@ -47,10 +48,8 @@ const HomeNavbar = ({userID}) => {
 
       {/* rightmost: search, profile icon image */}
       <View style={styles.rightGroup}>
-        <TouchableOpacity style={styles.searchButton}>
-          <Icon name="search" size={24} color={'white'} />
-        </TouchableOpacity>
-        <ProfileDropdown userID={userID}/>
+        <Searchbar />
+        <ProfileDropdown userID={userID} />
       </View>
     </View>
   )
@@ -109,11 +108,6 @@ const styles = StyleSheet.create({
   },
   hoveredButtonText: {
     transform: [{ scale: 1.2 }],
-  },
-  searchButton: {
-    padding: 10,
-    cursor: 'pointer',
-    color: 'var(--text-color)',
   },
 })
 
