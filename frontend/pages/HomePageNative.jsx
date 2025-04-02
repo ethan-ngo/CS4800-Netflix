@@ -45,6 +45,10 @@ const HomePageNative = ({ route }) => {
     fetchItems()
   }, [])
 
+  const handleSelectShow = (show) => {
+    navigation.navigate('ShowDetailsNative', { show }) 
+  }
+
   const handleSelectItem = (item) => {
     navigation.navigate('MediaDetailsNative', { media: item })
   }
@@ -67,16 +71,34 @@ const HomePageNative = ({ route }) => {
     )
   }
 
+  const renderShowItem = ({ item }) => {
+    const hasImage = item.ImageTags?.Primary
+    const imageUrl = `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`
+
+    if (!hasImage) {
+      return null
+    }
+
+    return (
+      <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectShow(item)}>
+        <Image source={{ uri: imageUrl }} style={styles.mediaImage} />
+        <Text style={styles.mediaName} numberOfLines={2} ellipsizeMode="tail">
+          {item.Name}
+        </Text>
+      </TouchableOpacity>
+    )
+  }
+
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
       {loading && <LoadingOverlay visible={loading} />}
       <HomeNavbar userID={userID} />
       <View style={styles.container}>
-      <Image 
-        source={{ uri: "https://static.vecteezy.com/system/resources/thumbnails/013/630/282/small/interesting-gradient-design-purple-black-free-photo.jpg" }} 
-        style={styles.backgroundImage} 
-        resizeMode="cover"
-      />
+        <Image 
+          source={{ uri: "https://static.vecteezy.com/system/resources/thumbnails/013/630/282/small/interesting-gradient-design-purple-black-free-photo.jpg" }} 
+          style={styles.backgroundImage} 
+          resizeMode="cover"
+        />
         <View style={styles.mediaSection}>
           <Text style={styles.sectionTitle}>All Items</Text>
           <FlatList
@@ -108,7 +130,7 @@ const HomePageNative = ({ route }) => {
             keyExtractor={(item) => item.Id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
-            renderItem={renderMediaItem}
+            renderItem={renderShowItem} 
             contentContainerStyle={styles.mediaList}
           />
         </View>
@@ -127,14 +149,6 @@ const styles = StyleSheet.create({
     padding: 10,
     overflowy: 'auto',
     overflowx: 'auto',
-  },
-  navBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
   },
   sectionTitle: {
     fontSize: 18,
@@ -171,7 +185,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     position: 'absolute',
-
   },
 })
 
