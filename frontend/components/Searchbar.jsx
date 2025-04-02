@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native'
 import Icon from 'react-native-vector-icons/EvilIcons'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from '../pages/api'
+import { useNavigation } from '@react-navigation/native'
 import '../globals.css'
 
 const Searchbar = () => {
@@ -11,6 +12,7 @@ const Searchbar = () => {
   const [filteredMovies, setFilteredMovies] = useState([])
   const [filteredShows, setFilteredShows] = useState([])
   const [filteredMedia, setFilteredMedia] = useState([])
+  const navigation = useNavigation()
 
   const onClickSearch = () => {
     setSearchBarOpen(!searchBarOpen)
@@ -34,26 +36,30 @@ const Searchbar = () => {
     const filteredMedia = mediaItems.filter((item) =>
       item.Name.toLowerCase().includes(text.toLowerCase())
     )
-    console.log('Filtered Movies:', filteredMovies)
-    console.log('Filtered Shows:', filteredShows)
-    console.log('Filtered Media:', filteredMedia)
+    // console.log('Filtered Movies:', filteredMovies)
+    // console.log('Filtered Shows:', filteredShows)
+    // console.log('Filtered Media:', filteredMedia)
 
     setFilteredMovies(filteredMovies)
     setFilteredShows(filteredShows)
     setFilteredMedia(filteredMedia)
   }
 
-  const handleSearch = async () => {
-    // if enter is pressed, redirect to a2 page with the search results
+  const handleSearch = (event) => {
+    if (event.key === 'Enter') {
+      console.log('Search initiated for:', searchTerm)
+      console.log('Filtered Movies:', filteredMovies)
+      console.log('Filtered Shows:', filteredShows)
+      console.log('Filtered Media:', filteredMedia)
+      // when enter is pressed, navigate to the search results page with the movies, shows, and images from the search
+      navigation.navigate('SearchResultsPage', {
+        searchTerm,
+        filteredMovies,
+        filteredShows,
+        filteredMedia,
+      })
+    }
   }
-
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {
-      handleSearch()
-    }, 300)
-
-    return () => clearTimeout(delayDebounceFn)
-  }, [searchTerm])
 
   return (
     <View style={styles.container}>
@@ -64,6 +70,7 @@ const Searchbar = () => {
             placeholder="Search"
             value={searchTerm}
             onChangeText={handleType}
+            onKeyPress={handleSearch}
           />
           {searchTerm && (
             <View style={styles.searchResultContainer}>
