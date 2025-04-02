@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native'
 import Icon from 'react-native-vector-icons/EvilIcons'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from '../pages/api'
@@ -14,6 +14,7 @@ const Searchbar = ({ userID }) => {
   const [filteredShows, setFilteredShows] = useState([])
   const [filteredMedia, setFilteredMedia] = useState([])
   const navigation = useNavigation()
+  const dropdownRef = useRef(null)
 
   const onClickSearch = () => {
     setSearchBarOpen(!searchBarOpen)
@@ -68,8 +69,25 @@ const Searchbar = ({ userID }) => {
     }
   }
 
+  // Close searchbar dropdown when clicking outside
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setSearchBarOpen(false)
+      }
+    }
+
+    if (searchBarOpen) {
+      document.addEventListener('mousedown', handleOutsideClick)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick)
+    }
+  }, [searchBarOpen])
+
   return (
-    <View style={styles.container}>
+    <View style={styles.container} ref={dropdownRef}>
       {searchBarOpen && (
         <View style={styles.searchContainer}>
           <TextInput
