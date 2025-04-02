@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, FlatList, Platform } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { getItems } from './api'
+import { getItems, getMovieDetails } from './api'
 import { useVideoPlayer, VideoView } from 'expo-video'
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -16,6 +16,8 @@ const ShowDetailsNative = () => {
     const [selectedSeason, setSelectedSeason] = useState(null)
     const [loading, setLoading] = useState(true)
     const [selectedEpisode, setSelectedEpisode] = useState(null)
+    const [cast, setCast] = useState([])
+    const [showDetails, setShowDetails] = useState(null) 
 
     const videoSource = selectedEpisode ? {
         uri: `${API_URL}/Videos/${selectedEpisode}/stream?api_key=${ACCESS_TOKEN}&DirectPlay=true&Static=true`,
@@ -29,6 +31,7 @@ const ShowDetailsNative = () => {
     useEffect(() => {
         if (show?.Name) {
             fetchEpisodes(show.Name)
+            fetchShowDetails(show.Name)
         }
     }, [show])
 
@@ -59,6 +62,18 @@ const ShowDetailsNative = () => {
         setSeasons(seasonMap)
         setSelectedSeason(Object.keys(seasonMap)[0]) // Set the first season as default
         setLoading(false)
+    }
+
+    const fetchShowDetails = async (showName) => {
+        try {
+            const data = await getMovieDetails(showName)
+            if (data) {
+                setShowDetails(data.movieDetails)
+                setCast(data.cast)
+            }
+        } catch (error) {
+            console.error('Error fetching show details:', error)
+        }
     }
 
     const handleEpisodeSelect = (episodeId) => {
@@ -141,9 +156,9 @@ const ShowDetailsNative = () => {
 
             <View style={Platform.OS === "web" ? styles.videoContainer : styles.videoContainerMobile}>
                 {selectedEpisode ? (
-                    <VideoView 
-                        player={player} 
-                        allowsFullscreen 
+                    <VideoView
+                        player={player}
+                        allowsFullscreen
                         allowsPictureInPicture
                         style={styles.videoPlayer}
                     />
@@ -153,7 +168,31 @@ const ShowDetailsNative = () => {
                     </View>
                 )}
             </View>
-            
+            {cast.length > 0 && (
+                <View style={styles.castContainer}>
+                    <Text style={styles.subtitle}>Cast:</Text>
+                    <FlatList
+                        data={cast}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={({ item }) => (
+                            <View style={styles.castItem}>
+                                <Image
+                                    source={{
+                                        uri: item.profile_path
+                                            ? `https://image.tmdb.org/t/p/w500/${item.profile_path}`
+                                            : 'https://via.placeholder.com/500x750?text=No+Image'
+                                    }}
+                                    style={styles.castImage}
+                                />
+                                <Text style={styles.castName}>{item.name}</Text>
+                                <Text style={styles.castCharacter}>{item.character}</Text>
+                            </View>
+                        )}
+                        keyExtractor={(item) => item.id.toString()}
+                        horizontal
+                    />
+                </View>
+            )}
         </ScrollView>
     )
 }
@@ -267,14 +306,14 @@ const styles = StyleSheet.create({
     videoContainer: {
         width: '60%',
         height: 500,
-        aspectRatio: 16/9, 
+        aspectRatio: 16 / 9,
         backgroundColor: 'black',
         marginVertical: 10,
     },
     videoContainerMobile: {
         width: '100%',
         height: 200,
-        aspectRatio: 16/9, 
+        aspectRatio: 16 / 9,
         backgroundColor: 'black',
         marginVertical: 10,
     },
@@ -291,6 +330,35 @@ const styles = StyleSheet.create({
     placeholderText: {
         color: '#fff',
         fontSize: 18,
+    },
+    tmdbContainer: {
+        marginTop: 20,
+        width: '100%',
+    },
+    castContainer: {
+        marginTop: 20,
+        width: '100%',
+    },
+    castItem: {
+        marginRight: 10,
+        alignItems: 'center',
+        width: 120,
+    },
+    castImage: {
+        width: 120,
+        height: 180,
+        borderRadius: 5,
+        marginBottom: 5,
+    },
+    castName: {
+        color: '#fff',
+        fontSize: 14,
+        textAlign: 'center',
+        width: '100%',
+    },
+    castCharacter: {
+        color: '#D3D3D3',
+        textAlign: 'center',
     },
 });
 
