@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/EvilIcons'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from '../pages/api'
 import { useNavigation } from '@react-navigation/native'
 import '../globals.css'
+import MediaDetailsNative from '../pages/mediaDetailsNative'
 
 const Searchbar = () => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -18,6 +19,11 @@ const Searchbar = () => {
     setSearchBarOpen(!searchBarOpen)
     setSearchTerm('')
     console.log('Search bar clicked')
+  }
+
+  const onClickSearchResult = (item) => {
+    console.log('Search result clicked:', item)
+    navigation.navigate('MediaDetailsNative', { media: item })
   }
 
   const handleType = async (text) => {
@@ -86,6 +92,7 @@ const Searchbar = () => {
                       ]}
                       onMouseEnter={() => setHoveredItem(item.Id)}
                       onMouseExit={() => setHoveredItem(null)}
+                      onPress={() => onClickSearchResult(item)}
                     >
                       <Text style={[hoveredItem === item.Id && styles.hoveredSearchResultItemText]}>
                         {item.Name}
