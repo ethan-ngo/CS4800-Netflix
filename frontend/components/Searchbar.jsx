@@ -11,6 +11,9 @@ const Searchbar = ({ userID }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchBarOpen, setSearchBarOpen] = useState(false)
   const [hoveredItem, setHoveredItem] = useState(null)
+  const [allMovies, setAllMovies] = useState([])
+  const [allShows, setAllShows] = useState([])
+  const [allMedia, setAllMedia] = useState([])
   const [filteredMovies, setFilteredMovies] = useState([])
   const [filteredShows, setFilteredShows] = useState([])
   const [filteredMedia, setFilteredMedia] = useState([])
@@ -28,25 +31,32 @@ const Searchbar = ({ userID }) => {
     navigation.navigate('MediaDetailsNative', { media: item })
   }
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const [movies, shows, media] = await Promise.all([getMovies(), getShows(), getItems()])
+      setAllMovies(movies)
+      setAllShows(shows)
+      setAllMedia(media)
+    }
+    fetchData()
+  }, [])
+
   const handleType = async (text) => {
     // only show a maximum of 6 shows & 6 movies
     const maxResults = 6
 
     console.log('Search term:', text)
     setSearchTerm(text)
-    const movieItems = await getMovies()
-    const showItems = await getShows()
-    const mediaItems = await getItems()
 
     const fuseOptions = {
       keys: ['Name'],
-      threshold: 0.4,
+      threshold: 0.2,
     }
 
     // fuzzy-searched items
-    const movieFuse = new Fuse(movieItems, fuseOptions)
-    const showFuse = new Fuse(showItems, fuseOptions)
-    const mediaFuse = new Fuse(mediaItems, fuseOptions)
+    const movieFuse = new Fuse(allMovies, fuseOptions)
+    const showFuse = new Fuse(allShows, fuseOptions)
+    const mediaFuse = new Fuse(allMedia, fuseOptions)
     const filteredMovies = movieFuse
       .search(text)
       .slice(0, maxResults)
