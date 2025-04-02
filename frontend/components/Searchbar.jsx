@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import Fuse from 'fuse.js'
 import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native'
 import Icon from 'react-native-vector-icons/EvilIcons'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from '../pages/api'
@@ -37,17 +38,27 @@ const Searchbar = ({ userID }) => {
     const showItems = await getShows()
     const mediaItems = await getItems()
 
-    const filteredMovies = movieItems
-      .filter((item) => item.Name.toLowerCase().includes(text.toLowerCase()))
-      .slice(0, maxResults)
+    const fuseOptions = {
+      keys: ['Name'],
+      threshold: 0.4,
+    }
 
-    const filteredShows = showItems
-      .filter((item) => item.Name.toLowerCase().includes(text.toLowerCase()))
+    // fuzzy-searched items
+    const movieFuse = new Fuse(movieItems, fuseOptions)
+    const showFuse = new Fuse(showItems, fuseOptions)
+    const mediaFuse = new Fuse(mediaItems, fuseOptions)
+    const filteredMovies = movieFuse
+      .search(text)
       .slice(0, maxResults)
-
-    const filteredMedia = mediaItems
-      .filter((item) => item.Name.toLowerCase().includes(text.toLowerCase()))
+      .map((result) => result.item)
+    const filteredShows = showFuse
+      .search(text)
       .slice(0, maxResults)
+      .map((result) => result.item)
+    const filteredMedia = mediaFuse
+      .search(text)
+      .slice(0, maxResults)
+      .map((result) => result.item)
 
     setFilteredMovies(filteredMovies)
     setFilteredShows(filteredShows)

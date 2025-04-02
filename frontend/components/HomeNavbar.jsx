@@ -16,6 +16,18 @@ const HomeNavbar = ({ userID }) => {
     navigation.navigate('Home', { userID: userID })
   }
 
+  const handleClickMovies = () => {
+    console.log('Movies button clicked')
+    // go to home, then scroll to the movies section (TODO)
+    navigation.navigate('Home', { userID: userID })
+  }
+
+  const handleClickShows = () => {
+    console.log('Shows button clicked')
+    // go to home, then scroll to the shows section (TODO)
+    navigation.navigate('Home', { userID: userID })
+  }
+
   return (
     <View style={styles.header}>
       {/* leftmost: title */}
@@ -25,33 +37,36 @@ const HomeNavbar = ({ userID }) => {
 
       {/* middle: home, shows, movies */}
       <View style={styles.middleGroup}>
-        <View
+        <TouchableOpacity
           style={styles.button}
           onMouseEnter={() => setHoveredButton('home')}
           onMouseLeave={() => setHoveredButton(null)}
+          onPress={handleClickHome}
         >
           <Text style={[styles.buttonText, hoveredButton === 'home' && styles.hoveredButtonText]}>
             Home
           </Text>
-        </View>
-        <View
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.button}
           onMouseEnter={() => setHoveredButton('movies')}
           onMouseLeave={() => setHoveredButton(null)}
+          onPress={handleClickMovies}
         >
           <Text style={[styles.buttonText, hoveredButton === 'movies' && styles.hoveredButtonText]}>
             Movies
           </Text>
-        </View>
-        <View
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.button}
           onMouseEnter={() => setHoveredButton('shows')}
           onMouseLeave={() => setHoveredButton(null)}
+          onPress={handleClickShows}
         >
           <Text style={[styles.buttonText, hoveredButton === 'shows' && styles.hoveredButtonText]}>
             Shows
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* rightmost: search, profile icon image */}
