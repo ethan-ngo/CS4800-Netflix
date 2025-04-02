@@ -28,24 +28,26 @@ const Searchbar = ({ userID }) => {
   }
 
   const handleType = async (text) => {
+    // only show a maximum of 6 shows & 6 movies
+    const maxResults = 6
+
     console.log('Search term:', text)
     setSearchTerm(text)
     const movieItems = await getMovies()
     const showItems = await getShows()
     const mediaItems = await getItems()
 
-    const filteredMovies = movieItems.filter((item) =>
-      item.Name.toLowerCase().includes(text.toLowerCase())
-    )
-    const filteredShows = showItems.filter((item) =>
-      item.Name.toLowerCase().includes(text.toLowerCase())
-    )
-    const filteredMedia = mediaItems.filter((item) =>
-      item.Name.toLowerCase().includes(text.toLowerCase())
-    )
-    // console.log('Filtered Movies:', filteredMovies)
-    // console.log('Filtered Shows:', filteredShows)
-    // console.log('Filtered Media:', filteredMedia)
+    const filteredMovies = movieItems
+      .filter((item) => item.Name.toLowerCase().includes(text.toLowerCase()))
+      .slice(0, maxResults)
+
+    const filteredShows = showItems
+      .filter((item) => item.Name.toLowerCase().includes(text.toLowerCase()))
+      .slice(0, maxResults)
+
+    const filteredMedia = mediaItems
+      .filter((item) => item.Name.toLowerCase().includes(text.toLowerCase()))
+      .slice(0, maxResults)
 
     setFilteredMovies(filteredMovies)
     setFilteredShows(filteredShows)
@@ -110,7 +112,7 @@ const Searchbar = ({ userID }) => {
                         hoveredItem === item.Id && styles.hoveredSearchResultItem,
                       ]}
                       onMouseEnter={() => setHoveredItem(item.Id)}
-                      onMouseExit={() => setHoveredItem(null)}
+                      onMouseLeave={() => setHoveredItem(null)}
                       onPress={() => onClickSearchResult(item)}
                     >
                       <Text style={[hoveredItem === item.Id && styles.hoveredSearchResultItemText]}>
@@ -131,7 +133,7 @@ const Searchbar = ({ userID }) => {
                         hoveredItem === item.Id && styles.hoveredSearchResultItem,
                       ]}
                       onMouseEnter={() => setHoveredItem(item.Id)}
-                      onMouseExit={() => setHoveredItem(null)}
+                      onMouseLeave={() => setHoveredItem(null)}
                     >
                       <Text style={[hoveredItem === item.Id && styles.hoveredSearchResultItemText]}>
                         {item.Name}
