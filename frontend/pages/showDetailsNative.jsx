@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, FlatList, Platform } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { getItems, getMovieDetails } from './api'
+import { getItems, getMovieDetails , getShowDetails} from './api'
 import { useVideoPlayer, VideoView } from 'expo-video'
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -17,7 +17,7 @@ const ShowDetailsNative = () => {
     const [loading, setLoading] = useState(true)
     const [selectedEpisode, setSelectedEpisode] = useState(null)
     const [cast, setCast] = useState([])
-    const [showDetails, setShowDetails] = useState(null) 
+    const [showDetails, setShowDetails] = useState(null)
 
     const videoSource = selectedEpisode ? {
         uri: `${API_URL}/Videos/${selectedEpisode}/stream?api_key=${ACCESS_TOKEN}&DirectPlay=true&Static=true`,
@@ -29,6 +29,7 @@ const ShowDetailsNative = () => {
     });
 
     useEffect(() => {
+        console.log(show)
         if (show?.Name) {
             fetchEpisodes(show.Name)
             fetchShowDetails(show.Name)
@@ -66,7 +67,7 @@ const ShowDetailsNative = () => {
 
     const fetchShowDetails = async (showName) => {
         try {
-            const data = await getMovieDetails(showName)
+            const data = await getShowDetails(showName)
             if (data) {
                 setShowDetails(data.movieDetails)
                 setCast(data.cast)
@@ -168,6 +169,21 @@ const ShowDetailsNative = () => {
                     </View>
                 )}
             </View>
+
+            {loading ? (
+                <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 20 }} />
+            ) : (
+                showDetails ? (
+                    <View style={styles.tmdbContainer}>
+                        <Text style={styles.subtitle}>More Info from TMDb:</Text>
+                        <Text style={styles.detail}><Text style={styles.bold}>Overview:</Text> {showDetails.overview}</Text>
+                        <Text style={styles.detail}><Text style={styles.bold}>TMDb Rating:</Text> {showDetails.vote_average}/10</Text>
+                        <Text style={styles.detail}><Text style={styles.bold}>Release Date:</Text> {showDetails.release_date}</Text>
+                    </View>
+                ) :(
+                    <Text style={styles.subtitle}>No Additional Info</Text>
+            ))}
+
             {cast.length > 0 && (
                 <View style={styles.castContainer}>
                     <Text style={styles.subtitle}>Cast:</Text>
