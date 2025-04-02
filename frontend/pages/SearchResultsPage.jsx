@@ -45,29 +45,33 @@ const SearchResultsPage = ({ route }) => {
 
         <Text style={styles.mainTitle}>Search Results for "{searchTerm}"</Text>
 
-        <View style={styles.mediaSection}>
-          <Text style={styles.sectionTitle}>Movies</Text>
-          <FlatList
-            data={filteredMovies}
-            keyExtractor={(item) => item.Id}
-            renderItem={renderMediaItem}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.mediaList}
-          />
-        </View>
+        {filteredMovies.length > 0 && (
+          <View style={styles.mediaSection}>
+            <Text style={styles.sectionTitle}>Movies</Text>
+            <FlatList
+              data={filteredMovies}
+              keyExtractor={(item) => item.Id}
+              renderItem={renderMediaItem}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.mediaList}
+            />
+          </View>
+        )}
 
-        <View style={styles.mediaSection}>
-          <Text style={styles.sectionTitle}>Shows</Text>
-          <FlatList
-            data={filteredShows}
-            keyExtractor={(item) => item.Id}
-            renderItem={renderMediaItem}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.mediaList}
-          />
-        </View>
+        {filteredShows.length > 0 && (
+          <View style={styles.mediaSection}>
+            <Text style={styles.sectionTitle}>Shows</Text>
+            <FlatList
+              data={filteredShows}
+              keyExtractor={(item) => item.Id}
+              renderItem={renderMediaItem}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.mediaList}
+            />
+          </View>
+        )}
       </View>
     </ScrollView>
   )
