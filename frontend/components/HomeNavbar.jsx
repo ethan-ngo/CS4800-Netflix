@@ -1,19 +1,27 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native'
 import ProfileDropdown from './ProfileDropdown'
 import '../globals.css'
 import Icon from 'react-native-vector-icons/EvilIcons'
 import Searchbar from './Searchbar'
+import { useNavigation } from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const HomeNavbar = ({ userID }) => {
   const [hoveredButton, setHoveredButton] = useState(null)
+  const navigation = useNavigation()
+
+  const handleClickHome = () => {
+    console.log('Home button clicked')
+    navigation.navigate('Home', { userID: userID })
+  }
 
   return (
     <View style={styles.header}>
       {/* leftmost: title */}
-      <View style={styles.leftGroup}>
+      <TouchableOpacity style={styles.leftGroup} onPress={handleClickHome}>
         <Text style={styles.title}>DomainFilms</Text>
-      </View>
+      </TouchableOpacity>
 
       {/* middle: home, shows, movies */}
       <View style={styles.middleGroup}>
@@ -48,7 +56,7 @@ const HomeNavbar = ({ userID }) => {
 
       {/* rightmost: search, profile icon image */}
       <View style={styles.rightGroup}>
-        <Searchbar />
+        <Searchbar userID={userID} />
         <ProfileDropdown userID={userID} />
       </View>
     </View>

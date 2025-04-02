@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native'
 import HomeNavbar from '../components/HomeNavbar'
 
 const SearchResultsPage = ({ route }) => {
-  const { searchTerm, filteredMovies = [], filteredShows = [] } = route.params
+  const { searchTerm, filteredMovies = [], filteredShows = [], userID } = route.params
   const navigation = useNavigation()
 
   const handleSelectItem = (item) => {
@@ -32,7 +32,7 @@ const SearchResultsPage = ({ route }) => {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
-      <HomeNavbar />
+      <HomeNavbar userID={userID} />
       <View style={styles.container}>
         <Image
           source={{

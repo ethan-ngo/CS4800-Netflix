@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native'
 import '../globals.css'
 import MediaDetailsNative from '../pages/mediaDetailsNative'
 
-const Searchbar = () => {
+const Searchbar = ({ userID }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchBarOpen, setSearchBarOpen] = useState(false)
   const [hoveredItem, setHoveredItem] = useState(null)
@@ -63,6 +63,7 @@ const Searchbar = () => {
         filteredMovies,
         filteredShows,
         filteredMedia,
+        userID: userID,
       })
     }
   }
