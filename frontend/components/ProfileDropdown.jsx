@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Pressable, Image} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Pressable, Image } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { jwtDecode } from 'jwt-decode'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import theme from '../utils/theme'
 
-const ProfileDropdown = ({userID}) => {
+const ProfileDropdown = ({ userID }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [hoveredButton, setHoveredButton] = useState(null)
   const [username, setUsername] = useState('+')
@@ -14,18 +14,18 @@ const ProfileDropdown = ({userID}) => {
   const navigation = useNavigation()
   const dropdownRef = useRef(null)
 
-  const app_url = process.env.APP_URL;
+  const app_url = process.env.APP_URL
 
   const fetchImage = async (userID) => {
     try {
-      const results = await fetch(app_url + "users/" + userID);
-      if(results.ok) {
-        const data = await results.json();
+      const results = await fetch(app_url + 'users/' + userID)
+      if (results.ok) {
+        const data = await results.json()
         setPFP(data.profilePic)
         setUsername(data.name[0].toUpperCase())
       }
-    } catch(error) {
-      console.log(error);
+    } catch (error) {
+      console.log(error)
     }
   }
 
@@ -49,7 +49,7 @@ const ProfileDropdown = ({userID}) => {
   }
 
   useEffect(() => {
-    fetchImage(userID);
+    fetchImage(userID)
   }, [])
 
   // Close dropdown when clicking outside
@@ -74,14 +74,13 @@ const ProfileDropdown = ({userID}) => {
       <View style={styles.profileButton}>
         <TouchableOpacity style={styles.imagePicker} onPress={toggleDropdown} activeOpacity={0.8}>
           {PFP ? (
-            <Image source={{ uri: PFP}} style={styles.profileImage} />
+            <Image source={{ uri: PFP }} style={styles.profileImage} />
           ) : (
             <Text style={styles.imageText}>{username}</Text>
           )}
         </TouchableOpacity>
         <Icon name={isOpen ? 'arrow-drop-up' : 'arrow-drop-down'} size={18} color="#fff" />
       </View>
-      
 
       {isOpen && (
         <View style={styles.dropdown}>
@@ -138,10 +137,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
     borderRadius: 4,
     minWidth: 160,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
     elevation: 5,
     marginTop: 8,
     overflow: 'hidden',

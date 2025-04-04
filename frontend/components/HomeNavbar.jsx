@@ -1,56 +1,78 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native'
 import ProfileDropdown from './ProfileDropdown'
 import '../globals.css'
 import Icon from 'react-native-vector-icons/EvilIcons'
+import Searchbar from './Searchbar'
+import { useNavigation } from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const HomeNavbar = ({userID}) => {
+const HomeNavbar = ({ userID }) => {
   const [hoveredButton, setHoveredButton] = useState(null)
+  const navigation = useNavigation()
+
+  const handleClickHome = () => {
+    console.log('Home button clicked')
+    navigation.navigate('Home', { userID: userID })
+  }
+
+  const handleClickMovies = () => {
+    console.log('Movies button clicked')
+    // go to home, then scroll to the movies section (TODO)
+    navigation.navigate('Home', { userID: userID })
+  }
+
+  const handleClickShows = () => {
+    console.log('Shows button clicked')
+    // go to home, then scroll to the shows section (TODO)
+    navigation.navigate('Home', { userID: userID })
+  }
 
   return (
     <View style={styles.header}>
       {/* leftmost: title */}
-      <View style={styles.leftGroup}>
+      <TouchableOpacity style={styles.leftGroup} onPress={handleClickHome}>
         <Text style={styles.title}>DomainFilms</Text>
-      </View>
+      </TouchableOpacity>
 
       {/* middle: home, shows, movies */}
       <View style={styles.middleGroup}>
-        <View
+        <TouchableOpacity
           style={styles.button}
           onMouseEnter={() => setHoveredButton('home')}
           onMouseLeave={() => setHoveredButton(null)}
+          onPress={handleClickHome}
         >
           <Text style={[styles.buttonText, hoveredButton === 'home' && styles.hoveredButtonText]}>
             Home
           </Text>
-        </View>
-        <View
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.button}
           onMouseEnter={() => setHoveredButton('movies')}
           onMouseLeave={() => setHoveredButton(null)}
+          onPress={handleClickMovies}
         >
           <Text style={[styles.buttonText, hoveredButton === 'movies' && styles.hoveredButtonText]}>
             Movies
           </Text>
-        </View>
-        <View
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.button}
           onMouseEnter={() => setHoveredButton('shows')}
           onMouseLeave={() => setHoveredButton(null)}
+          onPress={handleClickShows}
         >
           <Text style={[styles.buttonText, hoveredButton === 'shows' && styles.hoveredButtonText]}>
             Shows
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
 
       {/* rightmost: search, profile icon image */}
       <View style={styles.rightGroup}>
-        <TouchableOpacity style={styles.searchButton}>
-          <Icon name="search" size={24} color={'white'} />
-        </TouchableOpacity>
-        <ProfileDropdown userID={userID}/>
+        <Searchbar userID={userID} />
+        <ProfileDropdown userID={userID} />
       </View>
     </View>
   )
@@ -109,11 +131,6 @@ const styles = StyleSheet.create({
   },
   hoveredButtonText: {
     transform: [{ scale: 1.2 }],
-  },
-  searchButton: {
-    padding: 10,
-    cursor: 'pointer',
-    color: 'var(--text-color)',
   },
 })
 
