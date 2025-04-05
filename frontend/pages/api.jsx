@@ -72,4 +72,35 @@ export const getMovieDetails = async (movieName) => {
     console.error('Error fetching movie details and cast:', error)
     return null
   }
-}
+};
+
+export const getShowDetails = async (showName) => {
+  try {
+
+    const response = await tmdbApi.get('/search/tv', {
+      params: {
+        query: showName,
+      },
+    });
+
+    if (response.data.results.length === 0) {
+      console.error('TV Show not found');
+      return null;
+    }
+
+    const show = response.data.results[0];
+    const showId = show.id;
+
+    const showDetailsResponse = await tmdbApi.get(`/tv/${showId}`);
+    const castResponse = await tmdbApi.get(`/tv/${showId}/credits`);
+
+    return {
+      showId,    
+      showDetails: showDetailsResponse.data,  
+      cast: castResponse.data.cast,
+    };
+  } catch (error) {
+    console.error('Error fetching show details and cast:', error);
+    return null;
+  }
+};

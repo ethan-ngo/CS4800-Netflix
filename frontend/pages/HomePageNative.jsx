@@ -47,6 +47,10 @@ const HomePageNative = ({ route }) => {
     fetchItems()
   }, [])
 
+  const handleSelectShow = (show) => {
+    navigation.navigate('ShowDetailsNative', { show })
+  }
+
   const handleSelectItem = (item) => {
     navigation.navigate('MediaDetailsNative', { media: item })
   }
@@ -68,6 +72,25 @@ const HomePageNative = ({ route }) => {
       </TouchableOpacity>
     )
   }
+
+  const renderShowItem = ({ item }) => {
+    const hasImage = item.ImageTags?.Primary
+    const imageUrl = `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`
+
+    if (!hasImage) {
+      return null
+    }
+
+    return (
+      <TouchableOpacity style={styles.mediaItem} onPress={() => handleSelectShow(item)}>
+        <Image source={{ uri: imageUrl }} style={styles.mediaImage} />
+        <Text style={styles.mediaName} numberOfLines={2} ellipsizeMode="tail">
+          {item.Name}
+        </Text>
+      </TouchableOpacity>
+    )
+  }
+
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
       {loading && <LoadingOverlay visible={loading} />}
@@ -104,7 +127,7 @@ const HomePageNative = ({ route }) => {
             keyExtractor={(item) => item.Id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
-            renderItem={renderMediaItem}
+            renderItem={renderShowItem}
             contentContainerStyle={styles.mediaList}
           />
         </View>
@@ -123,14 +146,6 @@ const styles = StyleSheet.create({
     padding: 10,
     overflowy: 'auto',
     overflowx: 'auto',
-  },
-  navBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
   },
   sectionTitle: {
     fontSize: 18,

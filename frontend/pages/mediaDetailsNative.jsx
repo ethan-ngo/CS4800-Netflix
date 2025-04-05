@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   ScrollView,
   FlatList,
+  Platform,
 } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { getMovieDetails } from './api'
