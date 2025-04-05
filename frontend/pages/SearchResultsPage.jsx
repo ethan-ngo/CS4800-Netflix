@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity, Image }
 import { API_URL, ACCESS_TOKEN } from '../pages/api'
 import { useNavigation } from '@react-navigation/native'
 import HomeNavbar from '../components/HomeNavbar'
+import { LinearGradient } from 'expo-linear-gradient'
+import theme from '../utils/theme'
 
 const SearchResultsPage = ({ route }) => {
   const { searchTerm, filteredMovies = [], filteredShows = [], userID } = route.params
@@ -33,16 +35,7 @@ const SearchResultsPage = ({ route }) => {
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
       <HomeNavbar userID={userID} />
-      <View style={styles.container}>
-        <Image
-          source={{
-            uri:
-              'https://static.vecteezy.com/system/resources/thumbnails/013/630/282/small/interesting-gradient-design-purple-black-free-photo.jpg',
-          }}
-          style={styles.backgroundImage}
-          resizeMode="cover"
-        />
-
+      <LinearGradient colors={theme.gradient} style={styles.container}>
         <Text style={styles.mainTitle}>Search Results for "{searchTerm}"</Text>
 
         {filteredMovies.length > 0 && (
@@ -72,7 +65,7 @@ const SearchResultsPage = ({ route }) => {
             />
           </View>
         )}
-      </View>
+      </LinearGradient>
     </ScrollView>
   )
 }
