@@ -79,11 +79,13 @@ const SignUpPageNative = ({ navigation }) => {
     <View style={styles.container}>
       {loading && <LoadingOverlay visible={loading} />}
       <View style={styles.overlay} />
-      <Image 
-          source={{ uri: "https://wallpapers.com/images/hd/movie-poster-background-wg5mxe6b7djul0a8.jpg" }} 
-          style={styles.backgroundImage} 
-          resizeMode="cover"
-        />
+      <Image
+        source={{
+          uri: 'https://wallpapers.com/images/hd/movie-poster-background-wg5mxe6b7djul0a8.jpg',
+        }}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
       <Header />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.form}>
@@ -198,8 +200,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject, 
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
 })
 

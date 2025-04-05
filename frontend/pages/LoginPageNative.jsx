@@ -63,6 +63,7 @@ const LoginPageNative = ({ navigation }) => {
       // Store token
       await AsyncStorage.setItem('token', data.token)
       await AsyncStorage.setItem('email', email)
+      await AsyncStorage.setItem('userID', data.userID)
 
       // Navigate to homepage
       navigation.navigate('Home', { userID: data.userID })
@@ -81,11 +82,13 @@ const LoginPageNative = ({ navigation }) => {
     <View style={styles.container}>
       {loading && <LoadingOverlay visible={loading} />}
       <View style={styles.overlay} />
-        <Image 
-          source={{ uri: "https://wallpapers.com/images/hd/movie-poster-background-wg5mxe6b7djul0a8.jpg" }} 
-          style={styles.backgroundImage} 
-          resizeMode="cover"
-        />
+      <Image
+        source={{
+          uri: 'https://wallpapers.com/images/hd/movie-poster-background-wg5mxe6b7djul0a8.jpg',
+        }}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
       <Header />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.form}>
@@ -129,7 +132,6 @@ const LoginPageNative = ({ navigation }) => {
           </Text>
         </View>
       </ScrollView>
-      
     </View>
   )
 }
@@ -207,8 +209,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject, 
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
 })
 

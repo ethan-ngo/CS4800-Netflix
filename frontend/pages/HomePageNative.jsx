@@ -14,6 +14,8 @@ import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api'
 import { useNavigation } from '@react-navigation/native'
 import HomeNavbar from '../components/HomeNavbar'
 import LoadingOverlay from '../components/LoadingOverlay'
+import { LinearGradient } from 'expo-linear-gradient'
+import theme from '../utils/theme'
 
 const HomePageNative = ({ route }) => {
   const [items, setItems] = useState([])
@@ -46,7 +48,7 @@ const HomePageNative = ({ route }) => {
   }, [])
 
   const handleSelectShow = (show) => {
-    navigation.navigate('ShowDetailsNative', { show }) 
+    navigation.navigate('ShowDetailsNative', { show })
   }
 
   const handleSelectItem = (item) => {
@@ -93,12 +95,7 @@ const HomePageNative = ({ route }) => {
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
       {loading && <LoadingOverlay visible={loading} />}
       <HomeNavbar userID={userID} />
-      <View style={styles.container}>
-        <Image 
-          source={{ uri: "https://static.vecteezy.com/system/resources/thumbnails/013/630/282/small/interesting-gradient-design-purple-black-free-photo.jpg" }} 
-          style={styles.backgroundImage} 
-          resizeMode="cover"
-        />
+      <LinearGradient colors={theme.gradient} style={styles.container}>
         <View style={styles.mediaSection}>
           <Text style={styles.sectionTitle}>All Items</Text>
           <FlatList
@@ -130,11 +127,11 @@ const HomePageNative = ({ route }) => {
             keyExtractor={(item) => item.Id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
-            renderItem={renderShowItem} 
+            renderItem={renderShowItem}
             contentContainerStyle={styles.mediaList}
           />
         </View>
-      </View>
+      </LinearGradient>
     </ScrollView>
   )
 }
