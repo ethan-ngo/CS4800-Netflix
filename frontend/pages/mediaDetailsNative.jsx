@@ -14,6 +14,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { getMovieDetails } from './api'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import Video from 'react-native-video'
+import UserRatingButtons from '../components/userMovieRatingButtons'
 
 const API_URL = process.env.REACT_APP_API_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
@@ -73,6 +74,7 @@ const MediaDetailsNative = () => {
             uri: `${API_URL}/Items/${media.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`,
           }}
           style={styles.poster}
+          alt="Movie Poster"
         />
 
         <View style={styles.info}>
@@ -107,6 +109,8 @@ const MediaDetailsNative = () => {
         />
       </View>
 
+      <UserRatingButtons />
+
       {loading ? (
         <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 20 }} />
       ) : (
@@ -138,6 +142,7 @@ const MediaDetailsNative = () => {
                 <Image
                   source={{ uri: `https://image.tmdb.org/t/p/w500/${item.profile_path}` }}
                   style={styles.castImage}
+                  alt="Cast Image"
                 />
                 <Text style={styles.castName}>{item.name}</Text>
                 <Text style={styles.castCharacter}>{item.character}</Text>
