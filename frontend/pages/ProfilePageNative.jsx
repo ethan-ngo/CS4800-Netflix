@@ -11,6 +11,7 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ImagePicker from 'expo-image-picker'
+import { LinearGradient } from 'expo-linear-gradient'
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
 import { s3, BUCKET_NAME } from '../aws-config'
@@ -169,6 +170,7 @@ const ProfilePageNative = ({navigation}) => {
 
   //uses user data from the database to populate the form
   return (
+    <LinearGradient colors={theme.gradient} style={styles.container}>
     <View style={styles.container}>
       <View style={styles.form}>
         <Text style={styles.title}>Edit Profile</Text>
@@ -209,7 +211,8 @@ const ProfilePageNative = ({navigation}) => {
           <Text style={styles.homeButtonText}>Return Home</Text>
         </TouchableOpacity>
       </View>
-    </View>
+      </View>
+      </LinearGradient>
   )
 }
 
@@ -219,19 +222,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'white',
+   // backgroundColor: 'white',
   },
   form: {
     width: '100%',
-    maxWidth: 400,
-    padding: 20,
+    maxWidth: 500,
+    padding: 50,
     borderRadius: 10,
     backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.4,
     shadowRadius: 4,
-    elevation: 5,
+    elevation: 10,
   },
   title: {
     fontSize: 24,
