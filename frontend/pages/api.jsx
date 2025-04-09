@@ -115,9 +115,9 @@ export const getUserMovieByIDS = async(userID, movieID) => {
         const data = await response.json();
         return data;
       }
-      return null;
     } catch(error){
       console.error("Error fetching UserMovieInfo")
+      return null;
     }
 };
 
@@ -148,7 +148,7 @@ export const newUserMovie = async(userID, movieID, numWatched, timeStamp, isBook
   }
 };
 
-export const setUserMovieID = async(_id, userID, movieID, numWatched, timeStamp, isBookmarked, userMovieRating) => {
+export const setUserMovieInfo = async(_id, userID, movieID, numWatched, timeStamp, isBookmarked, userMovieRating) => {
   try {
     const response = await fetch(LOCAL_URL + `userMovieInfo/${_id}`, {
       method: 'PATCH',

@@ -12,7 +12,7 @@ import {
   Button,
 } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { getMovieDetails, getUserMovieByIDS, newUserMovie } from './api'
+import { getMovieDetails, getUserMovieByIDS, newUserMovie, setUserMovieInfo } from './api'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import { useEvent } from 'expo';
 import UserRatingButtons from '../components/userMovieRatingButtons'
@@ -33,7 +33,7 @@ const MediaDetailsNative = () => {
   const [timeStamp, setTimeStamp] = useState(0)
   const [isBookmarked, setBookmarked] = useState(false)
   const [userRating, setUserRating] = useState(0)
-  const [userUserMovieID, setUserMovieID] = useState(null)
+  const [userMovieID, setUserMovieID] = useState(null)
   const [numWatched, setNumWatched] = useState(0)
 
   useEffect(() => {
@@ -41,8 +41,8 @@ const MediaDetailsNative = () => {
       fetchMovieInfo(media.Name)
     }
     console.log(media)
-    player.currentTime = 3
-  }, [media])
+    player.currentTime = timeStamp
+  }, [media, timeStamp])
 
   const fetchMovieInfo = async (movieName) => {
     const data = await getMovieDetails(movieName)
@@ -65,7 +65,8 @@ const MediaDetailsNative = () => {
     }
     // user has not watched and will create userMovieInfo 
     else {
-      console.log(await newUserMovie(userID, media.Id, 0, 0, false, 0))
+      const response = await newUserMovie(userID, media.Id, 0, 0, false, 0)
+      setUserMovieID(response.insertedId)
     }
   };
 
@@ -86,11 +87,14 @@ const MediaDetailsNative = () => {
     isPlaying: player.playing,
   });
 
+  const handlePause = async () => {
+    const data = setUserMovieInfo(userMovieID, userID, media.Id, numWatched, player.currentTime, isBookmarked, userRating)
+  }
   useEffect(() => {
     if (!isPlaying) {
-      console.log(player.currentTime); // Set the timestamp when playback is paused
+      handlePause();
     }
-  }, [isPlaying, player]);
+  }, [isPlaying]);
 
   if (!media) {
     return (
