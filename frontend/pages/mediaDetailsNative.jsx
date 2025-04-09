@@ -111,13 +111,26 @@ const MediaDetailsNative = () => {
       </TouchableOpacity>
 
       <View style={styles.detailsContainer}>
-        <Image
-          source={{
-            uri: `${API_URL}/Items/${media.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`,
-          }}
-          style={styles.poster}
-          alt="Movie Poster"
-        />
+        <View style={styles.imageContainer}>
+          <Image
+            source={{
+              uri: `${API_URL}/Items/${media.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`,
+            }}
+            style={styles.poster}
+            alt="Movie Poster"
+          />
+          <TouchableOpacity
+            style={styles.starButton}
+            onPress={() => {
+              setBookmarked(!isBookmarked)
+              const data = setUserMovieInfo(userMovieID, userID, media.Id, numWatched, player.currentTime, !isBookmarked, userRating)
+            }}
+          >
+            <Text style={[styles.star, isBookmarked ? styles.starSelected : styles.starUnselected]}>
+              ★
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.info}>
           <Text style={styles.title}>{media.Name}</Text>
@@ -143,18 +156,6 @@ const MediaDetailsNative = () => {
       <Text style={styles.subtitle}>Now Playing:</Text>
 
       <VideoView style={Platform.OS === "web" ? styles.videoContainer : styles.videoContainerMobile} player={player} allowsFullscreen allowsPictureInPicture />
-      <View style={styles.controlsContainer}>
-        <Button
-          title={isPlaying ? 'Pause' : 'Play'}
-          onPress={() => {
-            if (isPlaying) {
-              player.pause();
-            } else {
-              player.play();
-            }
-          }}
-        />
-      </View>
 
       <UserRatingButtons />
 
@@ -237,11 +238,28 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     width: '100%',
   },
+  imageContainer: {
+    position: 'relative',
+  },
   poster: {
     width: 120,
     height: 180,
     borderRadius: 10,
     marginRight: 15,
+  },
+  starButton: {
+    position: 'absolute',
+    top: 5,
+    right: 20,
+  },
+  star: {
+    fontSize: 40,
+  },
+  starSelected: {
+    color: '#FFD700',
+  },
+  starUnselected: {
+    color: 'black',
   },
   info: {
     flex: 1,

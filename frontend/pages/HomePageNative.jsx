@@ -22,6 +22,8 @@ const HomePageNative = ({ route }) => {
   const [shows, setShows] = useState([])
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(false)
+  const [watchedMovies, setWatchedMovies] = useState([])
+  const [isStarred, setIsStarred] = useState(false);
 
   const userID = route.params.userID
   const navigation = useNavigation()
