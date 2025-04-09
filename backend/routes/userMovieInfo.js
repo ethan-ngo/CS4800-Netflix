@@ -21,7 +21,10 @@ router.get('/', async (req, res) => {
 // This section will help you get a single userMovieInfo by userID and movieID
 router.get('/:userID/:movieID', async (req, res) => {
   let collection = await db.collection('userMovieInfo')
-  let query = { userID: new ObjectId(req.params.userID), movieID: req.params.movieID }
+  let query = { 
+    userID: req.params.userID, 
+    movieID: req.params.movieID
+  }
   let result = await collection.findOne(query)
 
   if (!result) res.send('userMovieInfo Not found').status(404)
@@ -41,7 +44,7 @@ router.post('/', async (req, res) => {
     }
     let collection = await db.collection('userMovieInfo')
     let result = await collection.insertOne(newuserMovieInfo)
-    res.send(result).status(204)
+    res.send(result).status(200)
   } catch (err) {
     console.error(err)
     res.status(500).send('Error adding newUserMovieInfo')

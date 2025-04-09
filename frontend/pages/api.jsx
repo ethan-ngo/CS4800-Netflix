@@ -6,6 +6,7 @@ const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
 const API_KEY = process.env.TMDB_API_KEY
 const BASE_URL = 'https://api.themoviedb.org/3'
 const APP_URL = process.env.APP_URL
+const LOCAL_URL = process.env.LOCAL_URL
 
 export { API_URL, ACCESS_TOKEN }
 
@@ -109,7 +110,7 @@ export const getShowDetails = async (showName) => {
 // Returns a single instance of the user movie info based on userID and movieID
 export const getUserMovieByIDS = async(userID, movieID) => {
     try{
-      const response = fetch(APP_URL + `userMovieInfo/${userID}/${movieID}`);
+      const response = await fetch(LOCAL_URL + `userMovieInfo/${userID}/${movieID}`);
       if(response.ok){
         const data = await response.json();
         return data;
@@ -118,4 +119,57 @@ export const getUserMovieByIDS = async(userID, movieID) => {
     } catch(error){
       console.error("Error fetching UserMovieInfo")
     }
+};
+
+export const newUserMovie = async(userID, movieID, numWatched, timeStamp, isBookmarked, userMovieRating) => {
+  try{
+    const response = await fetch(APP_URL + "userMovieInfo", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        userID: userID, 
+        movieID: movieID, 
+        numWatched: numWatched, 
+        timeStamp: timeStamp, 
+        isBookmarked: isBookmarked, 
+        userMovieRating: userMovieRating
+      }),
+    })
+    if(response.ok) {
+      const data = await response.json()
+      return data
+    }
+    return null
+    
+  } catch(error){
+    console.error(error)
+  }
+};
+
+export const setUserMovieID = async(_id, userID, movieID, numWatched, timeStamp, isBookmarked, userMovieRating) => {
+  try {
+    const response = await fetch(LOCAL_URL + `userMovieInfo/${_id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        userID: userID, 
+        movieID: movieID, 
+        numWatched: numWatched, 
+        timeStamp: timeStamp, 
+        isBookmarked: isBookmarked, 
+        userMovieRating: userMovieRating
+      }),
+    })
+    if(response.ok) {
+      const data = await response.json()
+      return data
+    }
+    return null
+  } catch(error) {
+    console.error(error)
+  }
 };

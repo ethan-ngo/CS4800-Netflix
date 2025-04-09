@@ -12,7 +12,7 @@ import {
   Button,
 } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { getMovieDetails, getUserMovieByIDS } from './api'
+import { getMovieDetails, getUserMovieByIDS, newUserMovie } from './api'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import { useEvent } from 'expo';
 import UserRatingButtons from '../components/userMovieRatingButtons'
@@ -32,7 +32,9 @@ const MediaDetailsNative = () => {
   const [cast, setCast] = useState([]) // State for the cast
   const [timeStamp, setTimeStamp] = useState(0)
   const [isBookmarked, setBookmarked] = useState(false)
-  const [overallRating, setOverallRating] = useState(0)
+  const [userRating, setUserRating] = useState(0)
+  const [userUserMovieID, setUserMovieID] = useState(null)
+  const [numWatched, setNumWatched] = useState(0)
 
   useEffect(() => {
     if (media?.Name) {
@@ -55,11 +57,15 @@ const MediaDetailsNative = () => {
     const userMovieInfo = await getUserMovieByIDS(userID, media.Id);
     // user has watched movie and will update timestamp, rating, bookmark
     if (userMovieInfo) {
-
+      setUserMovieID(userMovieInfo._id)
+      setBookmarked(userMovieInfo.isBookmarked)
+      setUserRating(userMovieInfo.userMovieRating)
+      setTimeStamp(userMovieInfo.timeStamp)
+      setNumWatched(userMovieInfo.numWatched)
     }
     // user has not watched and will create userMovieInfo 
     else {
-      console.log("working"); 
+      console.log(await newUserMovie(userID, media.Id, 0, 0, false, 0))
     }
   };
 
