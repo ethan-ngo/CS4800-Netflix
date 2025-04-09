@@ -9,11 +9,12 @@ import {
   ScrollView,
   FlatList,
   Platform,
+  Button,
 } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { getMovieDetails } from './api'
 import { useVideoPlayer, VideoView } from 'expo-video'
-import Video from 'react-native-video'
+import { useEvent } from 'expo';
 import UserRatingButtons from '../components/userMovieRatingButtons'
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -34,6 +35,7 @@ const MediaDetailsNative = () => {
       fetchMovieInfo(media.Name)
     }
     console.log(media)
+    player.currentTime = 3
   }, [media])
 
   const fetchMovieInfo = async (movieName) => {
@@ -49,10 +51,20 @@ const MediaDetailsNative = () => {
     uri: `${API_URL}/Videos/${media.Id}/stream?api_key=${ACCESS_TOKEN}&DirectPlay=true&Static=true`,
   }
 
-  // const player = useVideoPlayer(videoSource, player => {
-  //     player.loop = true;
-  //     player.play();
-  // });
+  const player = useVideoPlayer(videoSource, (player) => {
+    player.loop = true;
+    player.play();
+  });
+
+  const { isPlaying } = useEvent(player, 'playingChange', {
+    isPlaying: player.playing,
+  });
+
+  useEffect(() => {
+    if (!isPlaying) {
+      console.log(player.currentTime); // Set the timestamp when playback is paused
+    }
+  }, [isPlaying, player]);
 
   if (!media) {
     return (
@@ -100,12 +112,17 @@ const MediaDetailsNative = () => {
 
       <Text style={styles.subtitle}>Now Playing:</Text>
 
-      <View style={styles.videoContainer}>
-        <Video
-          ref={videoRef}
-          source={videoSource}
-          style={styles.videoPlayer}
-          controls={true} // Enables default seek slider
+      <VideoView style={Platform.OS==="web" ? styles.videoContainer : styles.videoContainerMobile} player={player} allowsFullscreen allowsPictureInPicture />
+      <View style={styles.controlsContainer}>
+        <Button
+          title={isPlaying ? 'Pause' : 'Play'}
+          onPress={() => {
+            if (isPlaying) {
+              player.pause();
+            } else {
+              player.play();
+            }
+          }}
         />
       </View>
 
@@ -230,6 +247,16 @@ const styles = StyleSheet.create({
     aspectRatio: 16 / 9,
     backgroundColor: 'black',
     marginVertical: 10,
+  },
+  videoContainerMobile: {
+    width: '60%',
+    height: 200,
+    aspectRatio: 16 / 9,
+    backgroundColor: 'black',
+    marginVertical: 10,
+  },
+  controlsContainer: {
+    padding: 10,
   },
   tmdbContainer: {
     marginTop: 20,
