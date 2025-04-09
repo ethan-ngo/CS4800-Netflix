@@ -12,7 +12,7 @@ import {
   Button,
 } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { getMovieDetails } from './api'
+import { getMovieDetails, getUserMovieByIDS } from './api'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import { useEvent } from 'expo';
 import UserRatingButtons from '../components/userMovieRatingButtons'
@@ -24,11 +24,15 @@ const MediaDetailsNative = () => {
   const navigation = useNavigation()
   const route = useRoute()
   const media = route.params?.media
+  const userID = route.params?.userID
 
   const videoRef = useRef(null)
   const [movieData, setMovieData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [cast, setCast] = useState([]) // State for the cast
+  const [timeStamp, setTimeStamp] = useState(0)
+  const [isBookmarked, setBookmarked] = useState(false)
+  const [overallRating, setOverallRating] = useState(0)
 
   useEffect(() => {
     if (media?.Name) {
@@ -46,6 +50,22 @@ const MediaDetailsNative = () => {
     }
     setLoading(false)
   }
+
+  const handleNewUserMovieInfo = async () => {
+    const userMovieInfo = await getUserMovieByIDS(userID, media.Id);
+    // user has watched movie and will update timestamp, rating, bookmark
+    if (userMovieInfo) {
+
+    }
+    // user has not watched and will create userMovieInfo 
+    else {
+      console.log("working"); 
+    }
+  };
+
+  useEffect(() => {
+    handleNewUserMovieInfo();
+  }, []); 
 
   const videoSource = {
     uri: `${API_URL}/Videos/${media.Id}/stream?api_key=${ACCESS_TOKEN}&DirectPlay=true&Static=true`,
@@ -112,7 +132,7 @@ const MediaDetailsNative = () => {
 
       <Text style={styles.subtitle}>Now Playing:</Text>
 
-      <VideoView style={Platform.OS==="web" ? styles.videoContainer : styles.videoContainerMobile} player={player} allowsFullscreen allowsPictureInPicture />
+      <VideoView style={Platform.OS === "web" ? styles.videoContainer : styles.videoContainerMobile} player={player} allowsFullscreen allowsPictureInPicture />
       <View style={styles.controlsContainer}>
         <Button
           title={isPlaying ? 'Pause' : 'Play'}

@@ -5,6 +5,7 @@ const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
 // tmdb api
 const API_KEY = process.env.TMDB_API_KEY
 const BASE_URL = 'https://api.themoviedb.org/3'
+const APP_URL = process.env.APP_URL
 
 export { API_URL, ACCESS_TOKEN }
 
@@ -103,4 +104,18 @@ export const getShowDetails = async (showName) => {
     console.error('Error fetching show details and cast:', error);
     return null;
   }
+};
+
+// Returns a single instance of the user movie info based on userID and movieID
+export const getUserMovieByIDS = async(userID, movieID) => {
+    try{
+      const response = fetch(APP_URL + `userMovieInfo/${userID}/${movieID}`);
+      if(response.ok){
+        const data = await response.json();
+        return data;
+      }
+      return null;
+    } catch(error){
+      console.error("Error fetching UserMovieInfo")
+    }
 };
