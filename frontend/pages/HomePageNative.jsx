@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
+  Dimensions,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api'
@@ -17,11 +18,24 @@ import LoadingOverlay from '../components/LoadingOverlay'
 import { LinearGradient } from 'expo-linear-gradient'
 import theme from '../utils/theme'
 
+const screenWidth = Dimensions.get('window').width;
+const itemWidth = 120; // or whatever works for your item
+const horizontalSpacing = 10;
+const itemsPerRow = Math.floor(screenWidth / (itemWidth + horizontalSpacing));
+
 const HomePageNative = ({ route }) => {
   const [items, setItems] = useState([])
   const [shows, setShows] = useState([])
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(false)
+  const [mode, setMode] = useState('all') // default to show everything
+
+  useEffect(() => {
+    if (route.params?.mode) {
+      setMode(route.params.mode)
+    }
+  }, [route.params?.mode])
+
 
   const userID = route.params.userID
   const navigation = useNavigation()
@@ -96,41 +110,71 @@ const HomePageNative = ({ route }) => {
       {loading && <LoadingOverlay visible={loading} />}
       <HomeNavbar userID={userID} />
       <LinearGradient colors={theme.gradient} style={styles.container}>
-        <View style={styles.mediaSection}>
-          <Text style={styles.sectionTitle}>All Items</Text>
-          <FlatList
-            data={items}
-            keyExtractor={(item) => item.Id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            renderItem={renderMediaItem}
-            contentContainerStyle={styles.mediaList}
-          />
-        </View>
+        {mode === 'all' && (
+          <>
+            <View style={styles.mediaSection}>
+              <Text style={styles.sectionTitle}>Movies</Text>
+              <FlatList
+                data={movies}
+                keyExtractor={(item) => item.Id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                renderItem={renderMediaItem}
+                contentContainerStyle={styles.mediaList}
+              />
+            </View>
 
-        <View style={styles.mediaSection}>
-          <Text style={styles.sectionTitle}>Movies</Text>
-          <FlatList
-            data={movies}
-            keyExtractor={(item) => item.Id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            renderItem={renderMediaItem}
-            contentContainerStyle={styles.mediaList}
-          />
-        </View>
+            <View style={styles.mediaSection}>
+              <Text style={styles.sectionTitle}>Shows</Text>
+              <FlatList
+                data={shows}
+                keyExtractor={(item) => item.Id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                renderItem={renderShowItem}
+                contentContainerStyle={styles.mediaList}
+              />
+            </View>
 
-        <View style={styles.mediaSection}>
-          <Text style={styles.sectionTitle}>Shows</Text>
-          <FlatList
-            data={shows}
-            keyExtractor={(item) => item.Id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            renderItem={renderShowItem}
-            contentContainerStyle={styles.mediaList}
-          />
-        </View>
+            <View style={styles.mediaSection}>
+              <Text style={styles.sectionTitle}>All Items</Text>
+              <FlatList
+                data={items}
+                keyExtractor={(item) => item.Id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                renderItem={renderMediaItem}
+                contentContainerStyle={styles.mediaList}
+              />
+            </View>
+          </>
+        )}
+
+        {mode === 'movies' && (
+          <View style={styles.mediaSection}>
+            <Text style={styles.sectionTitle}>Movies</Text>
+            <View style={styles.gridContainer}>
+              {movies.map((item) => (
+                <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
+                  {renderMediaItem({ item })}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {mode === 'shows' && (
+          <View style={styles.mediaSection}>
+            <Text style={styles.sectionTitle}>Shows</Text>
+            <View style={styles.gridContainer}>
+              {shows.map((item) => (
+                <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
+                  {renderShowItem({ item })}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
       </LinearGradient>
     </ScrollView>
   )
@@ -177,6 +221,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     width: '100%',
+  },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+  },
+  gridItem: {
+    marginRight: horizontalSpacing,
+    marginBottom: 15,
   },
   backgroundImage: {
     width: '100%',
