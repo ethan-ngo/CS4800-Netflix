@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { View, Text, Image, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, FlatList, Platform } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { getItems, getMovieDetails , getShowDetails} from './api'
+import { getItems, getMovieDetails, getShowDetails } from './api'
 import { useVideoPlayer, VideoView } from 'expo-video'
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -35,6 +35,18 @@ const ShowDetailsNative = () => {
             fetchShowDetails(show.Name)
         }
     }, [show])
+
+
+    // for time stamp saving
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (player && player.currentTime != null) {
+                console.log(`Current Timestamp for ${selectedEpisode}:`, player.currentTime);
+            }
+        }, 10000); // Log every 10 seconds
+
+        return () => clearInterval(interval);
+    })
 
     const fetchEpisodes = async (showName) => {
         const allItems = await getItems()
@@ -180,9 +192,9 @@ const ShowDetailsNative = () => {
                         <Text style={styles.detail}><Text style={styles.bold}>TMDb Rating:</Text> {showDetails.vote_average}/10</Text>
                         <Text style={styles.detail}><Text style={styles.bold}>Release Date:</Text> {showDetails.release_date}</Text>
                     </View>
-                ) :(
+                ) : (
                     <Text style={styles.subtitle}>No Additional Info</Text>
-            ))}
+                ))}
 
             {cast.length > 0 && (
                 <View style={styles.castContainer}>

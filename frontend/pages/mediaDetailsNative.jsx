@@ -34,8 +34,20 @@ const MediaDetailsNative = () => {
       fetchMovieInfo(media.Name)
     }
     console.log(media)
-    player.currentTime = 3
+
   }, [media])
+
+
+  // for time stamp saving
+  useEffect(() => {
+    const interval = setInterval(() => { 
+      if(player && player.currentTime != null){
+        console.log('Current Timestamp:', player.currentTime); 
+      }
+    }, 10000) ; // log every 10 seconds
+
+    return () => clearInterval(interval); 
+  })
 
   const fetchMovieInfo = async (movieName) => {
     const data = await getMovieDetails(movieName)
