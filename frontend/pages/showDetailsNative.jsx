@@ -49,6 +49,17 @@ const ShowDetailsNative = () => {
     }
   }, [show])
 
+  // for time stamp saving
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (player && player.currentTime != null) {
+        console.log(`Current Timestamp for ${selectedEpisode}:`, player.currentTime)
+      }
+    }, 10000) // Log every 10 seconds
+
+    return () => clearInterval(interval)
+  })
+
   const fetchEpisodes = async (showName) => {
     const allItems = await getItems()
 

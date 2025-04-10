@@ -14,7 +14,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { getMovieDetails, getUserMovieByIDS, newUserMovie, setUserMovieInfo } from './api'
 import { useVideoPlayer, VideoView } from 'expo-video'
-import { useEvent } from 'expo';
+import { useEvent } from 'expo'
 import UserRatingButtons from '../components/userMovieRatingButtons'
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -44,6 +44,17 @@ const MediaDetailsNative = () => {
     player.currentTime = timeStamp
   }, [media, timeStamp])
 
+  // for time stamp saving
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (player && player.currentTime != null) {
+        console.log('Current Timestamp:', player.currentTime)
+      }
+    }, 10000) // log every 10 seconds
+
+    return () => clearInterval(interval)
+  })
+
   const fetchMovieInfo = async (movieName) => {
     const data = await getMovieDetails(movieName)
     if (data) {
@@ -54,7 +65,7 @@ const MediaDetailsNative = () => {
   }
 
   const handleNewUserMovieInfo = async () => {
-    const userMovieInfo = await getUserMovieByIDS(userID, media.Id);
+    const userMovieInfo = await getUserMovieByIDS(userID, media.Id)
     // user has watched movie and will update timestamp, rating, bookmark
     if (userMovieInfo) {
       setUserMovieID(userMovieInfo._id)
@@ -63,38 +74,46 @@ const MediaDetailsNative = () => {
       setTimeStamp(userMovieInfo.timeStamp)
       setNumWatched(userMovieInfo.numWatched)
     }
-    // user has not watched and will create userMovieInfo 
+    // user has not watched and will create userMovieInfo
     else {
       const response = await newUserMovie(userID, media.Id, 0, 0, false, 0)
       setUserMovieID(response.insertedId)
     }
-  };
+  }
 
   useEffect(() => {
-    handleNewUserMovieInfo();
-  }, []); 
+    handleNewUserMovieInfo()
+  }, [])
 
   const videoSource = {
     uri: `${API_URL}/Videos/${media.Id}/stream?api_key=${ACCESS_TOKEN}&DirectPlay=true&Static=true`,
   }
 
   const player = useVideoPlayer(videoSource, (player) => {
-    player.loop = true;
-    player.play();
-  });
+    player.loop = true
+    player.play()
+  })
 
   const { isPlaying } = useEvent(player, 'playingChange', {
     isPlaying: player.playing,
-  });
+  })
 
   const handlePause = async () => {
-    const data = setUserMovieInfo(userMovieID, userID, media.Id, numWatched, player.currentTime, isBookmarked, userRating)
+    const data = setUserMovieInfo(
+      userMovieID,
+      userID,
+      media.Id,
+      numWatched,
+      player.currentTime,
+      isBookmarked,
+      userRating
+    )
   }
   useEffect(() => {
     if (!isPlaying) {
-      handlePause();
+      handlePause()
     }
-  }, [isPlaying]);
+  }, [isPlaying])
 
   if (!media) {
     return (
@@ -123,7 +142,15 @@ const MediaDetailsNative = () => {
             style={styles.starButton}
             onPress={() => {
               setBookmarked(!isBookmarked)
-              const data = setUserMovieInfo(userMovieID, userID, media.Id, numWatched, player.currentTime, !isBookmarked, userRating)
+              const data = setUserMovieInfo(
+                userMovieID,
+                userID,
+                media.Id,
+                numWatched,
+                player.currentTime,
+                !isBookmarked,
+                userRating
+              )
             }}
           >
             <Text style={[styles.star, isBookmarked ? styles.starSelected : styles.starUnselected]}>
@@ -155,7 +182,12 @@ const MediaDetailsNative = () => {
 
       <Text style={styles.subtitle}>Now Playing:</Text>
 
-      <VideoView style={Platform.OS === "web" ? styles.videoContainer : styles.videoContainerMobile} player={player} allowsFullscreen allowsPictureInPicture />
+      <VideoView
+        style={Platform.OS === 'web' ? styles.videoContainer : styles.videoContainerMobile}
+        player={player}
+        allowsFullscreen
+        allowsPictureInPicture
+      />
 
       <UserRatingButtons />
 

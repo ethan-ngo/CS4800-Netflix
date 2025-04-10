@@ -12,20 +12,15 @@ const HomeNavbar = ({ userID }) => {
   const navigation = useNavigation()
 
   const handleClickHome = () => {
-    console.log('Home button clicked')
-    navigation.navigate('Home', { userID: userID })
+    navigation.navigate('Home', { userID, mode: 'all' })
   }
 
   const handleClickMovies = () => {
-    console.log('Movies button clicked')
-    // go to home, then scroll to the movies section (TODO)
-    navigation.navigate('Home', { userID: userID })
+    navigation.navigate('Home', { userID, mode: 'movies' })
   }
 
   const handleClickShows = () => {
-    console.log('Shows button clicked')
-    // go to home, then scroll to the shows section (TODO)
-    navigation.navigate('Home', { userID: userID })
+    navigation.navigate('Home', { userID, mode: 'shows' })
   }
 
   return (
