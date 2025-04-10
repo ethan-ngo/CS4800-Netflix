@@ -28,6 +28,8 @@ const HomePageNative = ({ route }) => {
   const [shows, setShows] = useState([])
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(false)
+  const [watchedMovies, setWatchedMovies] = useState([])
+  const [isStarred, setIsStarred] = useState(false);
   const [mode, setMode] = useState('all') // default to show everything
 
   useEffect(() => {
@@ -66,7 +68,7 @@ const HomePageNative = ({ route }) => {
   }
 
   const handleSelectItem = (item) => {
-    navigation.navigate('MediaDetailsNative', { media: item })
+    navigation.navigate('MediaDetailsNative', { userID: userID, media: item })
   }
 
   const renderMediaItem = ({ item }) => {
