@@ -12,9 +12,10 @@ import {
   Button,
 } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { getMovieDetails } from './api'
+import { getMovieDetails, getUserMovieByIDS, newUserMovie, setUserMovieInfo } from './api'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import { useEvent } from 'expo';
+import UserRatingButtons from '../components/userMovieRatingButtons'
 
 const API_URL = process.env.REACT_APP_API_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
@@ -23,19 +24,25 @@ const MediaDetailsNative = () => {
   const navigation = useNavigation()
   const route = useRoute()
   const media = route.params?.media
+  const userID = route.params?.userID
 
   const videoRef = useRef(null)
   const [movieData, setMovieData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [cast, setCast] = useState([]) // State for the cast
+  const [timeStamp, setTimeStamp] = useState(0)
+  const [isBookmarked, setBookmarked] = useState(false)
+  const [userRating, setUserRating] = useState(0)
+  const [userMovieID, setUserMovieID] = useState(null)
+  const [numWatched, setNumWatched] = useState(0)
 
   useEffect(() => {
     if (media?.Name) {
       fetchMovieInfo(media.Name)
     }
     console.log(media)
-    player.currentTime = 3
-  }, [media])
+    player.currentTime = timeStamp
+  }, [media, timeStamp])
 
   const fetchMovieInfo = async (movieName) => {
     const data = await getMovieDetails(movieName)
@@ -45,6 +52,27 @@ const MediaDetailsNative = () => {
     }
     setLoading(false)
   }
+
+  const handleNewUserMovieInfo = async () => {
+    const userMovieInfo = await getUserMovieByIDS(userID, media.Id);
+    // user has watched movie and will update timestamp, rating, bookmark
+    if (userMovieInfo) {
+      setUserMovieID(userMovieInfo._id)
+      setBookmarked(userMovieInfo.isBookmarked)
+      setUserRating(userMovieInfo.userMovieRating)
+      setTimeStamp(userMovieInfo.timeStamp)
+      setNumWatched(userMovieInfo.numWatched)
+    }
+    // user has not watched and will create userMovieInfo 
+    else {
+      const response = await newUserMovie(userID, media.Id, 0, 0, false, 0)
+      setUserMovieID(response.insertedId)
+    }
+  };
+
+  useEffect(() => {
+    handleNewUserMovieInfo();
+  }, []); 
 
   const videoSource = {
     uri: `${API_URL}/Videos/${media.Id}/stream?api_key=${ACCESS_TOKEN}&DirectPlay=true&Static=true`,
@@ -59,11 +87,14 @@ const MediaDetailsNative = () => {
     isPlaying: player.playing,
   });
 
+  const handlePause = async () => {
+    const data = setUserMovieInfo(userMovieID, userID, media.Id, numWatched, player.currentTime, isBookmarked, userRating)
+  }
   useEffect(() => {
     if (!isPlaying) {
-      console.log(player.currentTime); // Set the timestamp when playback is paused
+      handlePause();
     }
-  }, [isPlaying, player]);
+  }, [isPlaying]);
 
   if (!media) {
     return (
@@ -80,12 +111,26 @@ const MediaDetailsNative = () => {
       </TouchableOpacity>
 
       <View style={styles.detailsContainer}>
-        <Image
-          source={{
-            uri: `${API_URL}/Items/${media.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`,
-          }}
-          style={styles.poster}
-        />
+        <View style={styles.imageContainer}>
+          <Image
+            source={{
+              uri: `${API_URL}/Items/${media.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`,
+            }}
+            style={styles.poster}
+            alt="Movie Poster"
+          />
+          <TouchableOpacity
+            style={styles.starButton}
+            onPress={() => {
+              setBookmarked(!isBookmarked)
+              const data = setUserMovieInfo(userMovieID, userID, media.Id, numWatched, player.currentTime, !isBookmarked, userRating)
+            }}
+          >
+            <Text style={[styles.star, isBookmarked ? styles.starSelected : styles.starUnselected]}>
+              ★
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.info}>
           <Text style={styles.title}>{media.Name}</Text>
@@ -110,19 +155,9 @@ const MediaDetailsNative = () => {
 
       <Text style={styles.subtitle}>Now Playing:</Text>
 
-      <VideoView style={Platform.OS==="web" ? styles.videoContainer : styles.videoContainerMobile} player={player} allowsFullscreen allowsPictureInPicture />
-      <View style={styles.controlsContainer}>
-        <Button
-          title={isPlaying ? 'Pause' : 'Play'}
-          onPress={() => {
-            if (isPlaying) {
-              player.pause();
-            } else {
-              player.play();
-            }
-          }}
-        />
-      </View>
+      <VideoView style={Platform.OS === "web" ? styles.videoContainer : styles.videoContainerMobile} player={player} allowsFullscreen allowsPictureInPicture />
+
+      <UserRatingButtons />
 
       {loading ? (
         <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 20 }} />
@@ -155,6 +190,7 @@ const MediaDetailsNative = () => {
                 <Image
                   source={{ uri: `https://image.tmdb.org/t/p/w500/${item.profile_path}` }}
                   style={styles.castImage}
+                  alt="Cast Image"
                 />
                 <Text style={styles.castName}>{item.name}</Text>
                 <Text style={styles.castCharacter}>{item.character}</Text>
@@ -202,11 +238,28 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     width: '100%',
   },
+  imageContainer: {
+    position: 'relative',
+  },
   poster: {
     width: 120,
     height: 180,
     borderRadius: 10,
     marginRight: 15,
+  },
+  starButton: {
+    position: 'absolute',
+    top: 5,
+    right: 20,
+  },
+  star: {
+    fontSize: 40,
+  },
+  starSelected: {
+    color: '#FFD700',
+  },
+  starUnselected: {
+    color: 'black',
   },
   info: {
     flex: 1,

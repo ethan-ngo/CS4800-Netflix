@@ -119,7 +119,7 @@ const ProfileDropdown = ({ userID }) => {
   )
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     position: 'relative',
     zIndex: 1000,
