@@ -110,7 +110,7 @@ export const getShowDetails = async (showName) => {
 // Returns a single instance of the user movie info based on userID and movieID
 export const getUserMovieByIDS = async(userID, movieID) => {
     try{
-      const response = await fetch(LOCAL_URL + `userMovieInfo/${userID}/${movieID}`);
+      const response = await fetch(APP_URL + `userMovieInfo/${userID}/${movieID}`);
       if(response.ok){
         const data = await response.json();
         return data;
@@ -150,7 +150,7 @@ export const newUserMovie = async(userID, movieID, numWatched, timeStamp, isBook
 
 export const setUserMovieInfo = async(_id, userID, movieID, numWatched, timeStamp, isBookmarked, userMovieRating) => {
   try {
-    const response = await fetch(LOCAL_URL + `userMovieInfo/${_id}`, {
+    const response = await fetch(APP_URL + `userMovieInfo/${_id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
