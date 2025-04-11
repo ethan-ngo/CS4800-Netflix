@@ -15,6 +15,9 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
 import { s3, BUCKET_NAME } from '../aws-config'
+import HomeNavbar from '../components/HomeNavbar'
+import '../globals.css'
+
 
 const ProfilePageNative = ({navigation}) => {
   const [profilePic, setProfilePic] = useState(null)
@@ -171,6 +174,7 @@ const ProfilePageNative = ({navigation}) => {
   //uses user data from the database to populate the form
   return (
     <LinearGradient colors={theme.gradient} style={styles.container}>
+    <HomeNavbar userID={userId} />
     <View style={styles.container}>
       <View style={styles.form}>
         <Text style={styles.title}>Edit Profile</Text>
