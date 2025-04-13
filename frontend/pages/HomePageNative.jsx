@@ -18,10 +18,10 @@ import LoadingOverlay from '../components/LoadingOverlay'
 import { LinearGradient } from 'expo-linear-gradient'
 import theme from '../utils/theme'
 
-const screenWidth = Dimensions.get('window').width;
-const itemWidth = 120; // or whatever works for your item
-const horizontalSpacing = 10;
-const itemsPerRow = Math.floor(screenWidth / (itemWidth + horizontalSpacing));
+const screenWidth = Dimensions.get('window').width
+const itemWidth = 120 // or whatever works for your item
+const horizontalSpacing = 10
+const itemsPerRow = Math.floor(screenWidth / (itemWidth + horizontalSpacing))
 
 const HomePageNative = ({ route }) => {
   const [items, setItems] = useState([])
@@ -29,7 +29,7 @@ const HomePageNative = ({ route }) => {
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(false)
   const [watchedMovies, setWatchedMovies] = useState([])
-  const [isStarred, setIsStarred] = useState(false);
+  const [isStarred, setIsStarred] = useState(false)
   const [mode, setMode] = useState('all') // default to show everything
 
   useEffect(() => {
@@ -37,7 +37,6 @@ const HomePageNative = ({ route }) => {
       setMode(route.params.mode)
     }
   }, [route.params?.mode])
-
 
   const userID = route.params.userID
   const navigation = useNavigation()
