@@ -18,6 +18,7 @@ import { useEvent } from 'expo'
 import UserRatingButtons from '../components/userMovieRatingButtons'
 
 const API_URL = process.env.REACT_APP_API_URL
+const LOCAL_URL = process.env.REACT_APP_LOCAL_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
 
 const MediaDetailsNative = () => {
@@ -99,6 +100,8 @@ const MediaDetailsNative = () => {
   })
 
   const handlePause = async () => {
+    if (!userMovieID) return
+
     const data = setUserMovieInfo(
       userMovieID,
       userID,
@@ -189,7 +192,23 @@ const MediaDetailsNative = () => {
         allowsPictureInPicture
       />
 
-      <UserRatingButtons />
+      <UserRatingButtons
+        userID={userID}
+        mediaID={media.Id}
+        defaultRating={userRating}
+        onSetRating={(newRating) => {
+          setUserRating(newRating)
+          setUserMovieInfo(
+            userMovieID,
+            userID,
+            media.Id,
+            numWatched,
+            player.currentTime,
+            isBookmarked,
+            newRating
+          )
+        }}
+      />
 
       {loading ? (
         <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 20 }} />

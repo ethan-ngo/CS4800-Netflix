@@ -1,36 +1,43 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import Icon from 'react-native-vector-icons/Feather'
 import theme from '../utils/theme'
 import '../globals.css'
 
-const UserRatingButtons = () => {
-  const [selectedButton, setSelectedButton] = useState(null)
+const UserRatingButtons = ({ defaultRating, onSetRating }) => {
+  const [selectedButton, setSelectedButton] = useState(defaultRating)
+
+  useEffect(() => {
+    setSelectedButton(defaultRating)
+  }, [defaultRating])
 
   const handleButtonPress = (button) => {
     setSelectedButton(button)
     console.log(`Button pressed: ${button}`)
+    if (onSetRating) {
+      onSetRating(button)
+    }
   }
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={[styles.button, selectedButton === 'notForMe' && styles.selectedRatingButton]}
-        onPress={() => handleButtonPress('notForMe')}
+        style={[styles.button, selectedButton === 'dislike' && styles.selectedRatingButton]}
+        onPress={() => handleButtonPress('dislike')}
       >
         <Text style={styles.buttonText}>Not for me</Text>
         <Icon name="thumbs-down" size={18} color="#fff" style={styles.icon} />
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.button, selectedButton === 'likeIt' && styles.selectedRatingButton]}
-        onPress={() => handleButtonPress('likeIt')}
+        style={[styles.button, selectedButton === 'like' && styles.selectedRatingButton]}
+        onPress={() => handleButtonPress('like')}
       >
         <Text style={styles.buttonText}>Like it</Text>
         <Icon name="thumbs-up" size={18} color="#fff" style={styles.icon} />
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.button, selectedButton === 'loveIt' && styles.selectedRatingButton]}
-        onPress={() => handleButtonPress('loveIt')}
+        style={[styles.button, selectedButton === 'love' && styles.selectedRatingButton]}
+        onPress={() => handleButtonPress('love')}
       >
         <Text style={styles.buttonText}>Love this!</Text>
         <Icon name="heart" size={18} color="#fff" style={styles.icon} />

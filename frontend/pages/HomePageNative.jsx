@@ -63,7 +63,7 @@ const HomePageNative = ({ route }) => {
   }, [])
 
   const handleSelectShow = (show) => {
-    navigation.navigate('ShowDetailsNative', { show })
+    navigation.navigate('ShowDetailsNative', { userID: userID, show })
   }
 
   const handleSelectItem = (item) => {
