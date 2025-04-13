@@ -74,102 +74,115 @@ export const getMovieDetails = async (movieName) => {
     console.error('Error fetching movie details and cast:', error)
     return null
   }
-};
+}
 
 export const getShowDetails = async (showName) => {
   try {
-
     const response = await tmdbApi.get('/search/tv', {
       params: {
         query: showName,
       },
-    });
+    })
 
     if (response.data.results.length === 0) {
-      console.error('TV Show not found');
-      return null;
+      console.error('TV Show not found')
+      return null
     }
 
-    const show = response.data.results[0];
-    const showId = show.id;
+    const show = response.data.results[0]
+    const showId = show.id
 
-    const showDetailsResponse = await tmdbApi.get(`/tv/${showId}`);
-    const castResponse = await tmdbApi.get(`/tv/${showId}/credits`);
+    const showDetailsResponse = await tmdbApi.get(`/tv/${showId}`)
+    const castResponse = await tmdbApi.get(`/tv/${showId}/credits`)
 
     return {
-      showId,    
-      showDetails: showDetailsResponse.data,  
+      showId,
+      showDetails: showDetailsResponse.data,
       cast: castResponse.data.cast,
-    };
+    }
   } catch (error) {
-    console.error('Error fetching show details and cast:', error);
-    return null;
+    console.error('Error fetching show details and cast:', error)
+    return null
   }
-};
+}
 
 // Returns a single instance of the user movie info based on userID and movieID
-export const getUserMovieByIDS = async(userID, movieID) => {
-    try{
-      const response = await fetch(APP_URL + `userMovieInfo/${userID}/${movieID}`);
-      if(response.ok){
-        const data = await response.json();
-        return data;
-      }
-    } catch(error){
-      console.error("Error fetching UserMovieInfo")
-      return null;
+export const getUserMovieByIDS = async (userID, movieID) => {
+  try {
+    const response = await fetch(APP_URL + `userMovieInfo/${userID}/${movieID}`)
+    if (response.ok) {
+      const data = await response.json()
+      return data
     }
-};
+  } catch (error) {
+    console.error('Error fetching UserMovieInfo')
+    return null
+  }
+}
 
-export const newUserMovie = async(userID, movieID, numWatched, timeStamp, isBookmarked, userMovieRating) => {
-  try{
-    const response = await fetch(APP_URL + "userMovieInfo", {
+export const newUserMovie = async (
+  userID,
+  movieID,
+  numWatched,
+  timeStamp,
+  isBookmarked,
+  userMovieRating
+) => {
+  try {
+    const response = await fetch(APP_URL + 'userMovieInfo', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
-        userID: userID, 
-        movieID: movieID, 
-        numWatched: numWatched, 
-        timeStamp: timeStamp, 
-        isBookmarked: isBookmarked, 
-        userMovieRating: userMovieRating
+      body: JSON.stringify({
+        userID: userID,
+        movieID: movieID,
+        numWatched: numWatched,
+        timeStamp: timeStamp,
+        isBookmarked: isBookmarked,
+        userMovieRating: userMovieRating,
       }),
     })
-    if(response.ok) {
+    if (response.ok) {
       const data = await response.json()
       return data
     }
     return null
-    
-  } catch(error){
+  } catch (error) {
     console.error(error)
   }
-};
+}
 
-export const setUserMovieInfo = async(_id, userID, movieID, numWatched, timeStamp, isBookmarked, userMovieRating) => {
+export const setUserMovieInfo = async (
+  _id,
+  userID,
+  movieID,
+  numWatched,
+  timeStamp,
+  isBookmarked,
+  userMovieRating
+) => {
   try {
     const response = await fetch(APP_URL + `userMovieInfo/${_id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
-        userID: userID, 
-        movieID: movieID, 
-        numWatched: numWatched, 
-        timeStamp: timeStamp, 
-        isBookmarked: isBookmarked, 
-        userMovieRating: userMovieRating
+      body: JSON.stringify({
+        userID: userID,
+        movieID: movieID,
+        numWatched: numWatched,
+        timeStamp: timeStamp,
+        isBookmarked: isBookmarked,
+        userMovieRating: userMovieRating,
       }),
     })
-    if(response.ok) {
+    if (response.ok) {
       const data = await response.json()
       return data
     }
     return null
-  } catch(error) {
+  } catch (error) {
     console.error(error)
   }
-};
+}

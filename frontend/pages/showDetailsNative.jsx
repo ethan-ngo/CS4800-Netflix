@@ -11,9 +11,16 @@ import {
   Platform,
 } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
-import { getItems, getMovieDetails, getShowDetails } from './api'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import UserRatingButtons from '../components/userMovieRatingButtons'
+import {
+  getItems,
+  getMovieDetails,
+  getShowDetails,
+  getUserMovieByIDS,
+  newUserMovie,
+  setUserMovieInfo,
+} from './api'
 
 const API_URL = process.env.REACT_APP_API_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
@@ -29,6 +36,12 @@ const ShowDetailsNative = () => {
   const [selectedEpisode, setSelectedEpisode] = useState(null)
   const [cast, setCast] = useState([])
   const [showDetails, setShowDetails] = useState(null)
+
+  const [userMovieID, setUserMovieID] = useState(null)
+  const [userRating, setUserRating] = useState(null)
+  const [numWatched, setNumWatched] = useState(0)
+  const [timeStamp, setTimeStamp] = useState(0)
+  const [isBookmarked, setIsBookmarked] = useState(false)
 
   const videoSource = selectedEpisode
     ? {
@@ -47,6 +60,7 @@ const ShowDetailsNative = () => {
       fetchEpisodes(show.Name)
       fetchShowDetails(show.Name)
     }
+    handleNewUserMovieInfo()
   }, [show])
 
   // for time stamp saving
@@ -103,6 +117,26 @@ const ShowDetailsNative = () => {
 
   const handleEpisodeSelect = (episodeId) => {
     setSelectedEpisode(episodeId)
+  }
+
+  const handleNewUserMovieInfo = async () => {
+    const userID = route.params?.userID
+    const showID = show?.Id
+    if (!userID || !showID) return
+
+    const userMovieInfo = await getUserMovieByIDS(userID, showID)
+    if (userMovieInfo) {
+      setUserMovieID(userMovieInfo._id)
+      setUserRating(userMovieInfo.userMovieRating)
+      setTimeStamp(userMovieInfo.timeStamp)
+      setIsBookmarked(userMovieInfo.isBookmarked)
+      setNumWatched(userMovieInfo.numWatched)
+    } else {
+      const response = await newUserMovie(userID, showID, 0, 0, false, 0)
+      if (response && response.insertedId) {
+        setUserMovieID(response.insertedId)
+      }
+    }
   }
 
   if (!show)
@@ -210,7 +244,25 @@ const ShowDetailsNative = () => {
         )}
       </View>
 
-      <UserRatingButtons />
+      <UserRatingButtons
+        defaultRating={userRating}
+        onSetRating={(newRating) => {
+          setUserRating(newRating)
+          const userID = route.params?.userID
+          const showID = show?.Id
+          if (userMovieID && userID && showID) {
+            setUserMovieInfo(
+              userMovieID,
+              userID,
+              showID,
+              numWatched,
+              player.currentTime,
+              isBookmarked,
+              newRating,
+            )
+          }
+        }}
+      />
 
       {loading ? (
         <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 20 }} />
