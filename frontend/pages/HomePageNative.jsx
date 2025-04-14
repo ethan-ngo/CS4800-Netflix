@@ -29,9 +29,10 @@ const HomePageNative = ({ route }) => {
   const [shows, setShows] = useState([])
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(false)
-  const [watchedMovies, setWatchedMovies] = useState([])
-  const [isStarred, setIsStarred] = useState(false)
-  const [mode, setMode] = useState('all') // default to show everything
+  const [recommendedMovies, setRecommendedMovies] = useState([])
+  const [recommendedShows, setRecommendedShows] = useState([])
+  const [mode, setMode] = useState('all')
+  const [genreSection, setGenreSection] = useState([])
 
   useEffect(() => {
     if (route.params?.mode) {
@@ -53,7 +54,29 @@ const HomePageNative = ({ route }) => {
         setItems(mediaItems)
         setShows(showItems)
         setMovies(movieItems)
-        console.log(mediaItems)
+        setGenreSection(genreData)
+
+        const { movies: recMovies, shows: recShows } = await generateRecommendations(userID)
+
+        // if no recommendations, use all items
+        if (recMovies && recMovies.length > 0) {
+          const movieMap = new Map(movieItems.map((m) => [m.Id, m]))
+          const matchedMovies = recMovies.map((rec) => movieMap.get(rec.movieID)).filter(Boolean)
+          setRecommendedMovies(matchedMovies)
+        } else {
+          setRecommendedMovies(movieItems)
+        }
+
+        if (recShows && recShows.length > 0) {
+          const showMap = new Map(showItems.map((s) => [s.Id, s]))
+          const matchedShows = recShows.map((rec) => showMap.get(rec.showID)).filter(Boolean)
+          setRecommendedShows(matchedShows)
+        } else {
+          setRecommendedShows(showItems)
+        }
+
+        console.log('Recommended Movies:', recMovies)
+        console.log('Recommended Shows:', recShows)
       } catch (error) {
         console.error('Error fetching media items:', error)
         Alert.alert('Error', 'Failed to fetch media items.')
@@ -108,6 +131,43 @@ const HomePageNative = ({ route }) => {
     )
   }
 
+  const renderGenreSections = () => {
+    if (!genreSection || typeof genreSection !== 'object' || Object.keys(genreSection).length === 0) {
+      return (
+        <View style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>No genres available</Text>
+        </View>
+      );
+    }
+
+    return Object.entries(genreSection).map(([genre, genreMovies]) => {
+      if (!genreMovies || !Array.isArray(genreMovies) || genreMovies.length === 0) {
+        return null;
+      }
+
+      return (
+        <View key={genre} style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>{genre}</Text>
+          <FlatList
+            data={genreMovies}
+            keyExtractor={(item) => item.movieID || item.Id || Math.random().toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => {
+              const mediaItem = item.embyInfo || item;
+              return (
+                <View style={[styles.gridItem, { width: itemWidth }]}>
+                  {renderMediaItem({ item: mediaItem })}
+                </View>
+              );
+            }}
+            contentContainerStyle={styles.mediaList}
+          />
+        </View>
+      );
+    });
+  };
+
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
       {loading && <LoadingOverlay visible={loading} />}
@@ -116,9 +176,9 @@ const HomePageNative = ({ route }) => {
         {mode === 'all' && (
           <>
             <View style={styles.mediaSection}>
-              <Text style={styles.sectionTitle}>Movies</Text>
+              <Text style={styles.sectionTitle}>Recommended Movies</Text>
               <FlatList
-                data={movies}
+                data={recommendedMovies}
                 keyExtractor={(item) => item.Id.toString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -128,9 +188,9 @@ const HomePageNative = ({ route }) => {
             </View>
 
             <View style={styles.mediaSection}>
-              <Text style={styles.sectionTitle}>Shows</Text>
+              <Text style={styles.sectionTitle}>Recommended Shows</Text>
               <FlatList
-                data={shows}
+                data={recommendedShows}
                 keyExtractor={(item) => item.Id.toString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -139,17 +199,15 @@ const HomePageNative = ({ route }) => {
               />
             </View>
 
-            <View style={styles.mediaSection}>
-              <Text style={styles.sectionTitle}>All Items</Text>
-              <FlatList
-                data={items}
-                keyExtractor={(item) => item.Id.toString()}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                renderItem={renderMediaItem}
-                contentContainerStyle={styles.mediaList}
-              />
-            </View>
+            {/* Temporary debug view - remove after fixing */}
+            {/* <View style={{ backgroundColor: 'red', padding: 10 }}>
+               <Text style={{ color: 'white' }}>Genre Data Debug:</Text>
+               <Text style={{ color: 'white' }}>{JSON.stringify(Object.keys(genreSection || {}))}</Text>
+               <Text style={{ color: 'white' }}>Movies length: {movies.length}</Text>
+               <Text style={{ color: 'white' }}>Shows length: {shows.length}</Text>
+             </View> */}
+            {/* Render carousels for each genre */}
+            {renderGenreSections()}
           </>
         )}
 
