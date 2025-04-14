@@ -235,11 +235,11 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   searchBarInputMobile: {
-    height: 15,
-    width: 100,
+    height: 35,
+    width: 250,
     backgroundColor: 'white',
     borderRadius: 20,
-    fontSize: 5,
+    fontSize: 25,
     paddingLeft: 20,
   },
 })
