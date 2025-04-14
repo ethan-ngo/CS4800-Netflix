@@ -17,6 +17,7 @@ import HomeNavbar from '../components/HomeNavbar'
 import LoadingOverlay from '../components/LoadingOverlay'
 import { LinearGradient } from 'expo-linear-gradient'
 import theme from '../utils/theme'
+import { generateRecommendations } from '../utils/recommendations'
 
 const screenWidth = Dimensions.get('window').width
 const itemWidth = 120 // or whatever works for your item
@@ -52,6 +53,14 @@ const HomePageNative = ({ route }) => {
         setShows(showItems)
         setMovies(movieItems)
         console.log(mediaItems)
+
+        const {
+          movies: recommendedMovies,
+          shows: recommendedShows,
+        } = await generateRecommendations(userID)
+
+        console.log('Recommended Movies:', recommendedMovies)
+        console.log('Recommended Shows:', recommendedShows)
       } catch (error) {
         console.error('Error fetching media items:', error)
         Alert.alert('Error', 'Failed to fetch media items.')

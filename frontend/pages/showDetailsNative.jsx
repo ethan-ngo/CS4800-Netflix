@@ -258,7 +258,7 @@ const ShowDetailsNative = () => {
               numWatched,
               player.currentTime,
               isBookmarked,
-              newRating,
+              newRating
             )
           }
         }}

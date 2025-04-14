@@ -186,3 +186,15 @@ export const setUserMovieInfo = async (
     console.error(error)
   }
 }
+// get all userMovieInfo instances for a user
+export const getUserMovieInfoByUserID = async (userID) => {
+  try {
+    const response = await fetch(`${APP_URL}userMovieInfo/user/${userID}`)
+    if (response.ok) {
+      return await response.json()
+    }
+  } catch (err) {
+    console.error('Error fetching all userMovieInfo for user:', err)
+    return []
+  }
+}

@@ -18,6 +18,18 @@ router.get('/', async (req, res) => {
   res.send(results).status(200)
 })
 
+// This section will help you get a userMovieInfo by userID to get all userMovieInfo instances for a user
+router.get('/user/:userID', async (req, res) => {
+  try {
+    const collection = await db.collection('userMovieInfo')
+    const result = await collection.find({ userID: req.params.userID }).toArray()
+    res.status(200).json(result)
+  } catch (err) {
+    console.error('Error fetching userMovieInfo by userID:', err)
+    res.status(500).send('Internal Server Error')
+  }
+})
+
 // This section will help you get a single userMovieInfo by userID and movieID
 router.get('/:userID/:movieID', async (req, res) => {
   let collection = await db.collection('userMovieInfo')
