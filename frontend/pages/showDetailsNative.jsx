@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -13,14 +13,7 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import UserRatingButtons from '../components/userMovieRatingButtons'
-import {
-  getItems,
-  getMovieDetails,
-  getShowDetails,
-  getUserMovieByIDS,
-  newUserMovie,
-  setUserMovieInfo,
-} from './api'
+import { getItems, getShowDetails, getUserShowByIDS, newUserShow, setUserShowInfo } from './api'
 
 const API_URL = process.env.REACT_APP_API_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
@@ -37,7 +30,7 @@ const ShowDetailsNative = () => {
   const [cast, setCast] = useState([])
   const [showDetails, setShowDetails] = useState(null)
 
-  const [userMovieID, setUserMovieID] = useState(null)
+  const [userShowID, setUserShowID] = useState(null)
   const [userRating, setUserRating] = useState(null)
   const [numWatched, setNumWatched] = useState(0)
   const [timeStamp, setTimeStamp] = useState(0)
@@ -55,32 +48,26 @@ const ShowDetailsNative = () => {
   })
 
   useEffect(() => {
-    console.log(show)
     if (show?.Name) {
       fetchEpisodes(show.Name)
       fetchShowDetails(show.Name)
     }
-    handleNewUserMovieInfo()
+    handleNewUserShowInfo()
   }, [show])
 
-  // for time stamp saving
   useEffect(() => {
     const interval = setInterval(() => {
       if (player && player.currentTime != null) {
         console.log(`Current Timestamp for ${selectedEpisode}:`, player.currentTime)
       }
-    }, 10000) // Log every 10 seconds
-
+    }, 10000)
     return () => clearInterval(interval)
   })
 
   const fetchEpisodes = async (showName) => {
     const allItems = await getItems()
-
-    // Filter items related to the given show name
     const filteredItems = allItems.filter((item) => item.SeriesName === showName)
 
-    // Group episodes by season
     const seasonMap = {}
     filteredItems.forEach((item) => {
       if (item.Type === 'Episode' && item.ParentIndexNumber) {
@@ -99,7 +86,7 @@ const ShowDetailsNative = () => {
     })
 
     setSeasons(seasonMap)
-    setSelectedSeason(Object.keys(seasonMap)[0]) // Set the first season as default
+    setSelectedSeason(Object.keys(seasonMap)[0])
     setLoading(false)
   }
 
@@ -107,7 +94,7 @@ const ShowDetailsNative = () => {
     try {
       const data = await getShowDetails(showName)
       if (data) {
-        setShowDetails(data.movieDetails)
+        setShowDetails(data.showDetails)
         setCast(data.cast)
       }
     } catch (error) {
@@ -119,22 +106,22 @@ const ShowDetailsNative = () => {
     setSelectedEpisode(episodeId)
   }
 
-  const handleNewUserMovieInfo = async () => {
+  const handleNewUserShowInfo = async () => {
     const userID = route.params?.userID
     const showID = show?.Id
     if (!userID || !showID) return
 
-    const userMovieInfo = await getUserMovieByIDS(userID, showID)
-    if (userMovieInfo) {
-      setUserMovieID(userMovieInfo._id)
-      setUserRating(userMovieInfo.userMovieRating)
-      setTimeStamp(userMovieInfo.timeStamp)
-      setIsBookmarked(userMovieInfo.isBookmarked)
-      setNumWatched(userMovieInfo.numWatched)
+    const userShowInfo = await getUserShowByIDS(userID, showID)
+    if (userShowInfo) {
+      setUserShowID(userShowInfo._id)
+      setUserRating(userShowInfo.userShowRating)
+      setTimeStamp(userShowInfo.timeStamp)
+      setIsBookmarked(userShowInfo.isBookmarked)
+      setNumWatched(userShowInfo.numWatched)
     } else {
-      const response = await newUserMovie(userID, showID, 0, 0, false, 0)
-      if (response && response.insertedId) {
-        setUserMovieID(response.insertedId)
+      const response = await newUserShow(userID, showID, 0, 0, false, 0)
+      if (response?.insertedId) {
+        setUserShowID(response.insertedId)
       }
     }
   }
@@ -179,7 +166,6 @@ const ShowDetailsNative = () => {
 
       <Text style={styles.subtitle}>Seasons:</Text>
 
-      {/* Buttons for each season */}
       <View style={styles.seasonButtonContainer}>
         {Object.keys(seasons).map((seasonNumber) => (
           <TouchableOpacity
@@ -250,15 +236,15 @@ const ShowDetailsNative = () => {
           setUserRating(newRating)
           const userID = route.params?.userID
           const showID = show?.Id
-          if (userMovieID && userID && showID) {
-            setUserMovieInfo(
-              userMovieID,
+          if (userShowID && userID && showID) {
+            setUserShowInfo(
+              userShowID,
               userID,
               showID,
               numWatched,
               player.currentTime,
               isBookmarked,
-              newRating,
+              newRating
             )
           }
         }}

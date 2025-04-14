@@ -186,6 +186,123 @@ export const setUserMovieInfo = async (
     console.error(error)
   }
 }
+// get all userMovieInfo instances for a user
+export const getUserMovieInfoByUserID = async (userID) => {
+  try {
+    const response = await fetch(`${APP_URL}userMovieInfo/user/${userID}`)
+    if (response.ok) {
+      return await response.json()
+    }
+  } catch (err) {
+    console.error('Error fetching all userMovieInfo for user:', err)
+    return []
+  }
+}
+
+export const getUserShowByIDS = async (userID, showID) => {
+  try {
+    const url = `${APP_URL}userShowInfo/${userID}/${showID}`
+    console.log('Fetching userShowInfo from:', url)
+    const response = await fetch(url)
+    if (response.ok) {
+      return await response.json()
+    } else {
+      console.error('Fetch failed with status:', response.status)
+      const text = await response.text()
+      console.error('Response text:', text)
+    }
+  } catch (error) {
+    console.error('Error fetching userShowInfo:', error)
+    return null
+  }
+}
+
+export const newUserShow = async (
+  userID,
+  showID,
+  numWatched,
+  timeStamp,
+  isBookmarked,
+  userShowRating
+) => {
+  try {
+    const response = await fetch(`${APP_URL}userShowInfo`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userID,
+        showID,
+        numWatched,
+        timeStamp,
+        isBookmarked,
+        userShowRating,
+      }),
+    })
+    if (response.ok) return await response.json()
+  } catch (error) {
+    console.error('Error creating userShowInfo:', error)
+  }
+}
+
+export const setUserShowInfo = async (
+  _id,
+  userID,
+  showID,
+  numWatched,
+  timeStamp,
+  isBookmarked,
+  userShowRating
+) => {
+  try {
+    const response = await fetch(`${APP_URL}userShowInfo/${_id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userID,
+        showID,
+        numWatched,
+        timeStamp,
+        isBookmarked,
+        userShowRating,
+      }),
+    })
+    if (response.ok) return await response.json()
+  } catch (error) {
+    console.error('Error updating userShowInfo:', error)
+  }
+}
+
+
+ //genre functions
+ export const getMoviesByGenre = async () => {
+  try {
+    const movieRes = await fetch(`${APP_URL}movies`);
+    const allMovies = await movieRes.json();
+    const embyItems = await getItems();
+    const genreMap = {};
+
+    allMovies.forEach((movie) => {
+      const matchedItem = embyItems.find((item) => item.Id === movie.movieID);
+      if (!matchedItem) return; 
+
+      const combinedMovie = {
+        ...movie,
+        embyInfo: matchedItem,
+      };
+      movie.genres.forEach((genre) => {
+        if (!genreMap[genre]) {
+          genreMap[genre] = [];
+        }
+        genreMap[genre].push(combinedMovie);
+      });
+    });
+
+    return genreMap;
+  } catch (error) {
+    console.error('Error loading movies by genre:', error);
+    return {};
+  }
+};
 
 //genre functions
 export const getMoviesByGenre = async () => {

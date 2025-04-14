@@ -17,9 +17,10 @@ import HomeNavbar from '../components/HomeNavbar'
 import LoadingOverlay from '../components/LoadingOverlay'
 import { LinearGradient } from 'expo-linear-gradient'
 import theme from '../utils/theme'
+import { generateRecommendations } from '../utils/recommendations'
 
 const screenWidth = Dimensions.get('window').width
-const itemWidth = 120 // or whatever works for your item
+const itemWidth = 120
 const horizontalSpacing = 10
 const itemsPerRow = Math.floor(screenWidth / (itemWidth + horizontalSpacing))
 
@@ -31,7 +32,6 @@ const HomePageNative = ({ route }) => {
   const [watchedMovies, setWatchedMovies] = useState([])
   const [isStarred, setIsStarred] = useState(false)
   const [mode, setMode] = useState('all') // default to show everything
-  const [genreSection, setGenreSection] = useState([])
 
   useEffect(() => {
     if (route.params?.mode) {
@@ -53,9 +53,7 @@ const HomePageNative = ({ route }) => {
         setItems(mediaItems)
         setShows(showItems)
         setMovies(movieItems)
-        setGenreSection(genreData)
         console.log(mediaItems)
-        console.log(genreData)
       } catch (error) {
         console.error('Error fetching media items:', error)
         Alert.alert('Error', 'Failed to fetch media items.')
@@ -110,44 +108,6 @@ const HomePageNative = ({ route }) => {
     )
   }
 
-  const renderGenreSections = () => {
-    if (!genreSection || typeof genreSection !== 'object' || Object.keys(genreSection).length === 0) {
-      return (
-        <View style={styles.mediaSection}>
-          <Text style={styles.sectionTitle}>No genres available</Text>
-        </View>
-      );
-    }
-
-    return Object.entries(genreSection).map(([genre, genreMovies]) => {
-      if (!genreMovies || !Array.isArray(genreMovies) || genreMovies.length === 0) {
-        return null;
-      }
-
-      return (
-        <View key={genre} style={styles.mediaSection}>
-          <Text style={styles.sectionTitle}>{genre}</Text>
-          <FlatList
-            data={genreMovies}
-            keyExtractor={(item) => item.movieID || item.Id || Math.random().toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            renderItem={({ item }) => {
-              const mediaItem = item.embyInfo || item;
-              return (
-                <View style={[styles.gridItem, { width: itemWidth }]}>
-                  {renderMediaItem({ item: mediaItem })}
-                </View>
-              );
-            }}
-            contentContainerStyle={styles.mediaList}
-          />
-        </View>
-      );
-    });
-  };
-
-
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
       {loading && <LoadingOverlay visible={loading} />}
@@ -155,17 +115,42 @@ const HomePageNative = ({ route }) => {
       <LinearGradient colors={theme.gradient} style={styles.container}>
         {mode === 'all' && (
           <>
-            {/* Temporary debug view - remove after fixing */}
-            {/* <View style={{ backgroundColor: 'red', padding: 10 }}>
-              <Text style={{ color: 'white' }}>Genre Data Debug:</Text>
-              <Text style={{ color: 'white' }}>{JSON.stringify(Object.keys(genreSection || {}))}</Text>
-              <Text style={{ color: 'white' }}>Movies length: {movies.length}</Text>
-              <Text style={{ color: 'white' }}>Shows length: {shows.length}</Text>
-            </View> */}
-            {/* Render carousels for each genre */}
-            {renderGenreSections()}
-          </>
+            <View style={styles.mediaSection}>
+              <Text style={styles.sectionTitle}>Movies</Text>
+              <FlatList
+                data={movies}
+                keyExtractor={(item) => item.Id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                renderItem={renderMediaItem}
+                contentContainerStyle={styles.mediaList}
+              />
+            </View>
 
+            <View style={styles.mediaSection}>
+              <Text style={styles.sectionTitle}>Shows</Text>
+              <FlatList
+                data={shows}
+                keyExtractor={(item) => item.Id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                renderItem={renderShowItem}
+                contentContainerStyle={styles.mediaList}
+              />
+            </View>
+
+            <View style={styles.mediaSection}>
+              <Text style={styles.sectionTitle}>All Items</Text>
+              <FlatList
+                data={items}
+                keyExtractor={(item) => item.Id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                renderItem={renderMediaItem}
+                contentContainerStyle={styles.mediaList}
+              />
+            </View>
+          </>
         )}
 
         {mode === 'movies' && (
@@ -206,8 +191,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212',
     padding: 10,
-    overflowy: 'auto',
-    overflowx: 'auto',
   },
   sectionTitle: {
     fontSize: 18,
@@ -248,11 +231,6 @@ const styles = StyleSheet.create({
   gridItem: {
     marginRight: horizontalSpacing,
     marginBottom: 15,
-  },
-  backgroundImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
   },
 })
 
