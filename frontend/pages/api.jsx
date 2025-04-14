@@ -271,3 +271,35 @@ export const setUserShowInfo = async (
     console.error('Error updating userShowInfo:', error)
   }
 }
+
+
+ //genre functions
+ export const getMoviesByGenre = async () => {
+  try {
+    const movieRes = await fetch(`${APP_URL}movies`);
+    const allMovies = await movieRes.json();
+    const embyItems = await getItems();
+    const genreMap = {};
+
+    allMovies.forEach((movie) => {
+      const matchedItem = embyItems.find((item) => item.Id === movie.movieID);
+      if (!matchedItem) return; 
+
+      const combinedMovie = {
+        ...movie,
+        embyInfo: matchedItem,
+      };
+      movie.genres.forEach((genre) => {
+        if (!genreMap[genre]) {
+          genreMap[genre] = [];
+        }
+        genreMap[genre].push(combinedMovie);
+      });
+    });
+
+    return genreMap;
+  } catch (error) {
+    console.error('Error loading movies by genre:', error);
+    return {};
+  }
+};

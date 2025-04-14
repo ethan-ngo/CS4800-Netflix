@@ -11,7 +11,7 @@ import {
   Dimensions,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from './api'
+import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN, getMoviesByGenre } from './api'
 import { useNavigation } from '@react-navigation/native'
 import HomeNavbar from '../components/HomeNavbar'
 import LoadingOverlay from '../components/LoadingOverlay'
@@ -32,6 +32,7 @@ const HomePageNative = ({ route }) => {
   const [recommendedMovies, setRecommendedMovies] = useState([])
   const [recommendedShows, setRecommendedShows] = useState([])
   const [mode, setMode] = useState('all')
+  const [genreSection, setGenreSection] = useState([])
 
   useEffect(() => {
     if (route.params?.mode) {
@@ -49,9 +50,11 @@ const HomePageNative = ({ route }) => {
         const mediaItems = await getItems()
         const showItems = await getShows()
         const movieItems = await getMovies()
+        const genreData = await getMoviesByGenre()
         setItems(mediaItems)
         setShows(showItems)
         setMovies(movieItems)
+        setGenreSection(genreData)
 
         const { movies: recMovies, shows: recShows } = await generateRecommendations(userID)
 
@@ -128,6 +131,43 @@ const HomePageNative = ({ route }) => {
     )
   }
 
+  const renderGenreSections = () => {
+    if (!genreSection || typeof genreSection !== 'object' || Object.keys(genreSection).length === 0) {
+      return (
+        <View style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>No genres available</Text>
+        </View>
+      );
+    }
+
+    return Object.entries(genreSection).map(([genre, genreMovies]) => {
+      if (!genreMovies || !Array.isArray(genreMovies) || genreMovies.length === 0) {
+        return null;
+      }
+
+      return (
+        <View key={genre} style={styles.mediaSection}>
+          <Text style={styles.sectionTitle}>{genre}</Text>
+          <FlatList
+            data={genreMovies}
+            keyExtractor={(item) => item.movieID || item.Id || Math.random().toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => {
+              const mediaItem = item.embyInfo || item;
+              return (
+                <View style={[styles.gridItem, { width: itemWidth }]}>
+                  {renderMediaItem({ item: mediaItem })}
+                </View>
+              );
+            }}
+            contentContainerStyle={styles.mediaList}
+          />
+        </View>
+      );
+    });
+  };
+
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
       {loading && <LoadingOverlay visible={loading} />}
@@ -159,41 +199,15 @@ const HomePageNative = ({ route }) => {
               />
             </View>
 
-            <View style={styles.mediaSection}>
-              <Text style={styles.sectionTitle}>All Movies</Text>
-              <FlatList
-                data={movies}
-                keyExtractor={(item) => item.Id.toString()}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                renderItem={renderMediaItem}
-                contentContainerStyle={styles.mediaList}
-              />
-            </View>
-
-            <View style={styles.mediaSection}>
-              <Text style={styles.sectionTitle}>All Shows</Text>
-              <FlatList
-                data={shows}
-                keyExtractor={(item) => item.Id.toString()}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                renderItem={renderShowItem}
-                contentContainerStyle={styles.mediaList}
-              />
-            </View>
-
-            <View style={styles.mediaSection}>
-              <Text style={styles.sectionTitle}>All Items</Text>
-              <FlatList
-                data={items}
-                keyExtractor={(item) => item.Id.toString()}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                renderItem={renderMediaItem}
-                contentContainerStyle={styles.mediaList}
-              />
-            </View>
+            {/* Temporary debug view - remove after fixing */}
+            {/* <View style={{ backgroundColor: 'red', padding: 10 }}>
+               <Text style={{ color: 'white' }}>Genre Data Debug:</Text>
+               <Text style={{ color: 'white' }}>{JSON.stringify(Object.keys(genreSection || {}))}</Text>
+               <Text style={{ color: 'white' }}>Movies length: {movies.length}</Text>
+               <Text style={{ color: 'white' }}>Shows length: {shows.length}</Text>
+             </View> */}
+            {/* Render carousels for each genre */}
+            {renderGenreSections()}
           </>
         )}
 
@@ -244,7 +258,7 @@ const styles = StyleSheet.create({
     marginLeft: '1%',
   },
   mediaSection: {
-    minHeight: '15%',
+    minHeight: 150,
   },
   mediaList: {
     marginBottom: 20,
