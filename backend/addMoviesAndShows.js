@@ -8,7 +8,6 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY
 
 console.log('Using Jellyfin API:', API_URL)
 
-// TMDB API client
 const tmdbApi = axios.create({
   baseURL: 'https://api.themoviedb.org/3',
   params: {
@@ -17,30 +16,34 @@ const tmdbApi = axios.create({
   },
 })
 
-// TMDB: Get movie genres by title
-const getMovieGenres = async (title) => {
+// TMDB: Get movie genres by title and year
+const getMovieGenres = async (title, year) => {
   try {
-    const res = await tmdbApi.get('/search/movie', { params: { query: title } })
+    const res = await tmdbApi.get('/search/movie', {
+      params: { query: title, primary_release_year: year },
+    })
     const movie = res.data.results[0]
     if (!movie) return []
     const details = await tmdbApi.get(`/movie/${movie.id}`)
     return details.data.genres.map((g) => g.name)
   } catch (err) {
-    console.error(`TMDB movie error for "${title}":`, err.message)
+    console.error(`TMDB movie error for "${title}" (${year}):`, err.message)
     return []
   }
 }
 
-// TMDB: Get show genres by title
-const getShowGenres = async (title) => {
+// TMDB: Get show genres by title and year
+const getShowGenres = async (title, year) => {
   try {
-    const res = await tmdbApi.get('/search/tv', { params: { query: title } })
+    const res = await tmdbApi.get('/search/tv', {
+      params: { query: title, first_air_date_year: year },
+    })
     const show = res.data.results[0]
     if (!show) return []
     const details = await tmdbApi.get(`/tv/${show.id}`)
     return details.data.genres.map((g) => g.name)
   } catch (err) {
-    console.error(`TMDB show error for "${title}":`, err.message)
+    console.error(`TMDB show error for "${title}" (${year}):`, err.message)
     return []
   }
 }
@@ -66,7 +69,8 @@ const addMoviesToDatabase = async () => {
 
     for (const movie of movies) {
       const title = movie.Name
-      const genres = await getMovieGenres(title)
+      const year = movie.ProductionYear || undefined
+      const genres = await getMovieGenres(title, year)
 
       const enrichedMovie = {
         movieID: movie.Id,
@@ -79,7 +83,7 @@ const addMoviesToDatabase = async () => {
       }
 
       moviesToInsert.push(enrichedMovie)
-      console.log(`Prepared movie "${title}" with genres: ${genres.join(', ') || 'none'}`)
+      console.log(`Prepared movie "${title}" (${year}) with genres: ${genres.join(', ') || 'none'}`)
     }
 
     const result = await collection.insertMany(moviesToInsert)
@@ -110,7 +114,8 @@ const addShowsToDatabase = async () => {
 
     for (const show of shows) {
       const title = show.Name
-      const genres = await getShowGenres(title)
+      const year = show.ProductionYear || undefined
+      const genres = await getShowGenres(title, year)
 
       const enrichedShow = {
         showID: show.Id,
@@ -123,7 +128,7 @@ const addShowsToDatabase = async () => {
       }
 
       showsToInsert.push(enrichedShow)
-      console.log(`Prepared show "${title}" with genres: ${genres.join(', ') || 'none'}`)
+      console.log(`Prepared show "${title}" (${year}) with genres: ${genres.join(', ') || 'none'}`)
     }
 
     const result = await collection.insertMany(showsToInsert)
