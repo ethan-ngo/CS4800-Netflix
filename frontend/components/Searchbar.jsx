@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Fuse from 'fuse.js'
-import { View, TextInput, StyleSheet, TouchableOpacity, Text } from 'react-native'
+import { View, TextInput, StyleSheet, TouchableOpacity, Text, useWindowDimensions } from 'react-native'
 import Icon from 'react-native-vector-icons/EvilIcons'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN } from '../pages/api'
 import { useNavigation } from '@react-navigation/native'
 import '../globals.css'
 import MediaDetailsNative from '../pages/mediaDetailsNative'
-
+ 
 const Searchbar = ({ userID }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchBarOpen, setSearchBarOpen] = useState(false)
@@ -19,6 +19,8 @@ const Searchbar = ({ userID }) => {
   const [filteredMedia, setFilteredMedia] = useState([])
   const navigation = useNavigation()
   const dropdownRef = useRef(null)
+  const { width } = useWindowDimensions()
+  const isMobile = width < 768
 
   const onClickSearch = () => {
     setSearchBarOpen(!searchBarOpen)
@@ -114,7 +116,7 @@ const Searchbar = ({ userID }) => {
       {searchBarOpen && (
         <View style={styles.searchContainer}>
           <TextInput
-            style={styles.searchBarInput}
+            style={[styles.searchBarInput, isMobile && styles.searchBarInputMobile]}
             placeholder="Search"
             value={searchTerm}
             onChangeText={handleType}
@@ -231,6 +233,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'var(--background-color)',
     width: '100%',
+  },
+  searchBarInputMobile: {
+    height: 15,
+    width: 100,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    fontSize: 5,
+    paddingLeft: 20,
   },
 })
 
