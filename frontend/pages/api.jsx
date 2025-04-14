@@ -198,3 +198,76 @@ export const getUserMovieInfoByUserID = async (userID) => {
     return []
   }
 }
+
+export const getUserShowByIDS = async (userID, showID) => {
+  try {
+    const url = `${APP_URL}userShowInfo/${userID}/${showID}`
+    console.log('Fetching userShowInfo from:', url)
+    const response = await fetch(url)
+    if (response.ok) {
+      return await response.json()
+    } else {
+      console.error('Fetch failed with status:', response.status)
+      const text = await response.text()
+      console.error('Response text:', text)
+    }
+  } catch (error) {
+    console.error('Error fetching userShowInfo:', error)
+    return null
+  }
+}
+
+export const newUserShow = async (
+  userID,
+  showID,
+  numWatched,
+  timeStamp,
+  isBookmarked,
+  userShowRating
+) => {
+  try {
+    const response = await fetch(`${APP_URL}userShowInfo`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userID,
+        showID,
+        numWatched,
+        timeStamp,
+        isBookmarked,
+        userShowRating,
+      }),
+    })
+    if (response.ok) return await response.json()
+  } catch (error) {
+    console.error('Error creating userShowInfo:', error)
+  }
+}
+
+export const setUserShowInfo = async (
+  _id,
+  userID,
+  showID,
+  numWatched,
+  timeStamp,
+  isBookmarked,
+  userShowRating
+) => {
+  try {
+    const response = await fetch(`${APP_URL}userShowInfo/${_id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userID,
+        showID,
+        numWatched,
+        timeStamp,
+        isBookmarked,
+        userShowRating,
+      }),
+    })
+    if (response.ok) return await response.json()
+  } catch (error) {
+    console.error('Error updating userShowInfo:', error)
+  }
+}

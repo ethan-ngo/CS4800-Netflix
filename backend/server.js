@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import users from './routes/users.js'
 import userMovieInfo from './routes/userMovieInfo.js'
+import userShowInfo from './routes/userShowInfo.js'
 import movies from './routes/movies.js'
 import shows from './routes/shows.js'
 import directors from './routes/directors.js'
@@ -15,6 +16,7 @@ app.use(cors({ origin: '*', methods: ['GET', 'POST', 'DELETE', 'PATCH'] }))
 app.use(express.json())
 app.use('/users', users)
 app.use('/userMovieInfo', userMovieInfo)
+app.use('/userShowInfo', userShowInfo)
 app.use('/movies', movies)
 app.use('/shows', shows)
 app.use('/directors', directors)

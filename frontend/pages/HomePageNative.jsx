@@ -20,7 +20,7 @@ import theme from '../utils/theme'
 import { generateRecommendations } from '../utils/recommendations'
 
 const screenWidth = Dimensions.get('window').width
-const itemWidth = 120 // or whatever works for your item
+const itemWidth = 120
 const horizontalSpacing = 10
 const itemsPerRow = Math.floor(screenWidth / (itemWidth + horizontalSpacing))
 
@@ -29,9 +29,9 @@ const HomePageNative = ({ route }) => {
   const [shows, setShows] = useState([])
   const [movies, setMovies] = useState([])
   const [loading, setLoading] = useState(false)
-  const [watchedMovies, setWatchedMovies] = useState([])
-  const [isStarred, setIsStarred] = useState(false)
-  const [mode, setMode] = useState('all') // default to show everything
+  const [recommendedMovies, setRecommendedMovies] = useState([])
+  const [recommendedShows, setRecommendedShows] = useState([])
+  const [mode, setMode] = useState('all')
 
   useEffect(() => {
     if (route.params?.mode) {
@@ -52,15 +52,28 @@ const HomePageNative = ({ route }) => {
         setItems(mediaItems)
         setShows(showItems)
         setMovies(movieItems)
-        console.log(mediaItems)
 
-        const {
-          movies: recommendedMovies,
-          shows: recommendedShows,
-        } = await generateRecommendations(userID)
+        const { movies: recMovies, shows: recShows } = await generateRecommendations(userID)
 
-        console.log('Recommended Movies:', recommendedMovies)
-        console.log('Recommended Shows:', recommendedShows)
+        // if no recommendations, use all items
+        if (recMovies && recMovies.length > 0) {
+          const movieMap = new Map(movieItems.map((m) => [m.Id, m]))
+          const matchedMovies = recMovies.map((rec) => movieMap.get(rec.movieID)).filter(Boolean)
+          setRecommendedMovies(matchedMovies)
+        } else {
+          setRecommendedMovies(movieItems)
+        }
+
+        if (recShows && recShows.length > 0) {
+          const showMap = new Map(showItems.map((s) => [s.Id, s]))
+          const matchedShows = recShows.map((rec) => showMap.get(rec.showID)).filter(Boolean)
+          setRecommendedShows(matchedShows)
+        } else {
+          setRecommendedShows(showItems)
+        }
+
+        console.log('Recommended Movies:', recMovies)
+        console.log('Recommended Shows:', recShows)
       } catch (error) {
         console.error('Error fetching media items:', error)
         Alert.alert('Error', 'Failed to fetch media items.')
@@ -123,7 +136,31 @@ const HomePageNative = ({ route }) => {
         {mode === 'all' && (
           <>
             <View style={styles.mediaSection}>
-              <Text style={styles.sectionTitle}>Movies</Text>
+              <Text style={styles.sectionTitle}>Recommended Movies</Text>
+              <FlatList
+                data={recommendedMovies}
+                keyExtractor={(item) => item.Id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                renderItem={renderMediaItem}
+                contentContainerStyle={styles.mediaList}
+              />
+            </View>
+
+            <View style={styles.mediaSection}>
+              <Text style={styles.sectionTitle}>Recommended Shows</Text>
+              <FlatList
+                data={recommendedShows}
+                keyExtractor={(item) => item.Id.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                renderItem={renderShowItem}
+                contentContainerStyle={styles.mediaList}
+              />
+            </View>
+
+            <View style={styles.mediaSection}>
+              <Text style={styles.sectionTitle}>All Movies</Text>
               <FlatList
                 data={movies}
                 keyExtractor={(item) => item.Id.toString()}
@@ -135,7 +172,7 @@ const HomePageNative = ({ route }) => {
             </View>
 
             <View style={styles.mediaSection}>
-              <Text style={styles.sectionTitle}>Shows</Text>
+              <Text style={styles.sectionTitle}>All Shows</Text>
               <FlatList
                 data={shows}
                 keyExtractor={(item) => item.Id.toString()}
@@ -198,8 +235,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212',
     padding: 10,
-    overflowy: 'auto',
-    overflowx: 'auto',
   },
   sectionTitle: {
     fontSize: 18,
@@ -240,11 +275,6 @@ const styles = StyleSheet.create({
   gridItem: {
     marginRight: horizontalSpacing,
     marginBottom: 15,
-  },
-  backgroundImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
   },
 })
 

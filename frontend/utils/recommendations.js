@@ -1,77 +1,83 @@
 // function for generating a list of recommended movies and shows based on the user's watching preferences
 // parameters: user id
-import { getUserMovieInfoByUserID, getMoviesWithGenres, getShowsWithGenres } from '../pages/api'
 
 const APP_URL = process.env.APP_URL
-const LOCAL_URL = 'http://localhost:5050/'
 
 export const generateRecommendations = async (userID) => {
-  const userInfoURL = `${LOCAL_URL}userMovieInfo/user/${userID}`
-  const moviesURL = `${LOCAL_URL}movies`
-  const showsURL = `${LOCAL_URL}shows`
-
   try {
-    const [userInfoRes, moviesRes, showsRes] = await Promise.all([
-      fetch(userInfoURL),
-      fetch(moviesURL),
-      fetch(showsURL),
-    ])
+    const movieInfoRes = await fetch(`${APP_URL}userMovieInfo/user/${userID}`)
+    const showInfoRes = await fetch(`${APP_URL}userShowInfo/user/${userID}`)
+    const moviesRes = await fetch(`${APP_URL}movies`)
+    const showsRes = await fetch(`${APP_URL}shows`)
 
-    if (!userInfoRes.ok || !moviesRes.ok || !showsRes.ok) {
-      console.error('fetches failed')
+    if (!movieInfoRes.ok || !showInfoRes.ok || !moviesRes.ok || !showsRes.ok) {
+      console.error('One or more fetches failed')
       return { movies: [], shows: [] }
     }
 
-    const userMovieInfo = await userInfoRes.json()
+    const userMovieInfo = await movieInfoRes.json()
+    const userShowInfo = await showInfoRes.json()
     const allMovies = await moviesRes.json()
     const allShows = await showsRes.json()
 
     const genreWeights = {}
 
-    // Map movieID => movie object
     const movieMap = {}
     allMovies.forEach((movie) => {
       movieMap[movie.movieID] = movie
     })
 
-    userMovieInfo.forEach((entry) => {
-      const movie = movieMap[entry.movieID]
-      if (!movie || !movie.genres) return
+    const showMap = {}
+    allShows.forEach((show) => {
+      showMap[show.showID] = show
+    })
 
-      const genres = movie.genres
-      const rating = entry.userMovieRating
-      const timeWatchedTicks = entry.timeStamp || 0
-      const watchTimeMinutes = timeWatchedTicks / 600000000
-      const scaledWatchTime = Math.log1p(watchTimeMinutes)
+    const addWeights = (genres, rating, ticks) => {
+      const watchTime = ticks / 600000000
+      const scaledTime = Math.log1p(watchTime)
 
       let ratingWeight = 0
       if (rating === 'dislike') ratingWeight = -1
       else if (rating === 'like') ratingWeight = 1
       else if (rating === 'love') ratingWeight = 2
 
-      const weight = scaledWatchTime + ratingWeight
+      const weight = scaledTime + ratingWeight
 
       genres.forEach((genre) => {
-        genreWeights[genre] = (genreWeights[genre] || 0) + weight
+        if (!genreWeights[genre]) genreWeights[genre] = 0
+        genreWeights[genre] += weight
       })
+    }
+
+    userMovieInfo.forEach((entry) => {
+      const movie = movieMap[entry.movieID]
+      if (movie?.genres) {
+        addWeights(movie.genres, entry.userMovieRating, entry.timeStamp || 0)
+      }
     })
 
-    const sortedGenres = Object.entries(genreWeights).sort((a, b) => b[1] - a[1])
-    const genreList = sortedGenres.map(([genre]) => genre)
+    userShowInfo.forEach((entry) => {
+      const show = showMap[entry.showID]
+      if (show?.genres) {
+        addWeights(show.genres, entry.userShowRating, entry.timeStamp || 0)
+      }
+    })
 
-    const filteredMovies = allMovies.filter((movie) =>
-      movie.genres?.some((genre) => genreList.includes(genre))
-    )
-    const filteredShows = allShows.filter((show) =>
-      show.genres?.some((genre) => genreList.includes(genre))
-    )
+    console.log('Weighted genre dictionary:', genreWeights)
+
+    const sortedGenres = Object.entries(genreWeights).sort((a, b) => b[1] - a[1])
+    const genreList = sortedGenres.map(([g]) => g)
+
+    const filteredMovies = allMovies.filter((m) => m.genres?.some((g) => genreList.includes(g)))
+
+    const filteredShows = allShows.filter((s) => s.genres?.some((g) => genreList.includes(g)))
 
     return {
       movies: filteredMovies,
       shows: filteredShows,
     }
-  } catch (error) {
-    console.error('Error in generateRecommendations:', error)
+  } catch (err) {
+    console.error('Error in generateRecommendations:', err)
     return { movies: [], shows: [] }
   }
 }
