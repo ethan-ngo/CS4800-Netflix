@@ -12,32 +12,40 @@ const UserRatingButtons = ({ defaultRating, onSetRating }) => {
   }, [defaultRating])
 
   const handleButtonPress = (button) => {
-    setSelectedButton(button)
-    console.log(`Button pressed: ${button}`)
-    if (onSetRating) {
-      onSetRating(button)
+    if (selectedButton === button) {
+      // If the button is already selected, unselect it and reset the rating
+      setSelectedButton(null);
+      if (onSetRating) {
+        onSetRating(0); // Reset rating to 0
+      }
+    } else {
+      // Otherwise, select the button and set the corresponding rating
+      setSelectedButton(button);
+      if (onSetRating) {
+        onSetRating(button);
+      }
     }
   }
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={[styles.button, selectedButton === 'dislike' && styles.selectedRatingButton]}
-        onPress={() => handleButtonPress('dislike')}
+        style={[styles.button, selectedButton === -1 && styles.selectedRatingButton]}
+        onPress={() => handleButtonPress(-1)}
       >
         <Text style={styles.buttonText}>Not for me</Text>
         <Icon name="thumbs-down" size={18} color="#fff" style={styles.icon} />
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.button, selectedButton === 'like' && styles.selectedRatingButton]}
-        onPress={() => handleButtonPress('like')}
+        style={[styles.button, selectedButton === 1 && styles.selectedRatingButton]}
+        onPress={() => handleButtonPress(1)}
       >
         <Text style={styles.buttonText}>Like it</Text>
         <Icon name="thumbs-up" size={18} color="#fff" style={styles.icon} />
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.button, selectedButton === 'love' && styles.selectedRatingButton]}
-        onPress={() => handleButtonPress('love')}
+        style={[styles.button, selectedButton === 2 && styles.selectedRatingButton]}
+        onPress={() => handleButtonPress(2)}
       >
         <Text style={styles.buttonText}>Love this!</Text>
         <Icon name="heart" size={18} color="#fff" style={styles.icon} />
