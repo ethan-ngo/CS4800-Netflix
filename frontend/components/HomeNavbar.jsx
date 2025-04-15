@@ -7,7 +7,7 @@ import Searchbar from './Searchbar'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const HomeNavbar = ({ userID, onClick }) => {
+const HomeNavbar = ({ userID }) => {
   const [hoveredButton, setHoveredButton] = useState(null)
   const navigation = useNavigation()
   const { width } = useWindowDimensions()
@@ -26,9 +26,6 @@ const HomeNavbar = ({ userID, onClick }) => {
 
   const handleClickBookmark = () => {
     navigation.navigate('Home', { userID, mode: 'bookmarked' })
-    if(onClick) {
-      onClick();
-    }
   }
 
   return (

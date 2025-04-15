@@ -12,7 +12,7 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN, getMoviesByGenre, getUserMovieInfoByUserID } from './api'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useFocusEffect} from '@react-navigation/native'
 import HomeNavbar from '../components/HomeNavbar'
 import LoadingOverlay from '../components/LoadingOverlay'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -35,6 +35,15 @@ const HomePageNative = ({ route }) => {
   const [mode, setMode] = useState('all')
   const [genreSection, setGenreSection] = useState([])
 
+  useEffect(() => {
+    if (route.params?.mode) {
+      setMode(route.params.mode)
+    }
+  }, [route.params?.mode])
+
+  const userID = route.params.userID
+  const navigation = useNavigation()
+
   const fetchBookmarkedMovies = async () => {
     try {
       const watchedMovieItems = await getUserMovieInfoByUserID(userID);
@@ -53,15 +62,15 @@ const HomePageNative = ({ route }) => {
     }
   };
 
-  useEffect(() => {
-    if (route.params?.mode) {
-      setMode(route.params.mode)
-    }
-  }, [route.params?.mode])
-
-  const userID = route.params.userID
-  const navigation = useNavigation()
-
+  useFocusEffect(
+    React.useCallback(() => {
+      if(items){
+        fetchBookmarkedMovies();
+      }
+      console.log("bookmarked" + bookmarked)
+    }, [items])
+  );
+  
   useEffect(() => {
     const fetchItems = async () => {
       setLoading(true)
@@ -190,7 +199,7 @@ const HomePageNative = ({ route }) => {
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
       {loading && <LoadingOverlay visible={loading} />}
-      <HomeNavbar userID={userID} onClick={fetchBookmarkedMovies}/>
+      <HomeNavbar userID={userID}/>
       <LinearGradient colors={theme.gradient} style={styles.container}>
         {mode === 'all' && (
           <>
