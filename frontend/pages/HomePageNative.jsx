@@ -11,7 +11,7 @@ import {
   Dimensions,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN, getMoviesByGenre } from './api'
+import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN, getMoviesByGenre, getUserMovieInfoByUserID } from './api'
 import { useNavigation } from '@react-navigation/native'
 import HomeNavbar from '../components/HomeNavbar'
 import LoadingOverlay from '../components/LoadingOverlay'
@@ -28,11 +28,30 @@ const HomePageNative = ({ route }) => {
   const [items, setItems] = useState([])
   const [shows, setShows] = useState([])
   const [movies, setMovies] = useState([])
+  const [bookmarked, setBookmarked] = useState([])
   const [loading, setLoading] = useState(false)
   const [recommendedMovies, setRecommendedMovies] = useState([])
   const [recommendedShows, setRecommendedShows] = useState([])
   const [mode, setMode] = useState('all')
   const [genreSection, setGenreSection] = useState([])
+
+  const fetchBookmarkedMovies = async () => {
+    try {
+      const watchedMovieItems = await getUserMovieInfoByUserID(userID);
+
+      // Filter watched movies that are bookmarked and map to full movie objects
+      const bookmarkedMovies = watchedMovieItems
+        .filter((movie) => movie.isBookmarked === true)
+        .map((watchedMovie) => {
+          // Find the full movie object in movieItems
+          return items.find((movie) => movie.Id === watchedMovie.movieID);
+        })
+
+      setBookmarked(bookmarkedMovies);
+    } catch (error) {
+      console.error('Error fetching bookmarked movies:', error);
+    }
+  };
 
   useEffect(() => {
     if (route.params?.mode) {
@@ -171,7 +190,7 @@ const HomePageNative = ({ route }) => {
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
       {loading && <LoadingOverlay visible={loading} />}
-      <HomeNavbar userID={userID} />
+      <HomeNavbar userID={userID} onClick={fetchBookmarkedMovies}/>
       <LinearGradient colors={theme.gradient} style={styles.container}>
         {mode === 'all' && (
           <>
@@ -231,6 +250,18 @@ const HomePageNative = ({ route }) => {
               {shows.map((item) => (
                 <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
                   {renderShowItem({ item })}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+        {mode === 'bookmarked' && (
+          <View style={styles.mediaSection}>
+            <Text style={styles.sectionTitle}>Bookmarked</Text>
+            <View style={styles.gridContainer}>
+              {bookmarked.map((item) => (
+                <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
+                  {renderMediaItem({ item })}
                 </View>
               ))}
             </View>
