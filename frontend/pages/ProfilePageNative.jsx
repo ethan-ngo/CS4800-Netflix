@@ -210,9 +210,6 @@ const ProfilePageNative = ({navigation}) => {
         <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.8}>
           <Text style={styles.resetButtonText}>Reset</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.homeButton} onPress={handleHomeButton} activeOpacity={0.8}>
-          <Text style={styles.homeButtonText}>Return Home</Text>
-        </TouchableOpacity>
       </View>
     </View>
     </LinearGradient>
