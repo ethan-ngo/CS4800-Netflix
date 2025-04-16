@@ -1,4 +1,15 @@
-import React, { useRef, useEffect, useState } from 'react'
+/**
+ * MediaDetailsNative Component
+ * 
+ * This component displays detailed information about a selected media item (movie or show).
+ * It includes features such as video playback, user ratings, bookmarking, and cast information.
+ * 
+ * Props (via route parameters):
+ * - media: The selected media object containing details like Name, Id, ProductionYear, etc.
+ * - userID: The ID of the current user.
+ */
+
+import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,98 +20,120 @@ import {
   ScrollView,
   FlatList,
   Platform,
-  Button,
-} from 'react-native'
-import { useNavigation, useRoute } from '@react-navigation/native'
-import { getMovieDetails, getUserMovieByIDS, newUserMovie, setUserMovieInfo } from './api'
-import { useVideoPlayer, VideoView } from 'expo-video'
-import { useEvent } from 'expo'
-import UserRatingButtons from '../components/userMovieRatingButtons'
+} from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { getMovieDetails, getUserMovieByIDS, newUserMovie, setUserMovieInfo } from './api';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import { useEvent } from 'expo';
+import UserRatingButtons from '../components/userMovieRatingButtons';
 
-const API_URL = process.env.REACT_APP_API_URL
-const LOCAL_URL = process.env.REACT_APP_LOCAL_URL
-const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
+const API_URL = process.env.REACT_APP_API_URL;
+const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN;
 
 const MediaDetailsNative = () => {
-  const navigation = useNavigation()
-  const route = useRoute()
-  const media = route.params?.media
-  const userID = route.params?.userID
+  const navigation = useNavigation();
+  const route = useRoute();
+  const media = route.params?.media; // Media details passed via navigation
+  const userID = route.params?.userID; // User ID passed via navigation
 
-  const videoRef = useRef(null)
-  const [movieData, setMovieData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [cast, setCast] = useState([]) // State for the cast
-  const [timeStamp, setTimeStamp] = useState(0)
-  const [isBookmarked, setBookmarked] = useState(false)
-  const [userRating, setUserRating] = useState(0)
-  const [userMovieID, setUserMovieID] = useState(null)
-  const [numWatched, setNumWatched] = useState(0)
+  // References and state variables
+  const videoRef = useRef(null); // Reference to the video player
+  const [movieData, setMovieData] = useState(null); // Detailed movie data from TMDb
+  const [loading, setLoading] = useState(true); // Loading state for fetching data
+  const [cast, setCast] = useState([]); // Cast information
+  const [timeStamp, setTimeStamp] = useState(0); // Current playback timestamp
+  const [isBookmarked, setBookmarked] = useState(false); // Bookmark status
+  const [userRating, setUserRating] = useState(0); // User's rating for the media
+  const [userMovieID, setUserMovieID] = useState(null); // ID of the user's movie record
+  const [numWatched, setNumWatched] = useState(0); // Number of times the media has been watched
 
+  /**
+   * useEffect - Fetches movie details and initializes the video player when the media changes.
+   */
   useEffect(() => {
     if (media?.Name) {
-      fetchMovieInfo(media.Name)
+      fetchMovieInfo(media.Name);
     }
-    console.log(media)
-    player.currentTime = timeStamp
-  }, [media, timeStamp])
+    player.currentTime = timeStamp; // Set the video player's current time
+  }, [media, timeStamp]);
 
-  // for time stamp saving
+  /**
+   * useEffect - Periodically logs the current playback timestamp.
+   */
   useEffect(() => {
     const interval = setInterval(() => {
       if (player && player.currentTime != null) {
-        console.log('Current Timestamp:', player.currentTime)
+        console.log('Current Timestamp:', player.currentTime);
       }
-    }, 10000) // log every 10 seconds
+    }, 10000); // Log every 10 seconds
 
-    return () => clearInterval(interval)
-  })
+    return () => clearInterval(interval);
+  });
 
+  /**
+   * fetchMovieInfo - Fetches detailed movie information and cast data from the API.
+   * 
+   * @param {string} movieName - The name of the movie to fetch details for.
+   */
   const fetchMovieInfo = async (movieName) => {
-    const data = await getMovieDetails(movieName)
+    const data = await getMovieDetails(movieName);
     if (data) {
-      setMovieData(data.movieDetails)
-      setCast(data.cast)
+      setMovieData(data.movieDetails);
+      setCast(data.cast);
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
+  /**
+   * handleNewUserMovieInfo - Fetches or creates user-specific movie information.
+   * 
+   * This function checks if the user has already interacted with the media.
+   * If not, it creates a new record for the user.
+   */
   const handleNewUserMovieInfo = async () => {
-    const userMovieInfo = await getUserMovieByIDS(userID, media.Id)
-    // user has watched movie and will update timestamp, rating, bookmark
+    const userMovieInfo = await getUserMovieByIDS(userID, media.Id);
     if (userMovieInfo) {
-      setUserMovieID(userMovieInfo._id)
-      setBookmarked(userMovieInfo.isBookmarked)
-      setUserRating(userMovieInfo.userMovieRating)
-      setTimeStamp(userMovieInfo.timeStamp)
-      setNumWatched(userMovieInfo.numWatched)
+      // User has watched the movie; update state with existing data
+      setUserMovieID(userMovieInfo._id);
+      setBookmarked(userMovieInfo.isBookmarked);
+      setUserRating(userMovieInfo.userMovieRating);
+      setTimeStamp(userMovieInfo.timeStamp);
+      setNumWatched(userMovieInfo.numWatched);
+    } else {
+      // User has not watched the movie; create a new record
+      const response = await newUserMovie(userID, media.Id, 0, 0, false, 0);
+      setUserMovieID(response.insertedId);
     }
-    // user has not watched and will create userMovieInfo
-    else {
-      const response = await newUserMovie(userID, media.Id, 0, 0, false, 0)
-      setUserMovieID(response.insertedId)
-    }
-  }
+  };
 
+  /**
+   * useEffect - Initializes user-specific movie information when the component mounts.
+   */
   useEffect(() => {
-    handleNewUserMovieInfo()
-  }, [])
+    handleNewUserMovieInfo();
+  }, []);
 
+  // Video source URL for streaming
   const videoSource = {
     uri: `${API_URL}/Videos/${media.Id}/stream?api_key=${ACCESS_TOKEN}&DirectPlay=true&Static=true`,
-  }
+  };
 
+  // Video player instance
   const player = useVideoPlayer(videoSource, (player) => {
-    player.loop = true
-    player.play()
-  })
+    player.loop = true;
+    player.play();
+  });
 
+  // Event listener for playback state changes
   const { isPlaying } = useEvent(player, 'playingChange', {
     isPlaying: player.playing,
-  })
+  });
 
+  /**
+   * handlePause - Saves the current playback state when the video is paused.
+   */
   const handlePause = async () => {
-    if (!userMovieID) return
+    if (!userMovieID) return;
 
     const data = setUserMovieInfo(
       userMovieID,
@@ -110,28 +143,34 @@ const MediaDetailsNative = () => {
       player.currentTime,
       isBookmarked,
       userRating
-    )
-  }
+    );
+  };
+
+  /**
+   * useEffect - Triggers handlePause when the video playback state changes to paused.
+   */
   useEffect(() => {
     if (!isPlaying) {
-      handlePause()
+      handlePause();
     }
-  }, [isPlaying])
+  }, [isPlaying]);
 
   if (!media) {
     return (
       <View style={styles.loadingContainer}>
         <Text style={styles.loadingText}>Loading...</Text>
       </View>
-    )
+    );
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* Back Button */}
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Text style={styles.backButtonText}>⬅ Go Back</Text>
       </TouchableOpacity>
 
+      {/* Media Details */}
       <View style={styles.detailsContainer}>
         <View style={styles.imageContainer}>
           <Image
@@ -144,7 +183,7 @@ const MediaDetailsNative = () => {
           <TouchableOpacity
             style={styles.starButton}
             onPress={() => {
-              setBookmarked(!isBookmarked)
+              setBookmarked(!isBookmarked);
               const data = setUserMovieInfo(
                 userMovieID,
                 userID,
@@ -153,7 +192,7 @@ const MediaDetailsNative = () => {
                 player.currentTime,
                 !isBookmarked,
                 userRating
-              )
+              );
             }}
           >
             <Text style={[styles.star, isBookmarked ? styles.starSelected : styles.starUnselected]}>
@@ -183,8 +222,8 @@ const MediaDetailsNative = () => {
         </View>
       </View>
 
+      {/* Video Player */}
       <Text style={styles.subtitle}>Now Playing:</Text>
-
       <VideoView
         style={Platform.OS === 'web' ? styles.videoContainer : styles.videoContainerMobile}
         player={player}
@@ -192,12 +231,13 @@ const MediaDetailsNative = () => {
         allowsPictureInPicture
       />
 
+      {/* User Rating Buttons */}
       <UserRatingButtons
         userID={userID}
         mediaID={media.Id}
         defaultRating={userRating}
         onSetRating={(newRating) => {
-          setUserRating(newRating)
+          setUserRating(newRating);
           setUserMovieInfo(
             userMovieID,
             userID,
@@ -206,10 +246,11 @@ const MediaDetailsNative = () => {
             player.currentTime,
             isBookmarked,
             newRating
-          )
+          );
         }}
       />
 
+      {/* TMDb Information */}
       {loading ? (
         <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 20 }} />
       ) : (
@@ -229,7 +270,7 @@ const MediaDetailsNative = () => {
         )
       )}
 
-      {/* Display Cast */}
+      {/* Cast Information */}
       {cast.length > 0 && (
         <View style={styles.castContainer}>
           <Text style={styles.subtitle}>Cast:</Text>
@@ -253,8 +294,8 @@ const MediaDetailsNative = () => {
         </View>
       )}
     </ScrollView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -386,6 +427,6 @@ const styles = StyleSheet.create({
     color: '#D3D3D3',
     textAlign: 'center',
   },
-})
+});
 
-export default MediaDetailsNative
+export default MediaDetailsNative;

@@ -24,83 +24,112 @@ const itemWidth = 120
 const horizontalSpacing = 10
 const itemsPerRow = Math.floor(screenWidth / (itemWidth + horizontalSpacing))
 
+/**
+ * HomePageNative Component
+ * 
+ * This component serves as the main home page for the application. It displays
+ * recommended movies, shows, and genre-based sections in a scrollable layout.
+ * The data is fetched from the backend API and dynamically rendered.
+ * 
+ * Props:
+ * - route: Object containing navigation parameters, including `userID` and `mode`.
+ */
+
 const HomePageNative = ({ route }) => {
-  const [items, setItems] = useState([])
-  const [shows, setShows] = useState([])
-  const [movies, setMovies] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [recommendedMovies, setRecommendedMovies] = useState([])
-  const [recommendedShows, setRecommendedShows] = useState([])
-  const [mode, setMode] = useState('all')
-  const [genreSection, setGenreSection] = useState([])
+  // State variables to manage media items, loading state, and recommendations.
+  const [items, setItems] = useState([]); // All media items
+  const [shows, setShows] = useState([]); // TV shows
+  const [movies, setMovies] = useState([]); // Movies
+  const [loading, setLoading] = useState(false); // Loading indicator
+  const [recommendedMovies, setRecommendedMovies] = useState([]); // Recommended movies
+  const [recommendedShows, setRecommendedShows] = useState([]); // Recommended shows
+  const [mode, setMode] = useState('all'); // Display mode ('all', 'movies', 'shows')
+  const [genreSection, setGenreSection] = useState([]); // Movies grouped by genre
 
-  useEffect(() => {
-    if (route.params?.mode) {
-      setMode(route.params.mode)
-    }
-  }, [route.params?.mode])
+  // Extract userID from navigation route parameters.
+  const userID = route.params.userID;
 
-  const userID = route.params.userID
-  const navigation = useNavigation()
+  // Navigation object for navigating between screens.
+  const navigation = useNavigation();
 
+  /**
+   * useEffect - Fetches media items and recommendations when the component mounts.
+   * 
+   * This effect fetches movies, shows, and genre-based data from the API.
+   * It also generates recommendations for the user based on their preferences.
+   */
   useEffect(() => {
     const fetchItems = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const mediaItems = await getItems()
-        const showItems = await getShows()
-        const movieItems = await getMovies()
-        const genreData = await getMoviesByGenre()
-        setItems(mediaItems)
-        setShows(showItems)
-        setMovies(movieItems)
-        setGenreSection(genreData)
+        const mediaItems = await getItems();
+        const showItems = await getShows();
+        const movieItems = await getMovies();
+        const genreData = await getMoviesByGenre();
 
-        const { movies: recMovies, shows: recShows } = await generateRecommendations(userID)
+        setItems(mediaItems);
+        setShows(showItems);
+        setMovies(movieItems);
+        setGenreSection(genreData);
 
-        // if no recommendations, use all items
+        const { movies: recMovies, shows: recShows } = await generateRecommendations(userID);
+
+        // If no recommendations are available, use all items.
         if (recMovies && recMovies.length > 0) {
-          const movieMap = new Map(movieItems.map((m) => [m.Id, m]))
-          const matchedMovies = recMovies.map((rec) => movieMap.get(rec.movieID)).filter(Boolean)
-          setRecommendedMovies(matchedMovies)
+          const movieMap = new Map(movieItems.map((m) => [m.Id, m]));
+          const matchedMovies = recMovies.map((rec) => movieMap.get(rec.movieID)).filter(Boolean);
+          setRecommendedMovies(matchedMovies);
         } else {
-          setRecommendedMovies(movieItems)
+          setRecommendedMovies(movieItems);
         }
 
         if (recShows && recShows.length > 0) {
-          const showMap = new Map(showItems.map((s) => [s.Id, s]))
-          const matchedShows = recShows.map((rec) => showMap.get(rec.showID)).filter(Boolean)
-          setRecommendedShows(matchedShows)
+          const showMap = new Map(showItems.map((s) => [s.Id, s]));
+          const matchedShows = recShows.map((rec) => showMap.get(rec.showID)).filter(Boolean);
+          setRecommendedShows(matchedShows);
         } else {
-          setRecommendedShows(showItems)
+          setRecommendedShows(showItems);
         }
-
-        console.log('Recommended Movies:', recMovies)
-        console.log('Recommended Shows:', recShows)
       } catch (error) {
-        console.error('Error fetching media items:', error)
-        Alert.alert('Error', 'Failed to fetch media items.')
+        console.error('Error fetching media items:', error);
+        Alert.alert('Error', 'Failed to fetch media items.');
       }
-      setLoading(false)
-    }
+      setLoading(false);
+    };
 
-    fetchItems()
-  }, [])
+    fetchItems();
+  }, []);
 
+  /**
+   * handleSelectShow - Navigates to the Show Details screen.
+   * 
+   * @param {Object} show - The selected show object.
+   */
   const handleSelectShow = (show) => {
-    navigation.navigate('ShowDetailsNative', { userID: userID, show })
-  }
+    navigation.navigate('ShowDetailsNative', { userID: userID, show });
+  };
 
+  /**
+   * handleSelectItem - Navigates to the Media Details screen.
+   * 
+   * @param {Object} item - The selected media item (movie or show).
+   */
   const handleSelectItem = (item) => {
-    navigation.navigate('MediaDetailsNative', { userID: userID, media: item })
-  }
+    navigation.navigate('MediaDetailsNative', { userID: userID, media: item });
+  };
 
+  /**
+   * renderMediaItem - Renders a single media item (movie or show) in a FlatList.
+   * 
+   * @param {Object} item - The media item to render.
+   * @returns {JSX.Element|null} - A TouchableOpacity containing the media item's image and name.
+   */
   const renderMediaItem = ({ item }) => {
-    const hasImage = item.ImageTags?.Primary
-    const imageUrl = `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`
+    const hasImage = item.ImageTags?.Primary;
+    const imageUrl = `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`;
 
     if (!hasImage) {
-      return null
+      return null;
     }
 
     return (
@@ -110,15 +139,21 @@ const HomePageNative = ({ route }) => {
           {item.Name}
         </Text>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
+  /**
+   * renderShowItem - Renders a single show item in a FlatList.
+   * 
+   * @param {Object} item - The show item to render.
+   * @returns {JSX.Element|null} - A TouchableOpacity containing the show's image and name.
+   */
   const renderShowItem = ({ item }) => {
-    const hasImage = item.ImageTags?.Primary
-    const imageUrl = `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`
+    const hasImage = item.ImageTags?.Primary;
+    const imageUrl = `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`;
 
     if (!hasImage) {
-      return null
+      return null;
     }
 
     return (
@@ -128,9 +163,14 @@ const HomePageNative = ({ route }) => {
           {item.Name}
         </Text>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
+  /**
+   * renderGenreSections - Renders carousels for each genre.
+   * 
+   * @returns {JSX.Element[]} - An array of genre sections, each containing a FlatList of movies.
+   */
   const renderGenreSections = () => {
     if (!genreSection || typeof genreSection !== 'object' || Object.keys(genreSection).length === 0) {
       return (
@@ -198,7 +238,6 @@ const HomePageNative = ({ route }) => {
                 contentContainerStyle={styles.mediaList}
               />
             </View>
-
             {/* Temporary debug view - remove after fixing */}
             {/* <View style={{ backgroundColor: 'red', padding: 10 }}>
                <Text style={{ color: 'white' }}>Genre Data Debug:</Text>
@@ -238,8 +277,8 @@ const HomePageNative = ({ route }) => {
         )}
       </LinearGradient>
     </ScrollView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   scrollContainer: {

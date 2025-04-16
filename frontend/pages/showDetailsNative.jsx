@@ -1,4 +1,16 @@
-import React, { useEffect, useState } from 'react'
+/**
+ * ShowDetailsNative Component
+ * 
+ * This component displays detailed information about a selected TV show, including its seasons,
+ * episodes, cast, and additional metadata. It also allows users to play episodes, rate the show,
+ * and bookmark it for later viewing.
+ * 
+ * Props (via route parameters):
+ * - show: The selected show object containing details like Name, Id, ProductionYear, etc.
+ * - userID: The ID of the current user.
+ */
+
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,136 +21,169 @@ import {
   ScrollView,
   FlatList,
   Platform,
-} from 'react-native'
-import { useNavigation, useRoute } from '@react-navigation/native'
-import { useVideoPlayer, VideoView } from 'expo-video'
-import UserRatingButtons from '../components/userMovieRatingButtons'
-import { getItems, getShowDetails, getUserShowByIDS, newUserShow, setUserShowInfo } from './api'
+} from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import UserRatingButtons from '../components/userMovieRatingButtons';
+import { getItems, getShowDetails, getUserShowByIDS, newUserShow, setUserShowInfo } from './api';
 
-const API_URL = process.env.REACT_APP_API_URL
-const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
+const API_URL = process.env.REACT_APP_API_URL;
+const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN;
 
 const ShowDetailsNative = () => {
-  const navigation = useNavigation()
-  const route = useRoute()
-  const show = route.params?.show
+  const navigation = useNavigation();
+  const route = useRoute();
+  const show = route.params?.show; // Show details passed via navigation
 
-  const [seasons, setSeasons] = useState({})
-  const [selectedSeason, setSelectedSeason] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [selectedEpisode, setSelectedEpisode] = useState(null)
-  const [cast, setCast] = useState([])
-  const [showDetails, setShowDetails] = useState(null)
+  // State variables
+  const [seasons, setSeasons] = useState({}); // Map of seasons and their episodes
+  const [selectedSeason, setSelectedSeason] = useState(null); // Currently selected season
+  const [loading, setLoading] = useState(true); // Loading state for fetching data
+  const [selectedEpisode, setSelectedEpisode] = useState(null); // Currently selected episode
+  const [cast, setCast] = useState([]); // Cast information
+  const [showDetails, setShowDetails] = useState(null); // Additional show details from TMDb
 
-  const [userShowID, setUserShowID] = useState(null)
-  const [userRating, setUserRating] = useState(null)
-  const [numWatched, setNumWatched] = useState(0)
-  const [timeStamp, setTimeStamp] = useState(0)
-  const [isBookmarked, setIsBookmarked] = useState(false)
+  // User-specific state variables
+  const [userShowID, setUserShowID] = useState(null); // ID of the user's show record
+  const [userRating, setUserRating] = useState(null); // User's rating for the show
+  const [numWatched, setNumWatched] = useState(0); // Number of times the show has been watched
+  const [timeStamp, setTimeStamp] = useState(0); // Current playback timestamp
+  const [isBookmarked, setIsBookmarked] = useState(false); // Bookmark status
 
+  // Video source for the selected episode
   const videoSource = selectedEpisode
     ? {
         uri: `${API_URL}/Videos/${selectedEpisode}/stream?api_key=${ACCESS_TOKEN}&DirectPlay=true&Static=true`,
       }
-    : null
+    : null;
 
+  // Video player instance
   const player = useVideoPlayer(videoSource, (player) => {
-    player.loop = true
-    player.play()
-  })
+    player.loop = true;
+    player.play();
+  });
 
+  /**
+   * useEffect - Fetches episodes and show details when the component mounts or the show changes.
+   */
   useEffect(() => {
     if (show?.Name) {
-      fetchEpisodes(show.Name)
-      fetchShowDetails(show.Name)
+      fetchEpisodes(show.Name);
+      fetchShowDetails(show.Name);
     }
-    handleNewUserShowInfo()
-  }, [show])
+    handleNewUserShowInfo();
+  }, [show]);
 
+  /**
+   * useEffect - Logs the current playback timestamp periodically.
+   */
   useEffect(() => {
     const interval = setInterval(() => {
       if (player && player.currentTime != null) {
-        console.log(`Current Timestamp for ${selectedEpisode}:`, player.currentTime)
+        console.log(`Current Timestamp for ${selectedEpisode}:`, player.currentTime);
       }
-    }, 10000)
-    return () => clearInterval(interval)
-  })
+    }, 10000); // Log every 10 seconds
+    return () => clearInterval(interval);
+  });
 
+  /**
+   * fetchEpisodes - Fetches all episodes of the show and organizes them by season.
+   * 
+   * @param {string} showName - The name of the show to fetch episodes for.
+   */
   const fetchEpisodes = async (showName) => {
-    const allItems = await getItems()
-    const filteredItems = allItems.filter((item) => item.SeriesName === showName)
+    const allItems = await getItems();
+    const filteredItems = allItems.filter((item) => item.SeriesName === showName);
 
-    const seasonMap = {}
+    const seasonMap = {};
     filteredItems.forEach((item) => {
       if (item.Type === 'Episode' && item.ParentIndexNumber) {
         if (!seasonMap[item.ParentIndexNumber]) {
           seasonMap[item.ParentIndexNumber] = {
             seasonName: `Season ${item.ParentIndexNumber}`,
             episodes: [],
-          }
+          };
         }
-        seasonMap[item.ParentIndexNumber].episodes.push(item)
+        seasonMap[item.ParentIndexNumber].episodes.push(item);
       }
-    })
+    });
 
     Object.values(seasonMap).forEach((season) => {
-      season.episodes.sort((a, b) => a.IndexNumber - b.IndexNumber)
-    })
+      season.episodes.sort((a, b) => a.IndexNumber - b.IndexNumber);
+    });
 
-    setSeasons(seasonMap)
-    setSelectedSeason(Object.keys(seasonMap)[0])
-    setLoading(false)
-  }
+    setSeasons(seasonMap);
+    setSelectedSeason(Object.keys(seasonMap)[0]);
+    setLoading(false);
+  };
 
+  /**
+   * fetchShowDetails - Fetches additional details and cast information for the show.
+   * 
+   * @param {string} showName - The name of the show to fetch details for.
+   */
   const fetchShowDetails = async (showName) => {
     try {
-      const data = await getShowDetails(showName)
+      const data = await getShowDetails(showName);
       if (data) {
-        setShowDetails(data.showDetails)
-        setCast(data.cast)
+        setShowDetails(data.showDetails);
+        setCast(data.cast);
       }
     } catch (error) {
-      console.error('Error fetching show details:', error)
+      console.error('Error fetching show details:', error);
     }
-  }
+  };
 
+  /**
+   * handleEpisodeSelect - Sets the selected episode for playback.
+   * 
+   * @param {string} episodeId - The ID of the selected episode.
+   */
   const handleEpisodeSelect = (episodeId) => {
-    setSelectedEpisode(episodeId)
-  }
+    setSelectedEpisode(episodeId);
+  };
 
+  /**
+   * handleNewUserShowInfo - Fetches or creates user-specific show information.
+   * 
+   * This function checks if the user has already interacted with the show.
+   * If not, it creates a new record for the user.
+   */
   const handleNewUserShowInfo = async () => {
-    const userID = route.params?.userID
-    const showID = show?.Id
-    if (!userID || !showID) return
+    const userID = route.params?.userID;
+    const showID = show?.Id;
+    if (!userID || !showID) return;
 
-    const userShowInfo = await getUserShowByIDS(userID, showID)
+    const userShowInfo = await getUserShowByIDS(userID, showID);
     if (userShowInfo) {
-      setUserShowID(userShowInfo._id)
-      setUserRating(userShowInfo.userShowRating)
-      setTimeStamp(userShowInfo.timeStamp)
-      setIsBookmarked(userShowInfo.isBookmarked)
-      setNumWatched(userShowInfo.numWatched)
+      setUserShowID(userShowInfo._id);
+      setUserRating(userShowInfo.userShowRating);
+      setTimeStamp(userShowInfo.timeStamp);
+      setIsBookmarked(userShowInfo.isBookmarked);
+      setNumWatched(userShowInfo.numWatched);
     } else {
-      const response = await newUserShow(userID, showID, 0, 0, false, 0)
+      const response = await newUserShow(userID, showID, 0, 0, false, 0);
       if (response?.insertedId) {
-        setUserShowID(response.insertedId)
+        setUserShowID(response.insertedId);
       }
     }
-  }
+  };
 
   if (!show)
     return (
       <View style={styles.loadingContainer}>
         <Text style={styles.loadingText}>Loading...</Text>
       </View>
-    )
+    );
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* Back Button */}
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Text style={styles.backButtonText}>⬅ Go Back</Text>
       </TouchableOpacity>
 
+      {/* Show Details */}
       <View style={styles.detailsContainer}>
         <Image
           source={{ uri: `${API_URL}/Items/${show.Id}/Images/Primary?api_key=${ACCESS_TOKEN}` }}
@@ -164,8 +209,8 @@ const ShowDetailsNative = () => {
         </View>
       </View>
 
+      {/* Seasons and Episodes */}
       <Text style={styles.subtitle}>Seasons:</Text>
-
       <View style={styles.seasonButtonContainer}>
         {Object.keys(seasons).map((seasonNumber) => (
           <TouchableOpacity
@@ -213,8 +258,8 @@ const ShowDetailsNative = () => {
         </View>
       )}
 
+      {/* Video Player */}
       <Text style={styles.subtitle}>Now Playing:</Text>
-
       <View style={Platform.OS === 'web' ? styles.videoContainer : styles.videoContainerMobile}>
         {selectedEpisode ? (
           <VideoView
@@ -230,12 +275,13 @@ const ShowDetailsNative = () => {
         )}
       </View>
 
+      {/* User Rating Buttons */}
       <UserRatingButtons
         defaultRating={userRating}
         onSetRating={(newRating) => {
-          setUserRating(newRating)
-          const userID = route.params?.userID
-          const showID = show?.Id
+          setUserRating(newRating);
+          const userID = route.params?.userID;
+          const showID = show?.Id;
           if (userShowID && userID && showID) {
             setUserShowInfo(
               userShowID,
@@ -245,11 +291,12 @@ const ShowDetailsNative = () => {
               player.currentTime,
               isBookmarked,
               newRating
-            )
+            );
           }
         }}
       />
 
+      {/* Additional Show Details */}
       {loading ? (
         <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 20 }} />
       ) : showDetails ? (
@@ -269,6 +316,7 @@ const ShowDetailsNative = () => {
         <Text style={styles.subtitle}>No Additional Info</Text>
       )}
 
+      {/* Cast Information */}
       {cast.length > 0 && (
         <View style={styles.castContainer}>
           <Text style={styles.subtitle}>Cast:</Text>
@@ -296,8 +344,8 @@ const ShowDetailsNative = () => {
         </View>
       )}
     </ScrollView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -462,6 +510,6 @@ const styles = StyleSheet.create({
     color: '#D3D3D3',
     textAlign: 'center',
   },
-})
+});
 
-export default ShowDetailsNative
+export default ShowDetailsNative;
