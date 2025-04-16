@@ -24,6 +24,10 @@ const HomeNavbar = ({ userID }) => {
     navigation.navigate('Home', { userID, mode: 'shows' })
   }
 
+  const handleClickBookmark = () => {
+    navigation.navigate('Home', { userID, mode: 'bookmarked' })
+  }
+
   return (
     <View style={styles.header}>
       {/* leftmost: title */}
@@ -61,6 +65,16 @@ const HomeNavbar = ({ userID }) => {
         >
           <Text style={[styles.buttonText, hoveredButton === 'shows' && styles.hoveredButtonText]}>
             Shows
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onMouseEnter={() => setHoveredButton('bookmarked')}
+          onMouseLeave={() => setHoveredButton(null)}
+          onPress={handleClickBookmark}
+        >
+          <Text style={[styles.buttonText, hoveredButton === 'bookmarked' && styles.hoveredButtonText]}>
+            My Stuff
           </Text>
         </TouchableOpacity>
       </View>

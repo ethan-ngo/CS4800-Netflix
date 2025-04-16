@@ -16,6 +16,7 @@ import { getMovieDetails, getUserMovieByIDS, newUserMovie, setUserMovieInfo } fr
 import { useVideoPlayer, VideoView } from 'expo-video'
 import { useEvent } from 'expo'
 import UserRatingButtons from '../components/userMovieRatingButtons'
+import { addRatings } from '../utils/calcRatings'
 
 const API_URL = process.env.REACT_APP_API_URL
 const LOCAL_URL = process.env.REACT_APP_LOCAL_URL
@@ -34,6 +35,7 @@ const MediaDetailsNative = () => {
   const [timeStamp, setTimeStamp] = useState(0)
   const [isBookmarked, setBookmarked] = useState(false)
   const [userRating, setUserRating] = useState(0)
+  const [movieRating, setMovieRating] = useState(null)
   const [userMovieID, setUserMovieID] = useState(null)
   const [numWatched, setNumWatched] = useState(0)
 
@@ -49,7 +51,8 @@ const MediaDetailsNative = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (player && player.currentTime != null) {
-        console.log('Current Timestamp:', player.currentTime)
+        setTimeStamp(player.currentTime)
+        handlePause();
       }
     }, 10000) // log every 10 seconds
 
@@ -66,6 +69,8 @@ const MediaDetailsNative = () => {
   }
 
   const handleNewUserMovieInfo = async () => {
+    const rating = await addRatings(media.Id, 'userMovieInfo')
+    setMovieRating(rating)
     const userMovieInfo = await getUserMovieByIDS(userID, media.Id)
     // user has watched movie and will update timestamp, rating, bookmark
     if (userMovieInfo) {
@@ -168,10 +173,10 @@ const MediaDetailsNative = () => {
             <Text style={styles.bold}>Year:</Text> {media.ProductionYear}
           </Text>
           <Text style={styles.detail}>
-            <Text style={styles.bold}>Rating:</Text> {media.OfficialRating || 'Not Rated'}
+            <Text style={styles.bold}>Maturity:</Text> {media.OfficialRating || 'Not Rated'}
           </Text>
           <Text style={styles.detail}>
-            <Text style={styles.bold}>Community Rating:</Text> {media.CommunityRating || 'N/A'}
+            <Text style={styles.bold}>Community Rating: </Text> {movieRating || 'Be the first to Rate!'} {movieRating ? '/ 10.00' : ''}
           </Text>
           <Text style={styles.detail}>
             <Text style={styles.bold}>Container:</Text> {media.Container || 'Unknown'}

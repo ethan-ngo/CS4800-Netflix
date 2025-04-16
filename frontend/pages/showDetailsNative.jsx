@@ -14,6 +14,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import UserRatingButtons from '../components/userMovieRatingButtons'
 import { getItems, getShowDetails, getUserShowByIDS, newUserShow, setUserShowInfo } from './api'
+import { addRatings } from '../utils/calcRatings'
 
 const API_URL = process.env.REACT_APP_API_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
@@ -22,6 +23,7 @@ const ShowDetailsNative = () => {
   const navigation = useNavigation()
   const route = useRoute()
   const show = route.params?.show
+  const userID = route.params?.userID
 
   const [seasons, setSeasons] = useState({})
   const [selectedSeason, setSelectedSeason] = useState(null)
@@ -29,6 +31,7 @@ const ShowDetailsNative = () => {
   const [selectedEpisode, setSelectedEpisode] = useState(null)
   const [cast, setCast] = useState([])
   const [showDetails, setShowDetails] = useState(null)
+  const [showRating, setShowRating] = useState(null)
 
   const [userShowID, setUserShowID] = useState(null)
   const [userRating, setUserRating] = useState(null)
@@ -111,6 +114,9 @@ const ShowDetailsNative = () => {
     const showID = show?.Id
     if (!userID || !showID) return
 
+    const rating = await addRatings(show?.Id, 'userShowInfo')
+    setShowRating(rating)
+
     const userShowInfo = await getUserShowByIDS(userID, showID)
     if (userShowInfo) {
       setUserShowID(userShowInfo._id)
@@ -140,11 +146,33 @@ const ShowDetailsNative = () => {
       </TouchableOpacity>
 
       <View style={styles.detailsContainer}>
-        <Image
-          source={{ uri: `${API_URL}/Items/${show.Id}/Images/Primary?api_key=${ACCESS_TOKEN}` }}
-          style={styles.poster}
-          alt="Show Thumbnail"
-        />
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: `${API_URL}/Items/${show.Id}/Images/Primary?api_key=${ACCESS_TOKEN}` }}
+            style={styles.poster}
+            alt="Show Thumbnail"
+          />
+          <TouchableOpacity
+            style={styles.starButton}
+            onPress={() => {
+              setIsBookmarked(!isBookmarked)
+              const data = setUserShowInfo(
+                userShowID,
+                userID,
+                show?.Id,
+                numWatched,
+                player.currentTime,
+                !isBookmarked,
+                userRating
+              )
+            }}
+          >
+            <Text style={[styles.star, isBookmarked ? styles.starSelected : styles.starUnselected]}>
+              ★
+            </Text>
+          </TouchableOpacity>
+        </View>
+        
 
         <View style={styles.info}>
           <Text style={styles.title}>{show.Name}</Text>
@@ -152,10 +180,10 @@ const ShowDetailsNative = () => {
             <Text style={styles.bold}>Year:</Text> {show.ProductionYear}
           </Text>
           <Text style={styles.detail}>
-            <Text style={styles.bold}>Rating:</Text> {show.OfficialRating || 'Not Rated'}
+            <Text style={styles.bold}>Maturity:</Text> {show.OfficialRating || 'Not Rated'}
           </Text>
           <Text style={styles.detail}>
-            <Text style={styles.bold}>Community Rating:</Text> {show.CommunityRating || 'N/A'}
+            <Text style={styles.bold}>Community Rating:</Text> {showRating || 'Be the first to Rate!'} {showRating ? '/ 10.00' : ''}
           </Text>
           <Text style={styles.detail}>
             <Text style={styles.bold}>Run Time:</Text> {Math.floor(show.RunTimeTicks / 600000000)}{' '}
@@ -461,6 +489,23 @@ const styles = StyleSheet.create({
   castCharacter: {
     color: '#D3D3D3',
     textAlign: 'center',
+  },
+  starButton: {
+    position: 'absolute',
+    top: 5,
+    right: 20,
+  },
+  star: {
+    fontSize: 40,
+  },
+  starSelected: {
+    color: '#FFD700',
+  },
+  starUnselected: {
+    color: 'black',
+  },
+  imageContainer: {
+    position: 'relative',
   },
 })
 
