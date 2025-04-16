@@ -14,6 +14,9 @@ import * as ImagePicker from 'expo-image-picker'
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
 import { s3, BUCKET_NAME } from '../aws-config'
+import HomeNavbar from '../components/HomeNavbar'
+import { LinearGradient } from 'expo-linear-gradient'
+
 
 const ProfilePageNative = ({navigation}) => {
   const [profilePic, setProfilePic] = useState(null)
@@ -169,6 +172,8 @@ const ProfilePageNative = ({navigation}) => {
 
   //uses user data from the database to populate the form
   return (
+    <LinearGradient colors={theme.gradient} style={styles.backgroundcontainer}>
+    <HomeNavbar userID={userId} />
     <View style={styles.container}>
       <View style={styles.form}>
         <Text style={styles.title}>Edit Profile</Text>
@@ -210,6 +215,7 @@ const ProfilePageNative = ({navigation}) => {
         </TouchableOpacity>
       </View>
     </View>
+    </LinearGradient>
   )
 }
 
@@ -218,8 +224,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: 'white',
+    padding: 0,
+  },
+  backgroundcontainer:{
+    flex: 1,
+    backgroundColor: '#121212',
+    padding: 0,
   },
   form: {
     width: '100%',
