@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { addMovieRatings } from '../utils/calcRatings'
 import Icon from 'react-native-vector-icons/Feather'
 import theme from '../utils/theme'
 import '../globals.css'
@@ -14,7 +15,7 @@ const UserRatingButtons = ({ defaultRating, onSetRating }) => {
   const handleButtonPress = (button) => {
     if (selectedButton === button) {
       // If the button is already selected, unselect it and reset the rating
-      setSelectedButton(null);
+      setSelectedButton(0);
       if (onSetRating) {
         onSetRating(0); // Reset rating to 0
       }
@@ -30,22 +31,22 @@ const UserRatingButtons = ({ defaultRating, onSetRating }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity
-        style={[styles.button, selectedButton === -1 && styles.selectedRatingButton]}
-        onPress={() => handleButtonPress(-1)}
+        style={[styles.button, selectedButton === 1 && styles.selectedRatingButton]}
+        onPress={() => handleButtonPress(1)}
       >
         <Text style={styles.buttonText}>Not for me</Text>
         <Icon name="thumbs-down" size={18} color="#fff" style={styles.icon} />
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.button, selectedButton === 1 && styles.selectedRatingButton]}
-        onPress={() => handleButtonPress(1)}
+        style={[styles.button, selectedButton === 2 && styles.selectedRatingButton]}
+        onPress={() => handleButtonPress(2)}
       >
         <Text style={styles.buttonText}>Like it</Text>
         <Icon name="thumbs-up" size={18} color="#fff" style={styles.icon} />
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.button, selectedButton === 2 && styles.selectedRatingButton]}
-        onPress={() => handleButtonPress(2)}
+        style={[styles.button, selectedButton === 3 && styles.selectedRatingButton]}
+        onPress={() => handleButtonPress(3)}
       >
         <Text style={styles.buttonText}>Love this!</Text>
         <Icon name="heart" size={18} color="#fff" style={styles.icon} />

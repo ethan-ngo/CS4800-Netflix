@@ -14,6 +14,7 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import { useVideoPlayer, VideoView } from 'expo-video'
 import UserRatingButtons from '../components/userMovieRatingButtons'
 import { getItems, getShowDetails, getUserShowByIDS, newUserShow, setUserShowInfo } from './api'
+import { addRatings } from '../utils/calcRatings'
 
 const API_URL = process.env.REACT_APP_API_URL
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN
@@ -29,7 +30,8 @@ const ShowDetailsNative = () => {
   const [loading, setLoading] = useState(true)
   const [selectedEpisode, setSelectedEpisode] = useState(null)
   const [cast, setCast] = useState([])
-  const [showDetails, setShowDetails] = useState(null)  
+  const [showDetails, setShowDetails] = useState(null)
+  const [showRating, setShowRating] = useState(null)
 
   const [userShowID, setUserShowID] = useState(null)
   const [userRating, setUserRating] = useState(null)
@@ -112,8 +114,10 @@ const ShowDetailsNative = () => {
     const showID = show?.Id
     if (!userID || !showID) return
 
+    const rating = await addRatings(show?.Id, 'userShowInfo')
+    setShowRating(rating)
+
     const userShowInfo = await getUserShowByIDS(userID, showID)
-    console.log(userShowInfo)
     if (userShowInfo) {
       setUserShowID(userShowInfo._id)
       setUserRating(userShowInfo.userShowRating)
@@ -176,10 +180,10 @@ const ShowDetailsNative = () => {
             <Text style={styles.bold}>Year:</Text> {show.ProductionYear}
           </Text>
           <Text style={styles.detail}>
-            <Text style={styles.bold}>Rating:</Text> {show.OfficialRating || 'Not Rated'}
+            <Text style={styles.bold}>Maturity:</Text> {show.OfficialRating || 'Not Rated'}
           </Text>
           <Text style={styles.detail}>
-            <Text style={styles.bold}>Community Rating:</Text> {show.CommunityRating || 'N/A'}
+            <Text style={styles.bold}>Community Rating:</Text> {showRating || 'Be the first to Rate!'} {showRating ? '/ 10.00' : ''}
           </Text>
           <Text style={styles.detail}>
             <Text style={styles.bold}>Run Time:</Text> {Math.floor(show.RunTimeTicks / 600000000)}{' '}

@@ -36,10 +36,7 @@ export const generateRecommendations = async (userID) => {
       const watchTime = ticks / 600000000
       const scaledTime = Math.log1p(watchTime)
 
-      let ratingWeight = 0
-      if (rating === 'dislike') ratingWeight = -1
-      else if (rating === 'like') ratingWeight = 1
-      else if (rating === 'love') ratingWeight = 2
+      let ratingWeight = rating
 
       const weight = scaledTime + ratingWeight
 
