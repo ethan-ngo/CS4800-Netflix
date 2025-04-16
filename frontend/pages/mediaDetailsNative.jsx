@@ -49,7 +49,8 @@ const MediaDetailsNative = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (player && player.currentTime != null) {
-        console.log('Current Timestamp:', player.currentTime)
+        setTimeStamp(player.currentTime)
+        handlePause();
       }
     }, 10000) // log every 10 seconds
 

@@ -23,12 +23,14 @@ const screenWidth = Dimensions.get('window').width
 const itemWidth = 120
 const horizontalSpacing = 10
 const itemsPerRow = Math.floor(screenWidth / (itemWidth + horizontalSpacing))
+const APP_URL = process.env.APP_URL
 
 const HomePageNative = ({ route }) => {
   const [items, setItems] = useState([])
   const [shows, setShows] = useState([])
   const [movies, setMovies] = useState([])
-  const [bookmarked, setBookmarked] = useState([])
+  const [bookmarkedMovies, setBookmarkedMovies] = useState([])
+  const [bookmarkedShows, setBookmarkedShows] = useState([])
   const [loading, setLoading] = useState(false)
   const [recommendedMovies, setRecommendedMovies] = useState([])
   const [recommendedShows, setRecommendedShows] = useState([])
@@ -56,7 +58,26 @@ const HomePageNative = ({ route }) => {
           return items.find((movie) => movie.Id === watchedMovie.movieID);
         })
 
-      setBookmarked(bookmarkedMovies);
+      setBookmarkedMovies(bookmarkedMovies);
+    } catch (error) {
+      console.error('Error fetching bookmarked movies:', error);
+    }
+  };
+
+  const fetchBookmarkedShows = async () => {
+    try {
+      const response = await fetch(`${APP_URL}userShowInfo/user/${userID}`);
+      if(response.ok) {
+        const watchedShowItems = await response.json()
+          // Filter watched movies that are bookmarked and map to full movie objects
+        const bookmarkedShows = watchedShowItems
+        .filter((movie) => movie.isBookmarked === true)
+        .map((watchedShow) => {
+          // Find the full movie object in movieItems
+          return items.find((show) => show.Id === watchedShow.showID);
+        })
+        setBookmarkedShows(bookmarkedShows);
+      }
     } catch (error) {
       console.error('Error fetching bookmarked movies:', error);
     }
@@ -66,8 +87,8 @@ const HomePageNative = ({ route }) => {
     React.useCallback(() => {
       if(items){
         fetchBookmarkedMovies();
+        fetchBookmarkedShows();
       }
-      console.log("bookmarked" + bookmarked)
     }, [items])
   );
   
@@ -266,11 +287,19 @@ const HomePageNative = ({ route }) => {
         )}
         {mode === 'bookmarked' && (
           <View style={styles.mediaSection}>
-            <Text style={styles.sectionTitle}>Bookmarked</Text>
+            <Text style={styles.sectionTitle}>Bookmarked Movies</Text>
             <View style={styles.gridContainer}>
-              {bookmarked.map((item) => (
+              {bookmarkedMovies.map((item) => (
                 <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
                   {renderMediaItem({ item })}
+                </View>
+              ))}
+            </View>
+            <Text style={styles.sectionTitle}>Bookmarked Shows</Text>
+            <View style={styles.gridContainer}>
+              {bookmarkedShows.map((item) => (
+                <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
+                  {renderShowItem({ item })}
                 </View>
               ))}
             </View>

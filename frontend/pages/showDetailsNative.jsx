@@ -22,13 +22,14 @@ const ShowDetailsNative = () => {
   const navigation = useNavigation()
   const route = useRoute()
   const show = route.params?.show
+  const userID = route.params?.userID
 
   const [seasons, setSeasons] = useState({})
   const [selectedSeason, setSelectedSeason] = useState(null)
   const [loading, setLoading] = useState(true)
   const [selectedEpisode, setSelectedEpisode] = useState(null)
   const [cast, setCast] = useState([])
-  const [showDetails, setShowDetails] = useState(null)
+  const [showDetails, setShowDetails] = useState(null)  
 
   const [userShowID, setUserShowID] = useState(null)
   const [userRating, setUserRating] = useState(null)
@@ -112,6 +113,7 @@ const ShowDetailsNative = () => {
     if (!userID || !showID) return
 
     const userShowInfo = await getUserShowByIDS(userID, showID)
+    console.log(userShowInfo)
     if (userShowInfo) {
       setUserShowID(userShowInfo._id)
       setUserRating(userShowInfo.userShowRating)
@@ -140,11 +142,33 @@ const ShowDetailsNative = () => {
       </TouchableOpacity>
 
       <View style={styles.detailsContainer}>
-        <Image
-          source={{ uri: `${API_URL}/Items/${show.Id}/Images/Primary?api_key=${ACCESS_TOKEN}` }}
-          style={styles.poster}
-          alt="Show Thumbnail"
-        />
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: `${API_URL}/Items/${show.Id}/Images/Primary?api_key=${ACCESS_TOKEN}` }}
+            style={styles.poster}
+            alt="Show Thumbnail"
+          />
+          <TouchableOpacity
+            style={styles.starButton}
+            onPress={() => {
+              setIsBookmarked(!isBookmarked)
+              const data = setUserShowInfo(
+                userShowID,
+                userID,
+                show?.Id,
+                numWatched,
+                player.currentTime,
+                !isBookmarked,
+                userRating
+              )
+            }}
+          >
+            <Text style={[styles.star, isBookmarked ? styles.starSelected : styles.starUnselected]}>
+              ★
+            </Text>
+          </TouchableOpacity>
+        </View>
+        
 
         <View style={styles.info}>
           <Text style={styles.title}>{show.Name}</Text>
@@ -461,6 +485,23 @@ const styles = StyleSheet.create({
   castCharacter: {
     color: '#D3D3D3',
     textAlign: 'center',
+  },
+  starButton: {
+    position: 'absolute',
+    top: 5,
+    right: 20,
+  },
+  star: {
+    fontSize: 40,
+  },
+  starSelected: {
+    color: '#FFD700',
+  },
+  starUnselected: {
+    color: 'black',
+  },
+  imageContainer: {
+    position: 'relative',
   },
 })
 
