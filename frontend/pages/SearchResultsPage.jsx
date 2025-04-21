@@ -1,3 +1,17 @@
+/**
+ * SearchResultsPage Component
+ * 
+ * This component displays the search results for a given search term. It shows
+ * filtered movies and TV shows in separate sections, allowing users to navigate
+ * to the details page of a selected media item.
+ * 
+ * Props (via route parameters):
+ * - searchTerm: The search term entered by the user.
+ * - filteredMovies: An array of movie objects that match the search term.
+ * - filteredShows: An array of TV show objects that match the search term.
+ * - userID: The ID of the current user.
+ */
+
 import React from 'react'
 import { View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity, Image } from 'react-native'
 import { API_URL, ACCESS_TOKEN } from '../pages/api'
@@ -10,10 +24,21 @@ const SearchResultsPage = ({ route }) => {
   const { searchTerm, filteredMovies = [], filteredShows = [], userID } = route.params
   const navigation = useNavigation()
 
+  /**
+   * handleSelectItem - Navigates to the Media Details screen for the selected item.
+   * 
+   * @param {Object} item - The selected media item (movie or show).
+   */
   const handleSelectItem = (item) => {
     navigation.navigate('MediaDetailsNative', { media: item })
   }
 
+  /**
+   * renderMediaItem - Renders a single media item (movie or show) in the FlatList.
+   * 
+   * @param {Object} item - The media item to render.
+   * @returns {JSX.Element|null} - A TouchableOpacity containing the media item's image and name.
+   */
   const renderMediaItem = ({ item }) => {
     const hasImage = item.ImageTags?.Primary
     const imageUrl = `${API_URL}/Items/${item.Id}/Images/Primary?api_key=${ACCESS_TOKEN}`
@@ -34,10 +59,13 @@ const SearchResultsPage = ({ route }) => {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
+      {/* Navigation bar */}
       <HomeNavbar userID={userID} />
       <LinearGradient colors={theme.gradient} style={styles.container}>
+        {/* Search results title */}
         <Text style={styles.mainTitle}>Search Results for "{searchTerm}"</Text>
 
+        {/* Movies section */}
         {filteredMovies.length > 0 && (
           <View style={styles.mediaSection}>
             <Text style={styles.sectionTitle}>Movies</Text>
@@ -52,6 +80,7 @@ const SearchResultsPage = ({ route }) => {
           </View>
         )}
 
+        {/* Shows section */}
         {filteredShows.length > 0 && (
           <View style={styles.mediaSection}>
             <Text style={styles.sectionTitle}>Shows</Text>
@@ -70,6 +99,7 @@ const SearchResultsPage = ({ route }) => {
   )
 }
 
+// Styles for the component
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
