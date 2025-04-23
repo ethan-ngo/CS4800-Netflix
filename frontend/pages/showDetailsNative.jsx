@@ -21,19 +21,22 @@ import {
   ScrollView,
   FlatList,
   Platform,
-} from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { useVideoPlayer, VideoView } from 'expo-video';
-import UserRatingButtons from '../components/userMovieRatingButtons';
-import { getItems, getShowDetails, getUserShowByIDS, newUserShow, setUserShowInfo } from './api';
+} from 'react-native'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import { useVideoPlayer, VideoView } from 'expo-video'
+import UserRatingButtons from '../components/userMovieRatingButtons'
+import { getItems, getShowDetails, getUserShowByIDS, newUserShow, setUserShowInfo } from './api'
+import { addRatings } from '../utils/calcRatings'
 
 const API_URL = process.env.REACT_APP_API_URL;
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN;
 
 const ShowDetailsNative = () => {
+  // Navigation and route hooks
   const navigation = useNavigation();
   const route = useRoute();
   const show = route.params?.show; // Show details passed via navigation
+  const userID = route.params?.userID
 
   // State variables
   const [seasons, setSeasons] = useState({}); // Map of seasons and their episodes
@@ -42,6 +45,7 @@ const ShowDetailsNative = () => {
   const [selectedEpisode, setSelectedEpisode] = useState(null); // Currently selected episode
   const [cast, setCast] = useState([]); // Cast information
   const [showDetails, setShowDetails] = useState(null); // Additional show details from TMDb
+  const [showRating, setShowRating] = useState(null)
 
   // User-specific state variables
   const [userShowID, setUserShowID] = useState(null); // ID of the user's show record
@@ -150,9 +154,12 @@ const ShowDetailsNative = () => {
    * If not, it creates a new record for the user.
    */
   const handleNewUserShowInfo = async () => {
-    const userID = route.params?.userID;
-    const showID = show?.Id;
-    if (!userID || !showID) return;
+    const userID = route.params?.userID
+    const showID = show?.Id
+    if (!userID || !showID) return
+
+    const rating = await addRatings(show?.Id, 'userShowInfo')
+    setShowRating(rating)
 
     const userShowInfo = await getUserShowByIDS(userID, showID);
     if (userShowInfo) {
@@ -185,11 +192,33 @@ const ShowDetailsNative = () => {
 
       {/* Show Details */}
       <View style={styles.detailsContainer}>
-        <Image
-          source={{ uri: `${API_URL}/Items/${show.Id}/Images/Primary?api_key=${ACCESS_TOKEN}` }}
-          style={styles.poster}
-          alt="Show Thumbnail"
-        />
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ uri: `${API_URL}/Items/${show.Id}/Images/Primary?api_key=${ACCESS_TOKEN}` }}
+            style={styles.poster}
+            alt="Show Thumbnail"
+          />
+          <TouchableOpacity
+            style={styles.starButton}
+            onPress={() => {
+              setIsBookmarked(!isBookmarked)
+              const data = setUserShowInfo(
+                userShowID,
+                userID,
+                show?.Id,
+                numWatched,
+                player.currentTime,
+                !isBookmarked,
+                userRating
+              )
+            }}
+          >
+            <Text style={[styles.star, isBookmarked ? styles.starSelected : styles.starUnselected]}>
+              ★
+            </Text>
+          </TouchableOpacity>
+        </View>
+        
 
         <View style={styles.info}>
           <Text style={styles.title}>{show.Name}</Text>
@@ -197,10 +226,10 @@ const ShowDetailsNative = () => {
             <Text style={styles.bold}>Year:</Text> {show.ProductionYear}
           </Text>
           <Text style={styles.detail}>
-            <Text style={styles.bold}>Rating:</Text> {show.OfficialRating || 'Not Rated'}
+            <Text style={styles.bold}>Maturity:</Text> {show.OfficialRating || 'Not Rated'}
           </Text>
           <Text style={styles.detail}>
-            <Text style={styles.bold}>Community Rating:</Text> {show.CommunityRating || 'N/A'}
+            <Text style={styles.bold}>Community Rating:</Text> {showRating || 'Be the first to Rate!'} {showRating ? '/ 10.00' : ''}
           </Text>
           <Text style={styles.detail}>
             <Text style={styles.bold}>Run Time:</Text> {Math.floor(show.RunTimeTicks / 600000000)}{' '}
@@ -510,6 +539,23 @@ const styles = StyleSheet.create({
     color: '#D3D3D3',
     textAlign: 'center',
   },
-});
+  starButton: {
+    position: 'absolute',
+    top: 5,
+    right: 20,
+  },
+  star: {
+    fontSize: 40,
+  },
+  starSelected: {
+    color: '#FFD700',
+  },
+  starUnselected: {
+    color: 'black',
+  },
+  imageContainer: {
+    position: 'relative',
+  },
+})
 
 export default ShowDetailsNative;

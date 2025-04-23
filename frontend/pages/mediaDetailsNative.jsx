@@ -20,12 +20,14 @@ import {
   ScrollView,
   FlatList,
   Platform,
-} from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { getMovieDetails, getUserMovieByIDS, newUserMovie, setUserMovieInfo } from './api';
-import { useVideoPlayer, VideoView } from 'expo-video';
-import { useEvent } from 'expo';
-import UserRatingButtons from '../components/userMovieRatingButtons';
+  Button,
+} from 'react-native'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import { getMovieDetails, getUserMovieByIDS, newUserMovie, setUserMovieInfo } from './api'
+import { useVideoPlayer, VideoView } from 'expo-video'
+import { useEvent } from 'expo'
+import UserRatingButtons from '../components/userMovieRatingButtons'
+import { addRatings } from '../utils/calcRatings'
 
 const API_URL = process.env.REACT_APP_API_URL;
 const ACCESS_TOKEN = process.env.REACT_APP_ACCESS_TOKEN;
@@ -44,6 +46,7 @@ const MediaDetailsNative = () => {
   const [timeStamp, setTimeStamp] = useState(0); // Current playback timestamp
   const [isBookmarked, setBookmarked] = useState(false); // Bookmark status
   const [userRating, setUserRating] = useState(0); // User's rating for the media
+  const [movieRating, setMovieRating] = useState(null)
   const [userMovieID, setUserMovieID] = useState(null); // ID of the user's movie record
   const [numWatched, setNumWatched] = useState(0); // Number of times the media has been watched
 
@@ -63,7 +66,8 @@ const MediaDetailsNative = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (player && player.currentTime != null) {
-        console.log('Current Timestamp:', player.currentTime);
+        setTimeStamp(player.currentTime)
+        handlePause();
       }
     }, 10000); // Log every 10 seconds
 
@@ -91,7 +95,10 @@ const MediaDetailsNative = () => {
    * If not, it creates a new record for the user.
    */
   const handleNewUserMovieInfo = async () => {
-    const userMovieInfo = await getUserMovieByIDS(userID, media.Id);
+    const rating = await addRatings(media.Id, 'userMovieInfo')
+    setMovieRating(rating)
+    const userMovieInfo = await getUserMovieByIDS(userID, media.Id)
+    // user has watched movie and will update timestamp, rating, bookmark
     if (userMovieInfo) {
       // User has watched the movie; update state with existing data
       setUserMovieID(userMovieInfo._id);
@@ -207,10 +214,10 @@ const MediaDetailsNative = () => {
             <Text style={styles.bold}>Year:</Text> {media.ProductionYear}
           </Text>
           <Text style={styles.detail}>
-            <Text style={styles.bold}>Rating:</Text> {media.OfficialRating || 'Not Rated'}
+            <Text style={styles.bold}>Maturity:</Text> {media.OfficialRating || 'Not Rated'}
           </Text>
           <Text style={styles.detail}>
-            <Text style={styles.bold}>Community Rating:</Text> {media.CommunityRating || 'N/A'}
+            <Text style={styles.bold}>Community Rating: </Text> {movieRating || 'Be the first to Rate!'} {movieRating ? '/ 10.00' : ''}
           </Text>
           <Text style={styles.detail}>
             <Text style={styles.bold}>Container:</Text> {media.Container || 'Unknown'}

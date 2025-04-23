@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Platform, TouchableOpacity, useWindowDimensions } from 'react-native'
 import ProfileDropdown from './ProfileDropdown'
 import '../globals.css'
 import Icon from 'react-native-vector-icons/EvilIcons'
@@ -10,7 +10,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 const HomeNavbar = ({ userID }) => {
   const [hoveredButton, setHoveredButton] = useState(null)
   const navigation = useNavigation()
-
+  const { width } = useWindowDimensions()
+  const isMobile = width < 768
   const handleClickHome = () => {
     navigation.navigate('Home', { userID, mode: 'all' })
   }
@@ -23,6 +24,10 @@ const HomeNavbar = ({ userID }) => {
     navigation.navigate('Home', { userID, mode: 'shows' })
   }
 
+  const handleClickBookmark = () => {
+    navigation.navigate('Home', { userID, mode: 'bookmarked' })
+  }
+
   return (
     <View style={styles.header}>
       {/* leftmost: title */}
@@ -31,7 +36,7 @@ const HomeNavbar = ({ userID }) => {
       </TouchableOpacity>
 
       {/* middle: home, shows, movies */}
-      <View style={styles.middleGroup}>
+      <View style={[styles.middleGroup, isMobile && styles.middleGroupMobile]}>
         <TouchableOpacity
           style={styles.button}
           onMouseEnter={() => setHoveredButton('home')}
@@ -62,6 +67,16 @@ const HomeNavbar = ({ userID }) => {
             Shows
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onMouseEnter={() => setHoveredButton('bookmarked')}
+          onMouseLeave={() => setHoveredButton(null)}
+          onPress={handleClickBookmark}
+        >
+          <Text style={[styles.buttonText, hoveredButton === 'bookmarked' && styles.hoveredButtonText]}>
+            My Stuff
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* rightmost: search, profile icon image */}
@@ -72,6 +87,7 @@ const HomeNavbar = ({ userID }) => {
     </View>
   )
 }
+
 
 const styles = StyleSheet.create({
   header: {
@@ -85,6 +101,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     flexDirection: 'row',
     zIndex: 1000,
+    position: 'relative',
   },
   title: {
     fontSize: 24,
@@ -102,6 +119,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  middleGroupMobile:{
+    position: 'absolute',
+    bottom: -40, // Adjust depending on navbar height
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    backgroundColor: 'var(--background-color)',
+    paddingVertical: 10,
+    zIndex: 999,
   },
   rightGroup: {
     flex: 1,

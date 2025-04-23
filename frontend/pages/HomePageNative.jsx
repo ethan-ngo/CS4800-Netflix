@@ -11,8 +11,8 @@ import {
   Dimensions,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN, getMoviesByGenre } from './api'
-import { useNavigation } from '@react-navigation/native'
+import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN, getMoviesByGenre, getUserMovieInfoByUserID } from './api'
+import { useNavigation, useFocusEffect} from '@react-navigation/native'
 import HomeNavbar from '../components/HomeNavbar'
 import LoadingOverlay from '../components/LoadingOverlay'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -23,6 +23,7 @@ const screenWidth = Dimensions.get('window').width
 const itemWidth = 120
 const horizontalSpacing = 10
 const itemsPerRow = Math.floor(screenWidth / (itemWidth + horizontalSpacing))
+const APP_URL = process.env.APP_URL
 
 /**
  * HomePageNative Component
@@ -36,6 +37,8 @@ const itemsPerRow = Math.floor(screenWidth / (itemWidth + horizontalSpacing))
  */
 
 const HomePageNative = ({ route }) => {
+  const [bookmarkedMovies, setBookmarkedMovies] = useState([])
+  const [bookmarkedShows, setBookmarkedShows] = useState([])
   // State variables to manage media items, loading state, and recommendations.
   const [items, setItems] = useState([]); // All media items
   const [shows, setShows] = useState([]); // TV shows
@@ -51,6 +54,61 @@ const HomePageNative = ({ route }) => {
 
   // Navigation object for navigating between screens.
   const navigation = useNavigation();
+
+
+
+  useEffect(() => {
+    if (route.params?.mode) {
+      setMode(route.params.mode)
+    }
+  }, [route.params?.mode])
+
+  const fetchBookmarkedMovies = async () => {
+    try {
+      const watchedMovieItems = await getUserMovieInfoByUserID(userID);
+
+      // Filter watched movies that are bookmarked and map to full movie objects
+      const bookmarkedMovies = watchedMovieItems
+        .filter((movie) => movie.isBookmarked === true)
+        .map((watchedMovie) => {
+          // Find the full movie object in movieItems
+          return items.find((movie) => movie.Id === watchedMovie.movieID);
+        })
+
+      setBookmarkedMovies(bookmarkedMovies);
+    } catch (error) {
+      console.error('Error fetching bookmarked movies:', error);
+    }
+  };
+
+  const fetchBookmarkedShows = async () => {
+    try {
+      const response = await fetch(`${APP_URL}userShowInfo/user/${userID}`);
+      if(response.ok) {
+        const watchedShowItems = await response.json()
+          // Filter watched movies that are bookmarked and map to full movie objects
+        const bookmarkedShows = watchedShowItems
+        .filter((movie) => movie.isBookmarked === true)
+        .map((watchedShow) => {
+          // Find the full movie object in movieItems
+          return items.find((show) => show.Id === watchedShow.showID);
+        })
+        setBookmarkedShows(bookmarkedShows);
+      }
+    } catch (error) {
+      console.error('Error fetching bookmarked movies:', error);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if(items){
+        fetchBookmarkedMovies();
+        fetchBookmarkedShows();
+      }
+    }, [items])
+  );
+  
 
   /**
    * useEffect - Fetches media items and recommendations when the component mounts.
@@ -211,7 +269,7 @@ const HomePageNative = ({ route }) => {
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
       {loading && <LoadingOverlay visible={loading} />}
-      <HomeNavbar userID={userID} />
+      <HomeNavbar userID={userID}/>
       <LinearGradient colors={theme.gradient} style={styles.container}>
         {mode === 'all' && (
           <>
@@ -268,6 +326,26 @@ const HomePageNative = ({ route }) => {
             <Text style={styles.sectionTitle}>Shows</Text>
             <View style={styles.gridContainer}>
               {shows.map((item) => (
+                <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
+                  {renderShowItem({ item })}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+        {mode === 'bookmarked' && (
+          <View style={styles.mediaSection}>
+            <Text style={styles.sectionTitle}>Bookmarked Movies</Text>
+            <View style={styles.gridContainer}>
+              {bookmarkedMovies.map((item) => (
+                <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
+                  {renderMediaItem({ item })}
+                </View>
+              ))}
+            </View>
+            <Text style={styles.sectionTitle}>Bookmarked Shows</Text>
+            <View style={styles.gridContainer}>
+              {bookmarkedShows.map((item) => (
                 <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
                   {renderShowItem({ item })}
                 </View>
