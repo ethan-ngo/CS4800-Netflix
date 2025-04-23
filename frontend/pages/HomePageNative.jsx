@@ -12,7 +12,7 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { getItems, getMovies, getShows, API_URL, ACCESS_TOKEN, getMoviesByGenre, getUserMovieInfoByUserID } from './api'
-import { useNavigation, useFocusEffect} from '@react-navigation/native'
+import { useNavigation, useFocusEffect } from '@react-navigation/native'
 import HomeNavbar from '../components/HomeNavbar'
 import LoadingOverlay from '../components/LoadingOverlay'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -37,8 +37,7 @@ const APP_URL = process.env.APP_URL
  */
 
 const HomePageNative = ({ route }) => {
-  const [bookmarkedMovies, setBookmarkedMovies] = useState([])
-  const [bookmarkedShows, setBookmarkedShows] = useState([])
+
   // State variables to manage media items, loading state, and recommendations.
   const [items, setItems] = useState([]); // All media items
   const [shows, setShows] = useState([]); // TV shows
@@ -48,6 +47,9 @@ const HomePageNative = ({ route }) => {
   const [recommendedShows, setRecommendedShows] = useState([]); // Recommended shows
   const [mode, setMode] = useState('all'); // Display mode ('all', 'movies', 'shows')
   const [genreSection, setGenreSection] = useState([]); // Movies grouped by genre
+  const [bookmarkedMovies, setBookmarkedMovies] = useState([]) // Bookmarked movies
+  const [bookmarkedShows, setBookmarkedShows] = useState([]) // Bookmarked shows
+  const [recentlyWatched, setRecentlyWatched] = useState([]); // Recently watched movies/shows
 
   // Extract userID from navigation route parameters.
   const userID = route.params.userID;
@@ -55,60 +57,85 @@ const HomePageNative = ({ route }) => {
   // Navigation object for navigating between screens.
   const navigation = useNavigation();
 
-
-
+  /**
+   * Effect to sync screen mode from navigation parameters.
+   */
   useEffect(() => {
     if (route.params?.mode) {
-      setMode(route.params.mode)
+      setMode(route.params.mode);
     }
-  }, [route.params?.mode])
+  }, [route.params?.mode]);
 
+  /**
+   * Fetches all user movie data, then filters for:
+   * 1. Bookmarked movies
+   * 2. Recently watched movies (with timeStamp)
+   * Sets state for both categories.
+   */
   const fetchBookmarkedMovies = async () => {
     try {
+      // Get all movie interaction data for the user
       const watchedMovieItems = await getUserMovieInfoByUserID(userID);
 
-      // Filter watched movies that are bookmarked and map to full movie objects
+      // Filter for bookmarked movies and find their full info in `items`
       const bookmarkedMovies = watchedMovieItems
         .filter((movie) => movie.isBookmarked === true)
         .map((watchedMovie) => {
-          // Find the full movie object in movieItems
           return items.find((movie) => movie.Id === watchedMovie.movieID);
-        })
+        });
 
       setBookmarkedMovies(bookmarkedMovies);
+
+      // Filter for recently watched movies (has timeStamp)
+      const recentlyWatchedItems = watchedMovieItems
+        .filter((movie) => movie.timeStamp).reverse()
+        .map((watchedMovie) => {
+          return items.find((movie) => movie.Id === watchedMovie.movieID);
+        });
+
+      setRecentlyWatched(recentlyWatchedItems);
     } catch (error) {
       console.error('Error fetching bookmarked movies:', error);
     }
   };
 
+  /**
+   * Fetches bookmarked TV shows for the user.
+   * Retrieves full show objects from `items`.
+   */
   const fetchBookmarkedShows = async () => {
     try {
       const response = await fetch(`${APP_URL}userShowInfo/user/${userID}`);
-      if(response.ok) {
-        const watchedShowItems = await response.json()
-          // Filter watched movies that are bookmarked and map to full movie objects
+
+      if (response.ok) {
+        const watchedShowItems = await response.json();
+
+        // Filter for bookmarked shows and find their full info in `items`
         const bookmarkedShows = watchedShowItems
-        .filter((movie) => movie.isBookmarked === true)
-        .map((watchedShow) => {
-          // Find the full movie object in movieItems
-          return items.find((show) => show.Id === watchedShow.showID);
-        })
+          .filter((show) => show.isBookmarked === true)
+          .map((watchedShow) => {
+            return items.find((show) => show.Id === watchedShow.showID);
+          });
+
         setBookmarkedShows(bookmarkedShows);
       }
     } catch (error) {
-      console.error('Error fetching bookmarked movies:', error);
+      console.error('Error fetching bookmarked shows:', error);
     }
   };
 
+  /**
+   * Fetch user data when screen is focused.
+   * Ensures bookmarks and recently watched are updated live.
+   */
   useFocusEffect(
     React.useCallback(() => {
-      if(items){
+      if (items) {
         fetchBookmarkedMovies();
         fetchBookmarkedShows();
       }
     }, [items])
   );
-  
 
   /**
    * useEffect - Fetches media items and recommendations when the component mounts.
@@ -269,7 +296,7 @@ const HomePageNative = ({ route }) => {
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContainer}>
       {loading && <LoadingOverlay visible={loading} />}
-      <HomeNavbar userID={userID}/>
+      <HomeNavbar userID={userID} />
       <LinearGradient colors={theme.gradient} style={styles.container}>
         {mode === 'all' && (
           <>
@@ -280,7 +307,11 @@ const HomePageNative = ({ route }) => {
                 keyExtractor={(item) => item.Id.toString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                renderItem={renderMediaItem}
+                renderItem={({ item }) => (
+                  <View style={[styles.gridItem, { width: itemWidth }]}>
+                    {renderMediaItem({ item })}
+                  </View>
+                )}
                 contentContainerStyle={styles.mediaList}
               />
             </View>
@@ -292,7 +323,11 @@ const HomePageNative = ({ route }) => {
                 keyExtractor={(item) => item.Id.toString()}
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                renderItem={renderShowItem}
+                renderItem={({ item }) => (
+                  <View style={[styles.gridItem, { width: itemWidth }]}>
+                    {renderShowItem({ item })}
+                  </View>
+                )}
                 contentContainerStyle={styles.mediaList}
               />
             </View>
@@ -348,6 +383,16 @@ const HomePageNative = ({ route }) => {
               {bookmarkedShows.map((item) => (
                 <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
                   {renderShowItem({ item })}
+                </View>
+              ))}
+            </View>
+            <Text style={styles.sectionTitle}>Recently Watched</Text>
+            <View style={styles.gridContainer}>
+              {recentlyWatched.map((item) => (
+                <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
+                  {item.Type === 'Movie'
+                    ? renderMediaItem({ item })
+                    : renderShowItem({ item })}
                 </View>
               ))}
             </View>
