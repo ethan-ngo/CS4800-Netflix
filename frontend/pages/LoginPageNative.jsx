@@ -1,4 +1,16 @@
-import React, { useState, useEffect } from 'react'
+/**
+ * LoginPageNative Component
+ * 
+ * This component provides a user interface for users to log in to their accounts.
+ * It includes fields for email and password, and provides options for navigating
+ * to the "Forgot Password" and "Sign Up" screens. The component also handles
+ * authentication and session management.
+ * 
+ * Props:
+ * - navigation: React Navigation object for navigating between screens.
+ */
+
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,43 +21,59 @@ import {
   ScrollView,
   ActivityIndicator,
   Image,
-} from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { validateEmail } from '../utils/validateEmail'
-import theme from '../utils/theme'
-import Header from '../components/Header'
-import LoadingOverlay from '../components/LoadingOverlay'
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { validateEmail } from '../utils/validateEmail';
+import theme from '../utils/theme';
+import Header from '../components/Header';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 const LoginPageNative = ({ navigation }) => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const app_url = process.env.APP_URL
+  // State variables
+  const [email, setEmail] = useState(''); // User's email input
+  const [password, setPassword] = useState(''); // User's password input
+  const [loading, setLoading] = useState(false); // Loading state for API calls
+  const app_url = process.env.APP_URL; // Backend API URL
 
+  /**
+   * authUser - Authenticates the user session using a stored token.
+   * 
+   * This function checks if a valid session token exists in AsyncStorage.
+   * If the token is valid, the user is automatically logged in and navigated
+   * to the Home screen.
+   */
   const authUser = async () => {
-    setLoading(true)
-    const token = await AsyncStorage.getItem('token')
+    setLoading(true);
+    const token = await AsyncStorage.getItem('token');
     const response = await fetch(app_url + 'users/auth-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ token: token }),
-    })
+    });
     if (response.ok) {
-      const data = await response.json()
-      navigation.navigate('Home', { userID: data.userId })
+      const data = await response.json();
+      navigation.navigate('Home', { userID: data.userId });
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
+  // Automatically authenticate the user session on component mount
   useEffect(() => {
-    authUser()
-  }, [])
+    authUser();
+  }, []);
 
+  /**
+   * handleLogin - Handles the login process.
+   * 
+   * This function sends the user's email and password to the backend API for authentication.
+   * If the login is successful, the session token is stored in AsyncStorage, and the user
+   * is navigated to the Home screen. If the login fails, an error message is displayed.
+   */
   const handleLogin = async () => {
-    console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`)
-    setLoading(true)
+    console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`);
+    setLoading(true);
     try {
       const res = await fetch(app_url + 'users/login', {
         method: 'POST',
@@ -53,33 +81,37 @@ const LoginPageNative = ({ navigation }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
-      })
+      });
 
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
-      Alert.alert('Login successful')
-      const data = await res.json()
-      console.log('Data:', data)
+      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      Alert.alert('Login successful');
+      const data = await res.json();
+      console.log('Data:', data);
 
-      // Store token
-      await AsyncStorage.setItem('token', data.token)
-      await AsyncStorage.setItem('email', email)
-      await AsyncStorage.setItem('userID', data.userID)
+      // Store token and user details in AsyncStorage
+      await AsyncStorage.setItem('token', data.token);
+      await AsyncStorage.setItem('email', email);
+      await AsyncStorage.setItem('userID', data.userID);
 
-      // Navigate to homepage
-      navigation.navigate('Home', { userID: data.userID })
+      // Navigate to the Home screen
+      navigation.navigate('Home', { userID: data.userID });
     } catch (error) {
-      console.error('Error (unable to login): ', error)
-      Alert.alert('Login failed', 'Invalid email or password')
+      console.error('Error (unable to login): ', error);
+      Alert.alert('Login failed', 'Invalid email or password');
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
+  /**
+   * handleSignUp - Navigates to the Sign Up screen.
+   */
   const handleSignUp = () => {
-    navigation.navigate('SignUp')
-  }
+    navigation.navigate('SignUp');
+  };
 
   return (
     <View style={styles.container}>
+      {/* Loading overlay */}
       {loading && <LoadingOverlay visible={loading} />}
       <View style={styles.overlay} />
       <Image
@@ -93,6 +125,7 @@ const LoginPageNative = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.form}>
           <Text style={styles.title}>Login</Text>
+          {/* Email input */}
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -101,21 +134,24 @@ const LoginPageNative = ({ navigation }) => {
             onChangeText={setEmail}
             onBlur={() => {
               if (email && !validateEmail(email)) {
-                Alert.alert('Invalid Email', 'Please enter a valid email address')
+                Alert.alert('Invalid Email', 'Please enter a valid email address');
               }
             }}
           />
+          {/* Password input */}
           <TextInput
             style={styles.input}
             placeholder="Password"
             secureTextEntry
             value={password}
             onChangeText={setPassword}
-            onSubmitEditing={handleLogin} // after password is enterd, submit on enter
+            onSubmitEditing={handleLogin} // Submit on Enter key
           />
+          {/* Forgot Password link */}
           <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
+          {/* Login button */}
           <TouchableOpacity
             onPress={handleLogin}
             style={styles.loginButton}
@@ -124,6 +160,7 @@ const LoginPageNative = ({ navigation }) => {
           >
             <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
+          {/* Sign Up link */}
           <Text style={styles.signUpText}>
             Don't have an account yet?{' '}
             <Text style={styles.signUpLink} onPress={handleSignUp}>
@@ -133,9 +170,10 @@ const LoginPageNative = ({ navigation }) => {
         </View>
       </ScrollView>
     </View>
-  )
-}
+  );
+};
 
+// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -212,6 +250,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
-})
+});
 
-export default LoginPageNative
+export default LoginPageNative;

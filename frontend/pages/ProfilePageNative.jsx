@@ -17,7 +17,6 @@ import { s3, BUCKET_NAME } from '../aws-config'
 import HomeNavbar from '../components/HomeNavbar'
 import { LinearGradient } from 'expo-linear-gradient'
 
-
 const ProfilePageNative = ({navigation}) => {
   const [profilePic, setProfilePic] = useState(null)
   const [profilePicURI, setProfilePicURI] = useState(null)
@@ -30,7 +29,11 @@ const ProfilePageNative = ({navigation}) => {
   const [originalEmail, setOriginalEmail] = useState('')
   const [loading, setLoading] = useState(true)
 
-  // use email to fetch user data
+  /**
+   * fetchUserData - Loads the current user's profile information.
+   * Fetches the user's data using the stored email from AsyncStorage.
+   * Sets state with username, email, profile picture, and userId.
+   */
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -43,7 +46,6 @@ const ProfilePageNative = ({navigation}) => {
         }
         console.log('Fetched email:', email)
 
-        //const userResponse = await fetch(`http://localhost:5050/users/getUserByEmail/${encodeURIComponent(email)}`,{
         const userResponse = await fetch(`${process.env.APP_URL}users/getUserByEmail/${email}`, {
           method: 'GET',
           headers: {
@@ -74,13 +76,17 @@ const ProfilePageNative = ({navigation}) => {
         console.error('Error fetching user data:', error)
         Alert.alert('Error', 'An error occurred while fetching user data')
       } finally {
-        setLoading(false) // Ensure loading is set to false in all cases
+        setLoading(false)
       }
     }
 
     fetchUserData()
   }, [])
-  
+
+  /**
+   * pickImage - Opens the image picker for user to select a new profile picture.
+   * If the user selects an image, the URI and asset object are stored in state.
+   */
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -95,12 +101,23 @@ const ProfilePageNative = ({navigation}) => {
     }
   }
 
+  /**
+   * getBlobFromUri - Converts an image URI into a blob.
+   * @param {string} uri - The image URI
+   * @returns {Promise<Blob>} - A blob representing the image file
+   */
   const getBlobFromUri = async (uri) => {
-    const response = await fetch(uri); // Fetch the file from the URI
-    const blob = await response.blob(); // Convert the response to a blob
-    return blob;
-  };
+    const response = await fetch(uri)
+    const blob = await response.blob()
+    return blob
+  }
 
+  /**
+   * handleUpdateProfile - Handles submission of updated profile data.
+   * Validates email, optionally uploads a new profile picture to S3,
+   * and sends PATCH request to update the user's profile in the backend.
+   * Displays success or error messages accordingly.
+   */
   const handleUpdateProfile = async () => {
     if (!validateEmail(email)) {
       Alert.alert('Invalid Email', 'Please enter a valid email address')
@@ -112,25 +129,23 @@ const ProfilePageNative = ({navigation}) => {
     if (email) updatedUserData.email = email
     if (password) updatedUserData.password = password
 
-    const blob = await getBlobFromUri(profilePic.uri);
+    const blob = await getBlobFromUri(profilePic.uri)
     const params = {
       Bucket: BUCKET_NAME,
       Key: userId, 
       Body: blob,
       ContentType: profilePic.mimeType,
-    };
-
-    try {
-      const { Location } = await s3.upload(params).promise();
-      if (profilePic) updatedUserData.profilePic = Location
-    } catch (err) {
-      console.error("Upload failed:", err);
     }
 
-    //use userId to update the user data
+    try {
+      const { Location } = await s3.upload(params).promise()
+      if (profilePic) updatedUserData.profilePic = Location
+    } catch (err) {
+      console.error("Upload failed:", err)
+    }
+
     try {
       const response = await fetch(`${process.env.APP_URL}users/${userId}`, {
-        //const response = await fetch(`http://localhost:5050/users/${userId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -152,16 +167,23 @@ const ProfilePageNative = ({navigation}) => {
     }
   }
 
+  /**
+   * handleHomeButton - Navigates the user back to the Home page.
+   */
   const handleHomeButton = () => {
     navigation.navigate('Home', {userID: userId})
   }
 
+  /**
+   * handleReset - Resets the form fields to their original values.
+   */
   const handleReset = () => {
     setProfilePicURI(originalProfilePic)
     setUsername(originalUsername)
     setEmail(originalEmail)
     setPassword('')
   }
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -170,48 +192,47 @@ const ProfilePageNative = ({navigation}) => {
     )
   }
 
-  //uses user data from the database to populate the form
   return (
     <LinearGradient colors={theme.gradient} style={styles.backgroundcontainer}>
-    <HomeNavbar userID={userId} />
-    <View style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.title}>Edit Profile</Text>
-        <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
-          {profilePicURI ? (
-            <Image source={{ uri: profilePicURI}} style={styles.profileImage} />
-          ) : (
-            <Text style={styles.imageText}>Upload profile picture</Text>
-          )}
-        </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          placeholder={originalUsername}
-          value={username}
-          onChangeText={setUsername}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder={originalEmail}
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder={'Enter your password'}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile} activeOpacity={0.8}>
-          <Text style={styles.buttonText}>Update Profile</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.8}>
-          <Text style={styles.resetButtonText}>Reset</Text>
-        </TouchableOpacity>
+      <HomeNavbar userID={userId} />
+      <View style={styles.container}>
+        <View style={styles.form}>
+          <Text style={styles.title}>Edit Profile</Text>
+          <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+            {profilePicURI ? (
+              <Image source={{ uri: profilePicURI}} style={styles.profileImage} />
+            ) : (
+              <Text style={styles.imageText}>Upload profile picture</Text>
+            )}
+          </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder={originalUsername}
+            value={username}
+            onChangeText={setUsername}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder={originalEmail}
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder={'Enter your password'}
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile} activeOpacity={0.8}>
+            <Text style={styles.buttonText}>Update Profile</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.8}>
+            <Text style={styles.resetButtonText}>Reset</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
     </LinearGradient>
   )
 }
@@ -221,6 +242,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 0,
+  },
+  backgroundcontainer:{
+    flex: 1,
+    backgroundColor: '#121212',
+    padding: 0,
     padding: 0,
   },
   backgroundcontainer:{
