@@ -3,7 +3,7 @@
 
 # dependencies
 node_modules\
-coverage/
+/coverage
 # Expo
 .expo/
 web-build/
