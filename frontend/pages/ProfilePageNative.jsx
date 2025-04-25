@@ -1,207 +1,291 @@
-/**
- * LoginPageNative Component
- * 
- * This component provides a user interface for users to log in to their accounts.
- * It includes fields for email and password, and provides options for navigating
- * to the "Forgot Password" and "Sign Up" screens. The component also handles
- * authentication and session management.
- * 
- * Props:
- * - navigation: React Navigation object for navigating between screens.
- */
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   Alert,
-  ScrollView,
-  ActivityIndicator,
+  StyleSheet,
   Image,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { validateEmail } from '../utils/validateEmail';
-import theme from '../utils/theme';
-import Header from '../components/Header';
-import LoadingOverlay from '../components/LoadingOverlay';
+  ActivityIndicator,
+} from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import * as ImagePicker from 'expo-image-picker'
+import { validateEmail } from '../utils/validateEmail'
+import theme from '../utils/theme'
+import { s3, BUCKET_NAME } from '../aws-config'
+import HomeNavbar from '../components/HomeNavbar'
+import { LinearGradient } from 'expo-linear-gradient'
 
-const LoginPageNative = ({ navigation }) => {
-  // State variables
-  const [email, setEmail] = useState(''); // User's email input
-  const [password, setPassword] = useState(''); // User's password input
-  const [loading, setLoading] = useState(false); // Loading state for API calls
-  const app_url = process.env.APP_URL; // Backend API URL
+const ProfilePageNative = ({navigation}) => {
+  const [profilePic, setProfilePic] = useState(null)
+  const [profilePicURI, setProfilePicURI] = useState(null)
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [userId, setUserId] = useState('1')
+  const [originalProfilePic, setOriginalProfilePic] = useState(null)
+  const [originalUsername, setOriginalUsername] = useState('')
+  const [originalEmail, setOriginalEmail] = useState('')
+  const [loading, setLoading] = useState(true)
 
   /**
-   * authUser - Authenticates the user session using a stored token.
-   * 
-   * This function checks if a valid session token exists in AsyncStorage.
-   * If the token is valid, the user is automatically logged in and navigated
-   * to the Home screen.
+   * fetchUserData - Loads the current user's profile information.
+   * Fetches the user's data using the stored email from AsyncStorage.
+   * Sets state with username, email, profile picture, and userId.
    */
-  const authUser = async () => {
-    setLoading(true);
-    const token = await AsyncStorage.getItem('token');
-    const response = await fetch(app_url + 'users/auth-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ token: token }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      navigation.navigate('Home', { userID: data.userId });
-    }
-    setLoading(false);
-  };
-
-  // Automatically authenticate the user session on component mount
   useEffect(() => {
-    authUser();
-  }, []);
+    const fetchUserData = async () => {
+      try {
+        const email = await AsyncStorage.getItem('email')
+        if (!email) {
+          console.error('Error: Email is missing')
+          Alert.alert('Error', 'You are not authenticated')
+          setLoading(false)
+          return
+        }
+        console.log('Fetched email:', email)
+
+        const userResponse = await fetch(`${process.env.APP_URL}users/getUserByEmail/${email}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!userResponse.ok) {
+          const errorData = await userResponse.json()
+          console.error('Error fetching user details:', errorData.message)
+          Alert.alert('Error', errorData.message || 'Failed to fetch user details')
+          setLoading(false)
+          return
+        }
+
+        const user = await userResponse.json()
+        console.log('Fetched user details:', user)
+
+        setUserId(user.userId)
+        setProfilePicURI(user.profilePic)
+        setUsername(user.name)
+        setEmail(user.email)
+
+        setOriginalProfilePic(user.profilePic)
+        setOriginalUsername(user.name)
+        setOriginalEmail(user.email)
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+        Alert.alert('Error', 'An error occurred while fetching user data')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUserData()
+  }, [])
 
   /**
-   * handleLogin - Handles the login process.
-   * 
-   * This function sends the user's email and password to the backend API for authentication.
-   * If the login is successful, the session token is stored in AsyncStorage, and the user
-   * is navigated to the Home screen. If the login fails, an error message is displayed.
+   * pickImage - Opens the image picker for user to select a new profile picture.
+   * If the user selects an image, the URI and asset object are stored in state.
    */
-  const handleLogin = async () => {
-    console.log('Login Attempt', `Email: ${email}\nPassword: ${password}`);
-    setLoading(true);
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    })
+
+    if (!result.canceled) {
+      setProfilePic(result.assets[0])
+      setProfilePicURI(result.assets[0].uri)
+    }
+  }
+
+  /**
+   * getBlobFromUri - Converts an image URI into a blob.
+   * @param {string} uri - The image URI
+   * @returns {Promise<Blob>} - A blob representing the image file
+   */
+  const getBlobFromUri = async (uri) => {
+    const response = await fetch(uri)
+    const blob = await response.blob()
+    return blob
+  }
+
+  /**
+   * handleUpdateProfile - Handles submission of updated profile data.
+   * Validates email, optionally uploads a new profile picture to S3,
+   * and sends PATCH request to update the user's profile in the backend.
+   * Displays success or error messages accordingly.
+   */
+  const handleUpdateProfile = async () => {
+    if (!validateEmail(email)) {
+      Alert.alert('Invalid Email', 'Please enter a valid email address')
+      return
+    }
+
+    const updatedUserData = {}
+    if (username) updatedUserData.name = username
+    if (email) updatedUserData.email = email
+    if (password) updatedUserData.password = password
+
+    const blob = await getBlobFromUri(profilePic.uri)
+    const params = {
+      Bucket: BUCKET_NAME,
+      Key: userId, 
+      Body: blob,
+      ContentType: profilePic.mimeType,
+    }
+
     try {
-      const res = await fetch(app_url + 'users/login', {
-        method: 'POST',
+      const { Location } = await s3.upload(params).promise()
+      if (profilePic) updatedUserData.profilePic = Location
+    } catch (err) {
+      console.error("Upload failed:", err)
+    }
+
+    try {
+      const response = await fetch(`${process.env.APP_URL}users/${userId}`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
-      });
+        body: JSON.stringify(updatedUserData),
+      })
 
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      Alert.alert('Login successful');
-      const data = await res.json();
-      console.log('Data:', data);
-
-      // Store token and user details in AsyncStorage
-      await AsyncStorage.setItem('token', data.token);
-      await AsyncStorage.setItem('email', email);
-      await AsyncStorage.setItem('userID', data.userID);
-
-      // Navigate to the Home screen
-      navigation.navigate('Home', { userID: data.userID });
+      if (response.ok) {
+        const responseData = await response.json()
+        Alert.alert('Success', 'Profile updated successfully')
+        console.log('Updated user data:', responseData)
+      } else {
+        const errorData = await response.json()
+        Alert.alert('Error', errorData.message || 'Failed to update profile')
+      }
     } catch (error) {
-      console.error('Error (unable to login): ', error);
-      Alert.alert('Login failed', 'Invalid email or password');
+      console.error('Error updating profile:', error)
+      Alert.alert('Error', 'An error occurred while updating the profile')
     }
-    setLoading(false);
-  };
+  }
 
   /**
-   * handleSignUp - Navigates to the Sign Up screen.
+   * handleHomeButton - Navigates the user back to the Home page.
    */
-  const handleSignUp = () => {
-    navigation.navigate('SignUp');
-  };
+  const handleHomeButton = () => {
+    navigation.navigate('Home', {userID: userId})
+  }
+
+  /**
+   * handleReset - Resets the form fields to their original values.
+   */
+  const handleReset = () => {
+    setProfilePicURI(originalProfilePic)
+    setUsername(originalUsername)
+    setEmail(originalEmail)
+    setPassword('')
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#007BFF" />
+      </View>
+    )
+  }
 
   return (
-    <View style={styles.container}>
-      {/* Loading overlay */}
-      {loading && <LoadingOverlay visible={loading} />}
-      <View style={styles.overlay} />
-      <Image
-        source={{
-          uri: 'https://wallpapers.com/images/hd/movie-poster-background-wg5mxe6b7djul0a8.jpg',
-        }}
-        style={styles.backgroundImage}
-        resizeMode="cover"
-      />
-      <Header />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <LinearGradient colors={theme.gradient} style={styles.backgroundcontainer}>
+      <HomeNavbar userID={userId} />
+      <View style={styles.container}>
         <View style={styles.form}>
-          <Text style={styles.title}>Login</Text>
-          {/* Email input */}
+          <Text style={styles.title}>Edit Profile</Text>
+          <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+            {profilePicURI ? (
+              <Image source={{ uri: profilePicURI}} style={styles.profileImage} />
+            ) : (
+              <Text style={styles.imageText}>Upload profile picture</Text>
+            )}
+          </TouchableOpacity>
           <TextInput
             style={styles.input}
-            placeholder="Email"
+            placeholder={originalUsername}
+            value={username}
+            onChangeText={setUsername}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder={originalEmail}
             keyboardType="email-address"
             value={email}
             onChangeText={setEmail}
-            onBlur={() => {
-              if (email && !validateEmail(email)) {
-                Alert.alert('Invalid Email', 'Please enter a valid email address');
-              }
-            }}
           />
-          {/* Password input */}
           <TextInput
             style={styles.input}
-            placeholder="Password"
+            placeholder={'Enter your password'}
             secureTextEntry
             value={password}
             onChangeText={setPassword}
-            onSubmitEditing={handleLogin} // Submit on Enter key
           />
-          {/* Forgot Password link */}
-          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-            <Text style={styles.forgotPassword}>Forgot Password?</Text>
+          <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile} activeOpacity={0.8}>
+            <Text style={styles.buttonText}>Update Profile</Text>
           </TouchableOpacity>
-          {/* Login button */}
-          <TouchableOpacity
-            onPress={handleLogin}
-            style={styles.loginButton}
-            activeOpacity={0.8}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>Login</Text>
+          <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.8}>
+            <Text style={styles.resetButtonText}>Reset</Text>
           </TouchableOpacity>
-          {/* Sign Up link */}
-          <Text style={styles.signUpText}>
-            Don't have an account yet?{' '}
-            <Text style={styles.signUpLink} onPress={handleSignUp}>
-              Sign up!
-            </Text>
-          </Text>
         </View>
-      </ScrollView>
-    </View>
-  );
-};
+      </View>
+    </LinearGradient>
+  )
+}
 
-// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
-  },
-  scrollContainer: {
-    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 0,
+  },
+  backgroundcontainer:{
+    flex: 1,
+    backgroundColor: '#121212',
+    padding: 0,
   },
   form: {
     width: '100%',
-    maxWidth: 500,
-    padding: 50,
+    maxWidth: 400,
+    padding: 20,
     borderRadius: 10,
     backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.4,
     shadowRadius: 4,
-    elevation: 10,
+    elevation: 5,
   },
   title: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 20,
+  },
+  imagePicker: {
+    alignSelf: 'center',
+    marginBottom: 20,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  imageText: {
+    fontSize: 12,
+    color: 'gray',
+    textAlign: 'center',
   },
   input: {
     width: '100%',
@@ -209,47 +293,45 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderWidth: 1,
     borderRadius: 5,
-    marginBottom: 20,
+    marginBottom: 15,
     paddingHorizontal: 10,
   },
-  forgotPassword: {
-    color: '#007BFF',
-    textAlign: 'right',
-    marginBottom: 20,
-    textDecorationLine: 'underline',
-  },
-  loginButton: {
+  updateButton: {
     backgroundColor: theme.primaryColor,
     paddingVertical: 10,
     borderRadius: 5,
     alignItems: 'center',
     marginBottom: 10,
   },
-  signUpLink: {
-    textDecorationLine: 'underline',
-    color: '#007BFF',
+  resetButton: {
+    backgroundColor: 'white',
+    paddingVertical: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    borderColor: 'red',
+    borderWidth: 1,
   },
-  buttonText: {
-    color: theme.textColor,
+  resetButtonText: {
+    color: 'red',
     fontWeight: 'bold',
     fontSize: 16,
   },
-  signUpText: {
-    textAlign: 'center',
-    marginVertical: 10,
-    fontSize: 14,
-    color: 'gray',
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
-  backgroundImage: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    opacity: 0.7,
+  homeButton: {
+    backgroundColor: 'green',
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  homeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
-});
+})
 
-export default LoginPageNative;
+export default ProfilePageNative
