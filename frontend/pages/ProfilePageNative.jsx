@@ -248,6 +248,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#121212',
     padding: 0,
+    padding: 0,
+  },
+  backgroundcontainer:{
+    flex: 1,
+    backgroundColor: '#121212',
+    padding: 0,
   },
   form: {
     width: '100%',
