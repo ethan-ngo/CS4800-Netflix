@@ -106,6 +106,7 @@ const LoginPageNative = ({ navigation }) => {
             }}
           />
           <TextInput
+            testID="login-button"
             style={styles.input}
             placeholder="Password"
             secureTextEntry

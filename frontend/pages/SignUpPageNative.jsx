@@ -118,7 +118,7 @@ const SignUpPageNative = ({ navigation }) => {
             onChangeText={setConfirmPassword}
             onSubmitEditing={handleSignUp} // after password is enterd, submit on enter
           />
-          <TouchableOpacity style={styles.loginButton} onPress={handleSignUp} activeOpacity={0.8}>
+          <TouchableOpacity testID="signup-button" style={styles.loginButton} onPress={handleSignUp} activeOpacity={0.8}>
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
           <Text style={styles.signUpText}>
