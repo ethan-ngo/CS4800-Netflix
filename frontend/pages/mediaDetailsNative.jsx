@@ -67,7 +67,7 @@ const MediaDetailsNative = () => {
     const interval = setInterval(() => {
       if (player && player.currentTime != null) {
         setTimeStamp(player.currentTime)
-        handlePause();
+        // handlePause();
       }
     }, 10000); // Log every 10 seconds
 
