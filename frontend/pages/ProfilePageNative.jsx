@@ -207,7 +207,7 @@ const ProfilePageNative = ({navigation}) => {
           <Text style={styles.title}>Edit Profile</Text>
           <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
             {profilePicURI ? (
-              <Image source={{ uri: profilePicURI}} style={styles.profileImage} />
+              <Image source={{ uri: profilePicURI }} style={styles.profileImage} />
             ) : (
               <Text style={styles.imageText}>Upload profile picture</Text>
             )}
@@ -225,13 +225,10 @@ const ProfilePageNative = ({navigation}) => {
             value={email}
             onChangeText={setEmail}
           />
-          <TextInput
-            style={styles.input}
-            placeholder={'Enter your password'}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
+          {/* Link to Forgot Password Page */}
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} activeOpacity={0.8}>
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile} activeOpacity={0.8}>
             <Text style={styles.buttonText}>Update Profile</Text>
           </TouchableOpacity>
@@ -344,6 +341,13 @@ const styles = StyleSheet.create({
   homeButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  forgotPasswordText: {
+    color: theme.primaryColor,
+    fontWeight: 'bold',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 15,
   },
 })
 
