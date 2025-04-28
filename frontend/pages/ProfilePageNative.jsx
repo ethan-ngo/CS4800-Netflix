@@ -242,6 +242,13 @@ const ProfilePageNative = ({navigation}) => {
 }
 
 const styles = StyleSheet.create({
+  backgroundcontainer: {
+    flex: 1,
+    backgroundColor: '#121212',
+    padding: 10,
+    overflowy: 'auto',
+    overflowx: 'auto',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
