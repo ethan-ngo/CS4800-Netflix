@@ -18,14 +18,43 @@ router.get('/', async (req, res) => {
   res.send(results).status(200)
 })
 
-// This section will help you get a single userMovieInfo by id
-router.get('/:id', async (req, res) => {
+// This section will help you get a userMovieInfo by userID to get all userMovieInfo instances for a user
+router.get('/ratings/:movieID', async (req, res) => {
+  try {
+    const collection = await db.collection('userMovieInfo')
+    const result = await collection.find({ movieID: req.params.movieID, userMovieRating: {$ne: 0}}).toArray()
+    const totalRating = result.reduce((sum, item) => sum + item.userMovieRating, 0);
+
+    res.status(200).json({totalRating, result})
+  } catch (err) {
+    console.error('Error fetching userMovieInfo by movieID:', err)
+    res.status(500).send('Internal Server Error')
+  }
+})
+
+// This section will help you get a userMovieInfo by userID to get all userMovieInfo instances for a user
+router.get('/user/:userID', async (req, res) => {
+  try {
+    const collection = await db.collection('userMovieInfo')
+    const result = await collection.find({ userID: req.params.userID }).toArray()
+    res.status(200).json(result)
+  } catch (err) {
+    console.error('Error fetching userMovieInfo by userID:', err)
+    res.status(500).send('Internal Server Error')
+  }
+})
+
+// This section will help you get a single userMovieInfo by userID and movieID
+router.get('/:userID/:movieID', async (req, res) => {
   let collection = await db.collection('userMovieInfo')
-  let query = { _id: new ObjectId(req.params.id) }
+  let query = {
+    userID: req.params.userID,
+    movieID: req.params.movieID,
+  }
   let result = await collection.findOne(query)
 
   if (!result) res.send('userMovieInfo Not found').status(404)
-  else res.send(result).status(200)
+  else res.status(200).send(result)
 })
 
 // This section will help you create a new userMovieInfo.
@@ -41,7 +70,7 @@ router.post('/', async (req, res) => {
     }
     let collection = await db.collection('userMovieInfo')
     let result = await collection.insertOne(newuserMovieInfo)
-    res.send(result).status(204)
+    res.send(result).status(200)
   } catch (err) {
     console.error(err)
     res.status(500).send('Error adding newUserMovieInfo')

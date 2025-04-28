@@ -1,3 +1,15 @@
+/**
+ * SignUpPageNative Component
+ * 
+ * This component provides a user interface for users to create a new account.
+ * It includes fields for entering a name, email, password, and confirming the password.
+ * The component validates the input fields and sends the data to the backend API to create
+ * a new user account. It also provides navigation to the Login page for existing users.
+ * 
+ * Props:
+ * - navigation: React Navigation object for navigating between screens.
+ */
+
 import React, { useState } from 'react'
 import {
   View,
@@ -15,21 +27,32 @@ import Header from '../components/Header'
 import LoadingOverlay from '../components/LoadingOverlay'
 
 const SignUpPageNative = ({ navigation }) => {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  // State variables
+  const [name, setName] = useState('') // User's name input
+  const [email, setEmail] = useState('') // User's email input
+  const [password, setPassword] = useState('') // User's password input
+  const [confirmPassword, setConfirmPassword] = useState('') // User's confirm password input
+  const [loading, setLoading] = useState(false) // Loading state for API calls
 
+  /**
+   * handleSignUp - Handles the sign-up process.
+   * 
+   * This function validates the input fields to ensure all fields are filled,
+   * the email is valid, and the passwords match. If valid, it checks if the email
+   * is already in use and sends the data to the backend API to create a new user account.
+   * On success, the user is navigated to the Login page.
+   */
   const handleSignUp = async () => {
     setLoading(true)
     if (!name || !email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields')
+      setLoading(false)
       return
     }
 
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match')
+      setLoading(false)
       return
     }
 
@@ -43,11 +66,13 @@ const SignUpPageNative = ({ navigation }) => {
 
       if (usersWithMatchingEmail.length > 0) {
         Alert.alert('Error', 'Email is already in use')
+        setLoading(false)
         return
       }
     } catch (error) {
       console.error('Error checking email:', error)
       Alert.alert('Error', 'Failed to check email')
+      setLoading(false)
       return
     }
 
@@ -77,6 +102,7 @@ const SignUpPageNative = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* Loading overlay */}
       {loading && <LoadingOverlay visible={loading} />}
       <View style={styles.overlay} />
       <Image
@@ -90,7 +116,9 @@ const SignUpPageNative = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.form}>
           <Text style={styles.title}>Sign Up</Text>
+          {/* Name input */}
           <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
+          {/* Email input */}
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -103,6 +131,7 @@ const SignUpPageNative = ({ navigation }) => {
               }
             }}
           />
+          {/* Password input */}
           <TextInput
             style={styles.input}
             placeholder="Password"
@@ -110,17 +139,20 @@ const SignUpPageNative = ({ navigation }) => {
             value={password}
             onChangeText={setPassword}
           />
+          {/* Confirm password input */}
           <TextInput
             style={styles.input}
             placeholder="Confirm Password"
             secureTextEntry
             value={confirmPassword}
             onChangeText={setConfirmPassword}
-            onSubmitEditing={handleSignUp} // after password is enterd, submit on enter
+            onSubmitEditing={handleSignUp} // Submit on Enter key
           />
+          {/* Sign Up button */}
           <TouchableOpacity style={styles.loginButton} onPress={handleSignUp} activeOpacity={0.8}>
             <Text style={styles.buttonText}>Sign Up</Text>
           </TouchableOpacity>
+          {/* Navigate to Login link */}
           <Text style={styles.signUpText}>
             Already have an account?{' '}
             <Text style={styles.signUpLink} onPress={() => navigation.navigate('Login')}>
@@ -133,6 +165,7 @@ const SignUpPageNative = ({ navigation }) => {
   )
 }
 
+// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
