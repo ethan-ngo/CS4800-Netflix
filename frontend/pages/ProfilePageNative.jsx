@@ -16,7 +16,6 @@ import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
 import { s3, BUCKET_NAME } from '../aws-config'
 import HomeNavbar from '../components/HomeNavbar'
-import { LinearGradient } from 'expo-linear-gradient'
 
 const ProfilePageNative = ({navigation}) => {
   const [profilePic, setProfilePic] = useState(null)
@@ -121,30 +120,37 @@ const ProfilePageNative = ({navigation}) => {
    */
   const handleUpdateProfile = async () => {
     if (!validateEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address')
-      return
+      Alert.alert('Invalid Email', 'Please enter a valid email address');
+      return;
     }
 
-    const updatedUserData = {}
-    if (username) updatedUserData.name = username
-    if (email) updatedUserData.email = email
-    if (password) updatedUserData.password = password
+    const updatedUserData = {};
+    if (username) updatedUserData.name = username;
+    if (email) updatedUserData.email = email;
+    if (password) updatedUserData.password = password;
 
-    const blob = await getBlobFromUri(profilePic.uri)
-    const params = {
-      Bucket: BUCKET_NAME,
-      Key: userId, 
-      Body: blob,
-      ContentType: profilePic.mimeType,
+    // Check if the profile picture has been updated
+    if (profilePic && profilePic.uri !== originalProfilePic) {
+      try {
+        const blob = await getBlobFromUri(profilePic.uri);
+        const params = {
+          Bucket: BUCKET_NAME,
+          Key: userId,
+          Body: blob,
+          ContentType: profilePic.mimeType,
+        };
+
+        // Upload the new profile picture to S3
+        const { Location } = await s3.upload(params).promise();
+        updatedUserData.profilePic = Location; // Add the new profile picture URL to the update payload
+      } catch (err) {
+        console.error('Upload failed:', err);
+        Alert.alert('Error', 'Failed to upload profile picture');
+        return;
+      }
     }
 
-    try {
-      const { Location } = await s3.upload(params).promise()
-      if (profilePic) updatedUserData.profilePic = Location
-    } catch (err) {
-      console.error("Upload failed:", err)
-    }
-
+    // Send the updated profile data to the backend
     try {
       const response = await fetch(`${process.env.APP_URL}users/${userId}`, {
         method: 'PATCH',
@@ -152,19 +158,19 @@ const ProfilePageNative = ({navigation}) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedUserData),
-      })
+      });
 
       if (response.ok) {
-        const responseData = await response.json()
-        Alert.alert('Success', 'Profile updated successfully')
-        console.log('Updated user data:', responseData)
+        const responseData = await response.json();
+        Alert.alert('Success', 'Profile updated successfully');
+        console.log('Updated user data:', responseData);
       } else {
-        const errorData = await response.json()
-        Alert.alert('Error', errorData.message || 'Failed to update profile')
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.message || 'Failed to update profile');
       }
     } catch (error) {
-      console.error('Error updating profile:', error)
-      Alert.alert('Error', 'An error occurred while updating the profile')
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', 'An error occurred while updating the profile');
     }
   }
 
