@@ -388,13 +388,15 @@ const HomePageNative = ({ route }) => {
             </View>
             <Text style={styles.sectionTitle}>Recently Watched</Text>
             <View style={styles.gridContainer}>
-              {recentlyWatched.map((item) => (
-                <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
-                  {item.Type === 'Movie'
-                    ? renderMediaItem({ item })
-                    : renderShowItem({ item })}
-                </View>
-              ))}
+              {recentlyWatched
+                .filter(item => item) 
+                .map((item) => (
+                  <View key={item.Id} style={[styles.gridItem, { width: itemWidth }]}>
+                    {item.Type === 'Movie'
+                      ? renderMediaItem({ item })
+                      : renderShowItem({ item })}
+                  </View>
+                ))}
             </View>
           </View>
         )}
