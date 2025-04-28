@@ -194,47 +194,47 @@ const ProfilePageNative = ({navigation}) => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.form}>
-        <Text style={styles.title}>Edit Profile</Text>
-        <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
-          {profilePicURI ? (
-            <Image source={{ uri: profilePicURI}} style={styles.profileImage} />
-          ) : (
-            <Text style={styles.imageText}>Upload profile picture</Text>
-          )}
-        </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          placeholder={originalUsername}
-          value={username}
-          onChangeText={setUsername}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder={originalEmail}
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder={'Enter your password'}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile} activeOpacity={0.8}>
-          <Text style={styles.buttonText}>Update Profile</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.8}>
-          <Text style={styles.resetButtonText}>Reset</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.homeButton} onPress={handleHomeButton} activeOpacity={0.8}>
-          <Text style={styles.homeButtonText}>Return Home</Text>
-        </TouchableOpacity>
+    <LinearGradient colors={theme.gradient} style={styles.backgroundcontainer}>
+      <HomeNavbar userID={userId} />
+      <View style={styles.container}>
+        <View style={styles.form}>
+          <Text style={styles.title}>Edit Profile</Text>
+          <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
+            {profilePicURI ? (
+              <Image source={{ uri: profilePicURI}} style={styles.profileImage} />
+            ) : (
+              <Text style={styles.imageText}>Upload profile picture</Text>
+            )}
+          </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            placeholder={originalUsername}
+            value={username}
+            onChangeText={setUsername}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder={originalEmail}
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder={'Enter your password'}
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile} activeOpacity={0.8}>
+            <Text style={styles.buttonText}>Update Profile</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.8}>
+            <Text style={styles.resetButtonText}>Reset</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </LinearGradient>
   )
 }
 
@@ -243,8 +243,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: 'white',
+    padding: 0,
+  },
+  backgroundcontainer:{
+    flex: 1,
+    backgroundColor: '#121212',
+    padding: 0,
+    padding: 0,
+  },
+  backgroundcontainer:{
+    flex: 1,
+    backgroundColor: '#121212',
+    padding: 0,
   },
   form: {
     width: '100%',
