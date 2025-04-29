@@ -1,3 +1,14 @@
+/**
+ * ForgotPasswordNative Component
+ * 
+ * This component provides a user interface for users to reset their account password.
+ * It allows users to submit their email to receive a verification token and validate the token
+ * to proceed to the password reset screen.
+ * 
+ * Props:
+ * - navigation: React Navigation object for navigating between screens.
+ */
+
 import React, { useState } from 'react';
 import {
   View,
@@ -10,11 +21,19 @@ import {
 import theme from '../utils/theme';
 
 const ForgotPasswordNative = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [token, setToken] = useState('');
-  const [userID, setUserID] = useState(null);
+  // State variables
+  const [email, setEmail] = useState(''); // User's email input
+  const [submitted, setSubmitted] = useState(false); // Whether the email has been submitted
+  const [token, setToken] = useState(''); // Verification token input
+  const [userID, setUserID] = useState(null); // User ID retrieved from the backend
 
+  /**
+   * handleEmailSubmit - Handles the email submission process.
+   * 
+   * This function checks if the entered email exists in the database. If it does,
+   * it sends a verification email to the user and updates the state to indicate
+   * that the email has been submitted.
+   */
   const handleEmailSubmit = async () => {
     try {
       const res = await fetch(`${process.env.APP_URL}users`);
@@ -45,6 +64,12 @@ const ForgotPasswordNative = ({ navigation }) => {
     }
   };
 
+  /**
+   * handleTokenSubmit - Handles the token submission process.
+   * 
+   * This function validates the entered token by sending it to the backend.
+   * If the token is valid, the user is navigated to the ResetPassword screen.
+   */
   const handleTokenSubmit = async () => {
     try {
       const response = await fetch(`${process.env.APP_URL}users/validate-token/`, {
@@ -55,9 +80,7 @@ const ForgotPasswordNative = ({ navigation }) => {
         body: JSON.stringify({ email, token }),
       });
       if (response.ok) {
-        console.log(userID)
-        console.log(email)
-        navigation.navigate('ResetPassword', {_id: userID, email: email});
+        navigation.navigate('ResetPassword', { _id: userID, email: email });
       } else {
         Alert.alert('Error', 'Invalid token.');
       }
@@ -109,6 +132,7 @@ const ForgotPasswordNative = ({ navigation }) => {
   );
 };
 
+// Styles for the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
