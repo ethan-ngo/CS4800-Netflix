@@ -31,6 +31,10 @@ const ForgotPasswordNative = ({ navigation }) => {
 
   /**
    * handleEmailSubmit - Handles the email submission process.
+   * 
+   * This function checks if the entered email exists in the database. If it does,
+   * it sends a verification email to the user and updates the state to indicate
+   * that the email has been submitted.
    */
   const handleEmailSubmit = async () => {
     try {
@@ -67,6 +71,9 @@ const ForgotPasswordNative = ({ navigation }) => {
 
   /**
    * handleTokenSubmit - Handles the token submission process.
+   * 
+   * This function validates the entered token by sending it to the backend.
+   * If the token is valid, the user is navigated to the ResetPassword screen.
    */
   const handleTokenSubmit = async () => {
     try {
