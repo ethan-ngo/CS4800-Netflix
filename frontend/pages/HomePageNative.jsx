@@ -18,7 +18,7 @@ import LoadingOverlay from '../components/LoadingOverlay'
 import { LinearGradient } from 'expo-linear-gradient'
 import theme from '../utils/theme'
 import { generateRecommendations } from '../utils/recommendations'
-import Popup from '../components/popup' // Import your Popup component
+import Popup from '../components/popup' 
 
 const screenWidth = Dimensions.get('window').width
 const itemWidth = 120
@@ -181,7 +181,7 @@ const HomePageNative = ({ route }) => {
       } catch (error) {
         console.error('Error fetching media items:', error);
         setPopupMessage('Failed to fetch media items.');
-        setPopupVisible(true); // Show the popup
+        setPopupVisible(true); 
       }
       setLoading(false);
     };
@@ -411,7 +411,7 @@ const HomePageNative = ({ route }) => {
         visible={popupVisible}
         title="Error"
         message={popupMessage}
-        onClose={() => setPopupVisible(false)} // Close the popup
+        onClose={() => setPopupVisible(false)} 
       />
     </ScrollView>
   );

@@ -26,7 +26,7 @@ import { validateEmail } from '../utils/validateEmail';
 import theme from '../utils/theme';
 import Header from '../components/Header';
 import LoadingOverlay from '../components/LoadingOverlay';
-import Popup from '../components/popup'; // Import your Popup component
+import Popup from '../components/popup'; 
 
 const LoginPageNative = ({ navigation }) => {
   // State variables
@@ -180,7 +180,7 @@ const LoginPageNative = ({ navigation }) => {
         visible={popupVisible}
         title="Notification"
         message={popupMessage}
-        onClose={() => setPopupVisible(false)} // Close the popup
+        onClose={() => setPopupVisible(false)} 
       />
     </View>
   );

@@ -16,18 +16,23 @@ import theme from '../utils/theme'
 import { s3, BUCKET_NAME } from '../aws-config'
 import HomeNavbar from '../components/HomeNavbar'
 import { LinearGradient } from 'expo-linear-gradient'
+import Popup from '../components/popup'
 
-const ProfilePageNative = ({navigation}) => {
+const ProfilePageNative = ({ navigation }) => {
   const [profilePic, setProfilePic] = useState(null)
   const [profilePicURI, setProfilePicURI] = useState(null)
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [userId, setUserId] = useState('1')
   const [originalProfilePic, setOriginalProfilePic] = useState(null)
   const [originalUsername, setOriginalUsername] = useState('')
   const [originalEmail, setOriginalEmail] = useState('')
   const [loading, setLoading] = useState(true)
+  const [popupVisible, setPopupVisible] = useState(false)
+  const [popupMessage, setPopupMessage] = useState('')
+  const [confirmPopupVisible, setConfirmPopupVisible] = useState(false)
 
   /**
    * fetchUserData - Loads the current user's profile information.
@@ -40,7 +45,8 @@ const ProfilePageNative = ({navigation}) => {
         const email = await AsyncStorage.getItem('email')
         if (!email) {
           console.error('Error: Email is missing')
-          Alert.alert('Error', 'You are not authenticated')
+          setPopupMessage('You are not authenticated')
+          setPopupVisible(true)
           setLoading(false)
           return
         }
@@ -56,7 +62,8 @@ const ProfilePageNative = ({navigation}) => {
         if (!userResponse.ok) {
           const errorData = await userResponse.json()
           console.error('Error fetching user details:', errorData.message)
-          Alert.alert('Error', errorData.message || 'Failed to fetch user details')
+          setPopupMessage(errorData.message || 'Failed to fetch user details')
+          setPopupVisible(true)
           setLoading(false)
           return
         }
@@ -74,7 +81,8 @@ const ProfilePageNative = ({navigation}) => {
         setOriginalEmail(user.email)
       } catch (error) {
         console.error('Error fetching user data:', error)
-        Alert.alert('Error', 'An error occurred while fetching user data')
+        setPopupMessage('An error occurred while fetching user data')
+        setPopupVisible(true)
       } finally {
         setLoading(false)
       }
@@ -120,59 +128,76 @@ const ProfilePageNative = ({navigation}) => {
    */
   const handleUpdateProfile = async () => {
     if (!validateEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address')
-      return
+      setPopupMessage('Invalid Email: Please enter a valid email address');
+      setPopupVisible(true);
+      return;
     }
 
-    const updatedUserData = {}
-    if (username) updatedUserData.name = username
-    if (email) updatedUserData.email = email
-    if (password) updatedUserData.password = password
-
-    const blob = await getBlobFromUri(profilePic.uri)
-    const params = {
-      Bucket: BUCKET_NAME,
-      Key: userId, 
-      Body: blob,
-      ContentType: profilePic.mimeType,
+    if (!password || !confirmPassword) {
+      setPopupMessage('Please fill in both password fields to confirm changes');
+      setPopupVisible(true);
+      return;
     }
+
+    if (password !== confirmPassword) {
+      setPopupMessage('Passwords do not match');
+      setPopupVisible(true);
+      return;
+    }
+
+    const updatedUserData = {};
+    if (username) updatedUserData.name = username;
+    if (email) updatedUserData.email = email;
+    updatedUserData.password = password; // Include the new password in the update
 
     try {
-      const { Location } = await s3.upload(params).promise()
-      if (profilePic) updatedUserData.profilePic = Location
-    } catch (err) {
-      console.error("Upload failed:", err)
-    }
+      // Upload profile picture if it has been changed
+      if (profilePic && profilePic.uri !== originalProfilePic) {
+        const blob = await getBlobFromUri(profilePic.uri);
+        const params = {
+          Bucket: BUCKET_NAME,
+          Key: userId,
+          Body: blob,
+          ContentType: profilePic.mimeType,
+        };
 
-    try {
+        const { Location } = await s3.upload(params).promise();
+        updatedUserData.profilePic = Location;
+      }
+
+      // Send the updated profile data to the backend
       const response = await fetch(`${process.env.APP_URL}users/${userId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedUserData),
-      })
+      });
 
       if (response.ok) {
-        const responseData = await response.json()
-        Alert.alert('Success', 'Profile updated successfully')
-        console.log('Updated user data:', responseData)
+        const responseData = await response.json();
+        setPopupMessage('Profile updated successfully');
+        setPopupVisible(true);
+        console.log('Updated user data:', responseData);
       } else {
-        const errorData = await response.json()
-        Alert.alert('Error', errorData.message || 'Failed to update profile')
+        const errorData = await response.json();
+        setPopupMessage(errorData.message || 'Failed to update profile');
+        setPopupVisible(true);
       }
     } catch (error) {
-      console.error('Error updating profile:', error)
-      Alert.alert('Error', 'An error occurred while updating the profile')
+      console.error('Error updating profile:', error);
+      setPopupMessage('An error occurred while updating the profile');
+      setPopupVisible(true);
     }
-  }
+  };
 
   /**
-   * handleHomeButton - Navigates the user back to the Home page.
+   * proceedWithUpdate - Confirms the update and proceeds with profile update.
    */
-  const handleHomeButton = () => {
-    navigation.navigate('Home', {userID: userId})
-  }
+  const proceedWithUpdate = () => {
+    setConfirmPopupVisible(false);
+    handleUpdateProfile();
+  };
 
   /**
    * handleReset - Resets the form fields to their original values.
@@ -182,6 +207,7 @@ const ProfilePageNative = ({navigation}) => {
     setUsername(originalUsername)
     setEmail(originalEmail)
     setPassword('')
+    setConfirmPassword('')
   }
 
   if (loading) {
@@ -200,7 +226,7 @@ const ProfilePageNative = ({navigation}) => {
           <Text style={styles.title}>Edit Profile</Text>
           <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
             {profilePicURI ? (
-              <Image source={{ uri: profilePicURI}} style={styles.profileImage} />
+              <Image source={{ uri: profilePicURI }} style={styles.profileImage} />
             ) : (
               <Text style={styles.imageText}>Upload profile picture</Text>
             )}
@@ -220,12 +246,19 @@ const ProfilePageNative = ({navigation}) => {
           />
           <TextInput
             style={styles.input}
-            placeholder={'Enter your password'}
+            placeholder="Enter your password"
             secureTextEntry
             value={password}
             onChangeText={setPassword}
           />
-          <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile} activeOpacity={0.8}>
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm your password"
+            secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+          <TouchableOpacity style={styles.updateButton} onPress={() => setConfirmPopupVisible(true)} activeOpacity={0.8}>
             <Text style={styles.buttonText}>Update Profile</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.resetButton} onPress={handleReset} activeOpacity={0.8}>
@@ -233,6 +266,23 @@ const ProfilePageNative = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Notification Popup */}
+      <Popup
+        visible={popupVisible}
+        title="Notification"
+        message={popupMessage}
+        onClose={() => setPopupVisible(false)}
+      />
+
+      {/* Confirmation Popup */}
+      <Popup
+        visible={confirmPopupVisible}
+        title="Confirm Update"
+        message="Are you sure you want to update your profile information?"
+        onClose={() => setConfirmPopupVisible(false)} // Close the confirmation popup
+        onConfirm={proceedWithUpdate} // Proceed with the update
+      />
     </LinearGradient>
   )
 }
@@ -244,13 +294,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 0,
   },
-  backgroundcontainer:{
-    flex: 1,
-    backgroundColor: '#121212',
-    padding: 0,
-    padding: 0,
-  },
-  backgroundcontainer:{
+  backgroundcontainer: {
     flex: 1,
     backgroundColor: '#121212',
     padding: 0,
@@ -326,17 +370,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     fontSize: 16,
-  },
-  homeButton: {
-    backgroundColor: 'green',
-    paddingVertical: 10,
-    borderRadius: 5,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  homeButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
 })
 

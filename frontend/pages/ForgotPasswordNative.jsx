@@ -18,7 +18,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import theme from '../utils/theme';
-import Popup from '../components/popup'; // Import your Popup component
+import Popup from '../components/popup'; 
 
 const ForgotPasswordNative = ({ navigation }) => {
   // State variables
@@ -44,7 +44,7 @@ const ForgotPasswordNative = ({ navigation }) => {
 
       if (usersWithMatchingEmail.length === 0) {
         setPopupMessage(`${email} doesn't exist.`);
-        setPopupVisible(true); // Show the popup
+        setPopupVisible(true); 
       } else {
         try {
           const response = await fetch(`${process.env.APP_URL}users/send-email/${email}`, {
@@ -59,13 +59,13 @@ const ForgotPasswordNative = ({ navigation }) => {
         } catch (error) {
           console.error(error);
           setPopupMessage('Failed to send email.');
-          setPopupVisible(true); // Show the popup
+          setPopupVisible(true); 
         }
       }
     } catch (error) {
       console.error(error);
       setPopupMessage('Failed to fetch users.');
-      setPopupVisible(true); // Show the popup
+      setPopupVisible(true); 
     }
   };
 
@@ -88,12 +88,12 @@ const ForgotPasswordNative = ({ navigation }) => {
         navigation.navigate('ResetPassword', { _id: userID, email: email });
       } else {
         setPopupMessage('Invalid token.');
-        setPopupVisible(true); // Show the popup
+        setPopupVisible(true); 
       }
     } catch (error) {
       console.error(error);
       setPopupMessage('Failed to validate token.');
-      setPopupVisible(true); // Show the popup
+      setPopupVisible(true); 
     }
   };
 
@@ -141,7 +141,7 @@ const ForgotPasswordNative = ({ navigation }) => {
         visible={popupVisible}
         title="Error"
         message={popupMessage}
-        onClose={() => setPopupVisible(false)} // Close the popup
+        onClose={() => setPopupVisible(false)} 
       />
     </View>
   );
