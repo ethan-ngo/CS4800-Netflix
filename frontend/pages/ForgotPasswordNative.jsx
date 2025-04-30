@@ -16,9 +16,11 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  Image,
   StyleSheet,
 } from 'react-native';
 import theme from '../utils/theme';
+import Header from '../components/Header';
 
 const ForgotPasswordNative = ({ navigation }) => {
   // State variables
@@ -92,8 +94,19 @@ const ForgotPasswordNative = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      
+      <View style={styles.overlay} />
+      <Image
+              source={{
+                uri: 'https://wallpapers.com/images/hd/movie-poster-background-wg5mxe6b7djul0a8.jpg',
+              }}
+              style={styles.backgroundImage}
+              resizeMode="cover"
+            />
+      <Header />
       {submitted ? (
         <View style={styles.form}>
+          
           <Text style={styles.title}>Thank you!</Text>
           <Text style={styles.message}>An email with the token has been sent to {email}.</Text>
           <TextInput
@@ -192,6 +205,16 @@ const styles = StyleSheet.create({
     marginTop: 15,
     textDecorationLine: 'underline',
     fontSize: 16,
+  },
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    opacity: 0.8,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
 });
 

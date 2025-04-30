@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#333',
     position: 'absolute',
+    top: 0,
   },
   title: {
     fontSize: 24,
