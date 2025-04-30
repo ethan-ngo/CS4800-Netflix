@@ -15,13 +15,12 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   Image,
   StyleSheet,
 } from 'react-native';
 import theme from '../utils/theme';
 import Header from '../components/Header';
-import Popup from '../components/popup'; // Import your Popup component
+import Popup from '../components/popup'; 
 
 const ForgotPasswordNative = ({ navigation }) => {
   // State variables
@@ -68,7 +67,7 @@ const ForgotPasswordNative = ({ navigation }) => {
     } catch (error) {
       console.error(error);
       setPopupMessage('Failed to fetch users.');
-      setPopupVisible(true); // Show the popup
+      setPopupVisible(true); 
     }
   };
 
@@ -91,12 +90,12 @@ const ForgotPasswordNative = ({ navigation }) => {
         navigation.navigate('ResetPassword', { _id: userID, email: email });
       } else {
         setPopupMessage('Invalid token.');
-        setPopupVisible(true); // Show the popup
+        setPopupVisible(true); 
       }
     } catch (error) {
       console.error(error);
       setPopupMessage('Failed to validate token.');
-      setPopupVisible(true); // Show the popup
+      setPopupVisible(true); 
     }
   };
 

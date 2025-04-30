@@ -259,7 +259,7 @@ const ProfilePageNative = ({ navigation }) => {
         visible={confirmPopupVisible}
         title="Confirm Update"
         message="Are you sure you want to update your profile information?"
-        onClose={() => setConfirmPopupVisible(false)} // Close the confirmation popup
+        onClose={() => setConfirmPopupVisible(false)} 
         onConfirm={proceedWithUpdate} // Proceed with the update
       />
     </LinearGradient>

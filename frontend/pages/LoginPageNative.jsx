@@ -87,7 +87,7 @@ const LoginPageNative = ({ navigation }) => {
 
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       setPopupMessage('Login successful');
-      setPopupVisible(true); // Show the popup
+      setPopupVisible(true); 
       const data = await res.json();
       console.log('Data:', data);
 
@@ -101,7 +101,7 @@ const LoginPageNative = ({ navigation }) => {
     } catch (error) {
       console.error('Error (unable to login): ', error);
       setPopupMessage('Login failed: Invalid email or password');
-      setPopupVisible(true); // Show the popup
+      setPopupVisible(true); 
     }
     setLoading(false);
   };
@@ -139,7 +139,7 @@ const LoginPageNative = ({ navigation }) => {
             onBlur={() => {
               if (email && !validateEmail(email)) {
                 setPopupMessage('Invalid Email: Please enter a valid email address');
-                setPopupVisible(true); // Show the popup
+                setPopupVisible(true); 
               }
             }}
           />

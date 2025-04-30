@@ -24,7 +24,7 @@ import { validateEmail } from '../utils/validateEmail';
 import theme from '../utils/theme';
 import Header from '../components/Header';
 import LoadingOverlay from '../components/LoadingOverlay';
-import Popup from '../components/popup'; // Import your Popup component
+import Popup from '../components/popup'; 
 
 const SignUpPageNative = ({ navigation }) => {
   // State variables
@@ -48,14 +48,14 @@ const SignUpPageNative = ({ navigation }) => {
     setLoading(true);
     if (!name || !email || !password || !confirmPassword) {
       setPopupMessage('Please fill in all fields');
-      setPopupVisible(true); // Show the popup
+      setPopupVisible(true); 
       setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
       setPopupMessage('Passwords do not match');
-      setPopupVisible(true); // Show the popup
+      setPopupVisible(true); 
       setLoading(false);
       return;
     }
@@ -70,14 +70,14 @@ const SignUpPageNative = ({ navigation }) => {
 
       if (usersWithMatchingEmail.length > 0) {
         setPopupMessage('Email is already in use');
-        setPopupVisible(true); // Show the popup
+        setPopupVisible(true); 
         setLoading(false);
         return;
       }
     } catch (error) {
       console.error('Error checking email:', error);
       setPopupMessage('Failed to check email');
-      setPopupVisible(true); // Show the popup
+      setPopupVisible(true); 
       setLoading(false);
       return;
     }
@@ -98,12 +98,12 @@ const SignUpPageNative = ({ navigation }) => {
       console.log('New user created:', data);
 
       setPopupMessage('Account created successfully');
-      setPopupVisible(true); // Show the popup
-      navigation.navigate('Login'); // Navigate to the login page
+      setPopupVisible(true); 
+      navigation.navigate('Login'); 
     } catch (error) {
       console.error('Error creating user:', error);
       setPopupMessage('Failed to create account');
-      setPopupVisible(true); // Show the popup
+      setPopupVisible(true); 
     }
     setLoading(false);
   };
@@ -136,7 +136,7 @@ const SignUpPageNative = ({ navigation }) => {
             onBlur={() => {
               if (email && !validateEmail(email)) {
                 setPopupMessage('Invalid Email: Please enter a valid email address');
-                setPopupVisible(true); // Show the popup
+                setPopupVisible(true); 
               }
             }}
           />
@@ -176,7 +176,7 @@ const SignUpPageNative = ({ navigation }) => {
         visible={popupVisible}
         title="Notification"
         message={popupMessage}
-        onClose={() => setPopupVisible(false)} // Close the popup
+        onClose={() => setPopupVisible(false)} 
       />
     </View>
   );
