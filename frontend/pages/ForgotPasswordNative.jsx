@@ -15,17 +15,20 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Alert,
+  Image,
   StyleSheet,
 } from 'react-native';
 import theme from '../utils/theme';
-import Popup from '../components/popup'; 
+import Header from '../components/Header';
+import Popup from '../components/popup'; // Import your Popup component
 
 const ForgotPasswordNative = ({ navigation }) => {
   // State variables
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [token, setToken] = useState('');
-  const [userID, setUserID] = useState(null);
+  const [email, setEmail] = useState(''); // User's email input
+  const [submitted, setSubmitted] = useState(false); // Whether the email has been submitted
+  const [token, setToken] = useState(''); // Verification token input
+  const [userID, setUserID] = useState(null); // User ID retrieved from the backend
   const [popupVisible, setPopupVisible] = useState(false); // State to control popup visibility
   const [popupMessage, setPopupMessage] = useState(''); // State for popup message
 
@@ -44,7 +47,7 @@ const ForgotPasswordNative = ({ navigation }) => {
 
       if (usersWithMatchingEmail.length === 0) {
         setPopupMessage(`${email} doesn't exist.`);
-        setPopupVisible(true); 
+        setPopupVisible(true); // Show the popup
       } else {
         try {
           const response = await fetch(`${process.env.APP_URL}users/send-email/${email}`, {
@@ -59,13 +62,13 @@ const ForgotPasswordNative = ({ navigation }) => {
         } catch (error) {
           console.error(error);
           setPopupMessage('Failed to send email.');
-          setPopupVisible(true); 
+          setPopupVisible(true); // Show the popup
         }
       }
     } catch (error) {
       console.error(error);
       setPopupMessage('Failed to fetch users.');
-      setPopupVisible(true); 
+      setPopupVisible(true); // Show the popup
     }
   };
 
@@ -88,60 +91,69 @@ const ForgotPasswordNative = ({ navigation }) => {
         navigation.navigate('ResetPassword', { _id: userID, email: email });
       } else {
         setPopupMessage('Invalid token.');
-        setPopupVisible(true); 
+        setPopupVisible(true); // Show the popup
       }
     } catch (error) {
       console.error(error);
       setPopupMessage('Failed to validate token.');
-      setPopupVisible(true); 
+      setPopupVisible(true); // Show the popup
     }
   };
 
   return (
     <View style={styles.container}>
-      {submitted ? (
-        <View style={styles.form}>
-          <Text style={styles.title}>Thank you!</Text>
-          <Text style={styles.message}>An email with the token has been sent to {email}.</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Token"
-            value={token}
-            onChangeText={setToken}
-          />
-          <TouchableOpacity style={styles.button} onPress={handleTokenSubmit}>
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.hyperlink}>Back to Login</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <View style={styles.form}>
-          <Text style={styles.title}>Forgot Account Password</Text>
-          <Text style={styles.message}>Please enter an email for us to send a verification code.</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
-          />
-          <TouchableOpacity style={styles.button} onPress={handleEmailSubmit}>
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.hyperlink}>Back to Login</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {/* Popup Component */}
+      <View style={styles.overlay} />
+      <Image
+        source={{
+          uri: 'https://wallpapers.com/images/hd/movie-poster-background-wg5mxe6b7djul0a8.jpg',
+        }}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
+      <Header style={styles.header} /> {/* Ensure this is outside the content */}
+      <View style={styles.content}>
+        {submitted ? (
+          <View style={styles.form}>
+            <Text style={styles.title}>Thank you!</Text>
+            <Text style={styles.message}>An email with the token has been sent to {email}.</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Token"
+              value={token}
+              onChangeText={setToken}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleTokenSubmit}>
+              <Text style={styles.buttonText}>Submit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.hyperlink}>Back to Login</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={styles.form}>
+            <Text style={styles.title}>Forgot Account Password</Text>
+            <Text style={styles.message}>Please enter an email for us to send a verification code.</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleEmailSubmit}>
+              <Text style={styles.buttonText}>Submit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.hyperlink}>Back to Login</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
       <Popup
         visible={popupVisible}
         title="Error"
         message={popupMessage}
-        onClose={() => setPopupVisible(false)} 
+        onClose={() => setPopupVisible(false)}
       />
     </View>
   );
@@ -151,9 +163,8 @@ const ForgotPasswordNative = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start', // Align children to the top
     alignItems: 'center',
-    padding: 20,
     backgroundColor: '#f9f9f9',
   },
   form: {
@@ -207,6 +218,31 @@ const styles = StyleSheet.create({
     marginTop: 15,
     textDecorationLine: 'underline',
     fontSize: 16,
+  },
+  backgroundImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    opacity: 0.8,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  header: {
+    width: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: 10,
+    backgroundColor: 'transparent', // Optional: Ensure no background overlaps
+    padding: 10, // Optional: Add padding for spacing
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
 });
 

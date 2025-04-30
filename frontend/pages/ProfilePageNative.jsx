@@ -1,30 +1,27 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   StyleSheet,
   Image,
   ActivityIndicator,
-} from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import * as ImagePicker from 'expo-image-picker'
-import { validateEmail } from '../utils/validateEmail'
-import theme from '../utils/theme'
-import { s3, BUCKET_NAME } from '../aws-config'
-import HomeNavbar from '../components/HomeNavbar'
-import { LinearGradient } from 'expo-linear-gradient'
-import Popup from '../components/popup'
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
+import { validateEmail } from '../utils/validateEmail';
+import theme from '../utils/theme';
+import { s3, BUCKET_NAME } from '../aws-config';
+import HomeNavbar from '../components/HomeNavbar';
+import { LinearGradient } from 'expo-linear-gradient';
+import Popup from '../components/popup';
 
 const ProfilePageNative = ({ navigation }) => {
   const [profilePic, setProfilePic] = useState(null)
   const [profilePicURI, setProfilePicURI] = useState(null)
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
   const [userId, setUserId] = useState('1')
   const [originalProfilePic, setOriginalProfilePic] = useState(null)
   const [originalUsername, setOriginalUsername] = useState('')
@@ -42,54 +39,54 @@ const ProfilePageNative = ({ navigation }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const email = await AsyncStorage.getItem('email')
+        const email = await AsyncStorage.getItem('email');
         if (!email) {
-          console.error('Error: Email is missing')
-          setPopupMessage('You are not authenticated')
-          setPopupVisible(true)
-          setLoading(false)
-          return
+          console.error('Error: Email is missing');
+          setPopupMessage('You are not authenticated');
+          setPopupVisible(true);
+          setLoading(false);
+          return;
         }
-        console.log('Fetched email:', email)
+        console.log('Fetched email:', email);
 
         const userResponse = await fetch(`${process.env.APP_URL}users/getUserByEmail/${email}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
-        })
+        });
 
         if (!userResponse.ok) {
-          const errorData = await userResponse.json()
-          console.error('Error fetching user details:', errorData.message)
-          setPopupMessage(errorData.message || 'Failed to fetch user details')
-          setPopupVisible(true)
-          setLoading(false)
-          return
+          const errorData = await userResponse.json();
+          console.error('Error fetching user details:', errorData.message);
+          setPopupMessage(errorData.message || 'Failed to fetch user details');
+          setPopupVisible(true);
+          setLoading(false);
+          return;
         }
 
-        const user = await userResponse.json()
-        console.log('Fetched user details:', user)
+        const user = await userResponse.json();
+        console.log('Fetched user details:', user);
 
-        setUserId(user.userId)
-        setProfilePicURI(user.profilePic)
-        setUsername(user.name)
-        setEmail(user.email)
+        setUserId(user.userId);
+        setProfilePicURI(user.profilePic);
+        setUsername(user.name);
+        setEmail(user.email);
 
-        setOriginalProfilePic(user.profilePic)
-        setOriginalUsername(user.name)
-        setOriginalEmail(user.email)
+        setOriginalProfilePic(user.profilePic);
+        setOriginalUsername(user.name);
+        setOriginalEmail(user.email);
       } catch (error) {
-        console.error('Error fetching user data:', error)
-        setPopupMessage('An error occurred while fetching user data')
-        setPopupVisible(true)
+        console.error('Error fetching user data:', error);
+        setPopupMessage('An error occurred while fetching user data');
+        setPopupVisible(true);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchUserData()
-  }, [])
+    fetchUserData();
+  }, []);
 
   /**
    * pickImage - Opens the image picker for user to select a new profile picture.
@@ -101,13 +98,13 @@ const ProfilePageNative = ({ navigation }) => {
       allowsEditing: true,
       aspect: [1, 1],
       quality: 1,
-    })
+    });
 
     if (!result.canceled) {
-      setProfilePic(result.assets[0])
-      setProfilePicURI(result.assets[0].uri)
+      setProfilePic(result.assets[0]);
+      setProfilePicURI(result.assets[0].uri);
     }
-  }
+  };
 
   /**
    * getBlobFromUri - Converts an image URI into a blob.
@@ -115,10 +112,10 @@ const ProfilePageNative = ({ navigation }) => {
    * @returns {Promise<Blob>} - A blob representing the image file
    */
   const getBlobFromUri = async (uri) => {
-    const response = await fetch(uri)
-    const blob = await response.blob()
-    return blob
-  }
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    return blob;
+  };
 
   /**
    * handleUpdateProfile - Handles submission of updated profile data.
@@ -133,22 +130,9 @@ const ProfilePageNative = ({ navigation }) => {
       return;
     }
 
-    if (!password || !confirmPassword) {
-      setPopupMessage('Please fill in both password fields to confirm changes');
-      setPopupVisible(true);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setPopupMessage('Passwords do not match');
-      setPopupVisible(true);
-      return;
-    }
-
     const updatedUserData = {};
     if (username) updatedUserData.name = username;
     if (email) updatedUserData.email = email;
-    updatedUserData.password = password; // Include the new password in the update
 
     try {
       // Upload profile picture if it has been changed
@@ -203,19 +187,24 @@ const ProfilePageNative = ({ navigation }) => {
    * handleReset - Resets the form fields to their original values.
    */
   const handleReset = () => {
-    setProfilePicURI(originalProfilePic)
-    setUsername(originalUsername)
-    setEmail(originalEmail)
-    setPassword('')
-    setConfirmPassword('')
-  }
+    setProfilePicURI(originalProfilePic);
+    setUsername(originalUsername);
+    setEmail(originalEmail);
+  };
+
+  /**
+   * handleNavigateToForgotPassword - Navigates to the ForgotPasswordNative screen.
+   */
+  const handleNavigateToForgotPassword = () => {
+    navigation.navigate('ForgotPasswordNative'); // Navigate to Forgot Password page
+  };
 
   if (loading) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#007BFF" />
       </View>
-    )
+    );
   }
 
   return (
@@ -244,20 +233,10 @@ const ProfilePageNative = ({ navigation }) => {
             value={email}
             onChangeText={setEmail}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm your password"
-            secureTextEntry
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-          />
+          {/* Link to Forgot Password Page */}
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} activeOpacity={0.8}>
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.updateButton} onPress={() => setConfirmPopupVisible(true)} activeOpacity={0.8}>
             <Text style={styles.buttonText}>Update Profile</Text>
           </TouchableOpacity>
@@ -284,8 +263,8 @@ const ProfilePageNative = ({ navigation }) => {
         onConfirm={proceedWithUpdate} // Proceed with the update
       />
     </LinearGradient>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -360,6 +339,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: 'red',
     borderWidth: 1,
+    marginBottom: 10,
   },
   resetButtonText: {
     color: 'red',
@@ -371,6 +351,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-})
+  forgotPasswordLink: {
+    color: '#007BFF',
+    textAlign: 'center',
+    marginTop: 10,
+    textDecorationLine: 'underline',
+    fontSize: 14,
+  },
+});
 
-export default ProfilePageNative
+export default ProfilePageNative;
