@@ -11,11 +11,11 @@ import {
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as ImagePicker from 'expo-image-picker'
+import { LinearGradient } from 'expo-linear-gradient'
 import { validateEmail } from '../utils/validateEmail'
 import theme from '../utils/theme'
 import { s3, BUCKET_NAME } from '../aws-config'
 import HomeNavbar from '../components/HomeNavbar'
-import { LinearGradient } from 'expo-linear-gradient'
 
 const ProfilePageNative = ({navigation}) => {
   const [profilePic, setProfilePic] = useState(null)
@@ -120,30 +120,37 @@ const ProfilePageNative = ({navigation}) => {
    */
   const handleUpdateProfile = async () => {
     if (!validateEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address')
-      return
+      Alert.alert('Invalid Email', 'Please enter a valid email address');
+      return;
     }
 
-    const updatedUserData = {}
-    if (username) updatedUserData.name = username
-    if (email) updatedUserData.email = email
-    if (password) updatedUserData.password = password
+    const updatedUserData = {};
+    if (username) updatedUserData.name = username;
+    if (email) updatedUserData.email = email;
+    if (password) updatedUserData.password = password;
 
-    const blob = await getBlobFromUri(profilePic.uri)
-    const params = {
-      Bucket: BUCKET_NAME,
-      Key: userId, 
-      Body: blob,
-      ContentType: profilePic.mimeType,
+    // Check if the profile picture has been updated
+    if (profilePic && profilePic.uri !== originalProfilePic) {
+      try {
+        const blob = await getBlobFromUri(profilePic.uri);
+        const params = {
+          Bucket: BUCKET_NAME,
+          Key: userId,
+          Body: blob,
+          ContentType: profilePic.mimeType,
+        };
+
+        // Upload the new profile picture to S3
+        const { Location } = await s3.upload(params).promise();
+        updatedUserData.profilePic = Location; // Add the new profile picture URL to the update payload
+      } catch (err) {
+        console.error('Upload failed:', err);
+        Alert.alert('Error', 'Failed to upload profile picture');
+        return;
+      }
     }
 
-    try {
-      const { Location } = await s3.upload(params).promise()
-      if (profilePic) updatedUserData.profilePic = Location
-    } catch (err) {
-      console.error("Upload failed:", err)
-    }
-
+    // Send the updated profile data to the backend
     try {
       const response = await fetch(`${process.env.APP_URL}users/${userId}`, {
         method: 'PATCH',
@@ -151,19 +158,19 @@ const ProfilePageNative = ({navigation}) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedUserData),
-      })
+      });
 
       if (response.ok) {
-        const responseData = await response.json()
-        Alert.alert('Success', 'Profile updated successfully')
-        console.log('Updated user data:', responseData)
+        const responseData = await response.json();
+        Alert.alert('Success', 'Profile updated successfully');
+        console.log('Updated user data:', responseData);
       } else {
-        const errorData = await response.json()
-        Alert.alert('Error', errorData.message || 'Failed to update profile')
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.message || 'Failed to update profile');
       }
     } catch (error) {
-      console.error('Error updating profile:', error)
-      Alert.alert('Error', 'An error occurred while updating the profile')
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', 'An error occurred while updating the profile');
     }
   }
 
@@ -200,7 +207,7 @@ const ProfilePageNative = ({navigation}) => {
           <Text style={styles.title}>Edit Profile</Text>
           <TouchableOpacity onPress={pickImage} style={styles.imagePicker}>
             {profilePicURI ? (
-              <Image source={{ uri: profilePicURI}} style={styles.profileImage} />
+              <Image source={{ uri: profilePicURI }} style={styles.profileImage} />
             ) : (
               <Text style={styles.imageText}>Upload profile picture</Text>
             )}
@@ -218,13 +225,10 @@ const ProfilePageNative = ({navigation}) => {
             value={email}
             onChangeText={setEmail}
           />
-          <TextInput
-            style={styles.input}
-            placeholder={'Enter your password'}
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-          />
+          {/* Link to Forgot Password Page */}
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} activeOpacity={0.8}>
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile} activeOpacity={0.8}>
             <Text style={styles.buttonText}>Update Profile</Text>
           </TouchableOpacity>
@@ -238,6 +242,13 @@ const ProfilePageNative = ({navigation}) => {
 }
 
 const styles = StyleSheet.create({
+  backgroundcontainer: {
+    flex: 1,
+    backgroundColor: '#121212',
+    padding: 10,
+    overflowy: 'auto',
+    overflowx: 'auto',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -257,15 +268,15 @@ const styles = StyleSheet.create({
   },
   form: {
     width: '100%',
-    maxWidth: 400,
-    padding: 20,
+    maxWidth: 500,
+    padding: 50,
     borderRadius: 10,
     backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.4,
     shadowRadius: 4,
-    elevation: 5,
+    elevation: 10,
   },
   title: {
     fontSize: 24,
@@ -337,6 +348,13 @@ const styles = StyleSheet.create({
   homeButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  forgotPasswordText: {
+    color: theme.primaryColor,
+    fontWeight: 'bold',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 15,
   },
 })
 
