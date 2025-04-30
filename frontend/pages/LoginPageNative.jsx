@@ -45,6 +45,7 @@ const LoginPageNative = ({ navigation }) => {
   const authUser = async () => {
     setLoading(true);
     const token = await AsyncStorage.getItem('token');
+    if(!token) return;
     const response = await fetch(app_url + 'users/auth-session', {
       method: 'POST',
       headers: {
@@ -140,7 +141,6 @@ const LoginPageNative = ({ navigation }) => {
           />
           {/* Password input */}
           <TextInput
-            testID="login-button"
             style={styles.input}
             placeholder="Password"
             secureTextEntry
@@ -155,6 +155,7 @@ const LoginPageNative = ({ navigation }) => {
           {/* Login button */}
           <TouchableOpacity
             onPress={handleLogin}
+            testID='login-button'
             style={styles.loginButton}
             activeOpacity={0.8}
             disabled={loading}
