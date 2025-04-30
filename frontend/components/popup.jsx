@@ -37,10 +37,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   popupContainer: {
-    width: '80%',
+    width: '70%', // Reduced width to make it smaller
     backgroundColor: 'white',
     borderRadius: 10,
-    padding: 20,
+    padding: 15, // Reduced padding
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -55,10 +55,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   message: {
-    fontSize: 16,
+    fontSize: 14, // Slightly smaller font size for the message
     color: '#333',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 15, // Reduced margin
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   cancelButton: {
     flex: 1,
     backgroundColor: '#ddd',
-    paddingVertical: 10,
+    paddingVertical: 8, // Reduced padding
     borderRadius: 5,
     alignItems: 'center',
     marginRight: 10,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   confirmButton: {
     flex: 1,
     backgroundColor: '#007BFF',
-    paddingVertical: 10,
+    paddingVertical: 8, // Reduced padding
     borderRadius: 5,
     alignItems: 'center',
   },

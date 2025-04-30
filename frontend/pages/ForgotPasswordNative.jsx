@@ -15,24 +15,22 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   StyleSheet,
 } from 'react-native';
 import theme from '../utils/theme';
+import Popup from '../components/popup'; // Import your Popup component
 
 const ForgotPasswordNative = ({ navigation }) => {
   // State variables
-  const [email, setEmail] = useState(''); // User's email input
-  const [submitted, setSubmitted] = useState(false); // Whether the email has been submitted
-  const [token, setToken] = useState(''); // Verification token input
-  const [userID, setUserID] = useState(null); // User ID retrieved from the backend
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+  const [token, setToken] = useState('');
+  const [userID, setUserID] = useState(null);
+  const [popupVisible, setPopupVisible] = useState(false); // State to control popup visibility
+  const [popupMessage, setPopupMessage] = useState(''); // State for popup message
 
   /**
    * handleEmailSubmit - Handles the email submission process.
-   * 
-   * This function checks if the entered email exists in the database. If it does,
-   * it sends a verification email to the user and updates the state to indicate
-   * that the email has been submitted.
    */
   const handleEmailSubmit = async () => {
     try {
@@ -41,7 +39,8 @@ const ForgotPasswordNative = ({ navigation }) => {
       const usersWithMatchingEmail = users.filter((user) => user.email === email);
 
       if (usersWithMatchingEmail.length === 0) {
-        Alert.alert('Error', `${email} doesn't exist.`);
+        setPopupMessage(`${email} doesn't exist.`);
+        setPopupVisible(true); // Show the popup
       } else {
         try {
           const response = await fetch(`${process.env.APP_URL}users/send-email/${email}`, {
@@ -55,20 +54,19 @@ const ForgotPasswordNative = ({ navigation }) => {
           setSubmitted(true);
         } catch (error) {
           console.error(error);
-          Alert.alert('Error', 'Failed to send email.');
+          setPopupMessage('Failed to send email.');
+          setPopupVisible(true); // Show the popup
         }
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to fetch users.');
+      setPopupMessage('Failed to fetch users.');
+      setPopupVisible(true); // Show the popup
     }
   };
 
   /**
    * handleTokenSubmit - Handles the token submission process.
-   * 
-   * This function validates the entered token by sending it to the backend.
-   * If the token is valid, the user is navigated to the ResetPassword screen.
    */
   const handleTokenSubmit = async () => {
     try {
@@ -82,11 +80,13 @@ const ForgotPasswordNative = ({ navigation }) => {
       if (response.ok) {
         navigation.navigate('ResetPassword', { _id: userID, email: email });
       } else {
-        Alert.alert('Error', 'Invalid token.');
+        setPopupMessage('Invalid token.');
+        setPopupVisible(true); // Show the popup
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Failed to validate token.');
+      setPopupMessage('Failed to validate token.');
+      setPopupVisible(true); // Show the popup
     }
   };
 
@@ -128,6 +128,14 @@ const ForgotPasswordNative = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Popup Component */}
+      <Popup
+        visible={popupVisible}
+        title="Error"
+        message={popupMessage}
+        onClose={() => setPopupVisible(false)} // Close the popup
+      />
     </View>
   );
 };
