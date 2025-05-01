@@ -63,16 +63,16 @@ const MediaDetailsNative = () => {
   /**
    * useEffect - Periodically logs the current playback timestamp.
    */
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (player && player.currentTime != null) {
-        setTimeStamp(player.currentTime)
-        // handlePause();
-      }
-    }, 10000); // Log every 10 seconds
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (player && player.currentTime != null) {
+  //       setTimeStamp(player.currentTime)
+  //       handlePause();
+  //     }
+  //   }, 10000); // Log every 10 seconds
 
-    return () => clearInterval(interval);
-  });
+  //   return () => clearInterval(interval);
+  // });
 
   /**
    * fetchMovieInfo - Fetches detailed movie information and cast data from the API.
