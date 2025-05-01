@@ -6,7 +6,6 @@ import {
   FlatList,
   Image,
   TouchableOpacity,
-  Alert,
   ScrollView,
   Dimensions,
 } from 'react-native'
@@ -18,6 +17,7 @@ import LoadingOverlay from '../components/LoadingOverlay'
 import { LinearGradient } from 'expo-linear-gradient'
 import theme from '../utils/theme'
 import { generateRecommendations } from '../utils/recommendations'
+import Popup from '../components/popup' 
 
 const screenWidth = Dimensions.get('window').width
 const itemWidth = 120
@@ -50,6 +50,8 @@ const HomePageNative = ({ route }) => {
   const [bookmarkedMovies, setBookmarkedMovies] = useState([]) // Bookmarked movies
   const [bookmarkedShows, setBookmarkedShows] = useState([]) // Bookmarked shows
   const [recentlyWatched, setRecentlyWatched] = useState([]); // Recently watched movies/shows
+  const [popupVisible, setPopupVisible] = useState(false); // State to control popup visibility
+  const [popupMessage, setPopupMessage] = useState(''); // State for popup message
 
   // Extract userID from navigation route parameters.
   const userID = route.params.userID;
@@ -177,7 +179,8 @@ const HomePageNative = ({ route }) => {
         }
       } catch (error) {
         console.error('Error fetching media items:', error);
-        Alert.alert('Error', 'Failed to fetch media items.');
+        setPopupMessage('Failed to fetch media items.');
+        setPopupVisible(true); 
       }
       setLoading(false);
     };
@@ -401,6 +404,14 @@ const HomePageNative = ({ route }) => {
           </View>
         )}
       </LinearGradient>
+
+      {/* Popup Component */}
+      <Popup
+        visible={popupVisible}
+        title="Error"
+        message={popupMessage}
+        onClose={() => setPopupVisible(false)} 
+      />
     </ScrollView>
   );
 };

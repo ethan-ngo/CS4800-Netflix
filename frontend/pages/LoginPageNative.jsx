@@ -17,7 +17,6 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   ScrollView,
   ActivityIndicator,
   Image,
@@ -27,12 +26,15 @@ import { validateEmail } from '../utils/validateEmail';
 import theme from '../utils/theme';
 import Header from '../components/Header';
 import LoadingOverlay from '../components/LoadingOverlay';
+import Popup from '../components/popup'; 
 
 const LoginPageNative = ({ navigation }) => {
   // State variables
   const [email, setEmail] = useState(''); // User's email input
   const [password, setPassword] = useState(''); // User's password input
   const [loading, setLoading] = useState(false); // Loading state for API calls
+  const [popupVisible, setPopupVisible] = useState(false); // State to control popup visibility
+  const [popupMessage, setPopupMessage] = useState(''); // State for popup message
   const app_url = process.env.APP_URL; // Backend API URL
 
   /**
@@ -84,7 +86,8 @@ const LoginPageNative = ({ navigation }) => {
       });
 
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      Alert.alert('Login successful');
+      setPopupMessage('Login successful');
+      setPopupVisible(true); 
       const data = await res.json();
       console.log('Data:', data);
 
@@ -97,7 +100,8 @@ const LoginPageNative = ({ navigation }) => {
       navigation.navigate('Home', { userID: data.userID });
     } catch (error) {
       console.error('Error (unable to login): ', error);
-      Alert.alert('Login failed', 'Invalid email or password');
+      setPopupMessage('Login failed: Invalid email or password');
+      setPopupVisible(true); 
     }
     setLoading(false);
   };
@@ -134,7 +138,8 @@ const LoginPageNative = ({ navigation }) => {
             onChangeText={setEmail}
             onBlur={() => {
               if (email && !validateEmail(email)) {
-                Alert.alert('Invalid Email', 'Please enter a valid email address');
+                setPopupMessage('Invalid Email: Please enter a valid email address');
+                setPopupVisible(true); 
               }
             }}
           />
@@ -169,6 +174,14 @@ const LoginPageNative = ({ navigation }) => {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Popup Component */}
+      <Popup
+        visible={popupVisible}
+        title="Notification"
+        message={popupMessage}
+        onClose={() => setPopupVisible(false)} 
+      />
     </View>
   );
 };
