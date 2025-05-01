@@ -234,7 +234,7 @@ const ProfilePageNative = ({ navigation }) => {
             onChangeText={setEmail}
           />
           {/* Link to Forgot Password Page */}
-          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} activeOpacity={0.8}>
+          <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} activeOpacity={0.8} style={styles.forgotPasswordContainer}>
             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.updateButton} onPress={() => setConfirmPopupVisible(true)} activeOpacity={0.8}>
@@ -351,12 +351,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  forgotPasswordLink: {
-    color: '#007BFF',
-    textAlign: 'center',
-    marginTop: 10,
-    textDecorationLine: 'underline',
+  forgotPasswordContainer: {
+    alignSelf: 'flex-end', 
+    marginBottom: 15, 
+  },
+  forgotPasswordText: {
+    color: '#007BFF', 
     fontSize: 14,
+    textDecorationLine: 'underline',
+    fontWeight: '500',
   },
 });
 
