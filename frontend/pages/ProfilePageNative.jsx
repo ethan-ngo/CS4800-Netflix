@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
   ActivityIndicator,
+
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
@@ -134,6 +135,7 @@ const ProfilePageNative = ({ navigation }) => {
     if (username) updatedUserData.name = username;
     if (email) updatedUserData.email = email;
 
+
     try {
       // Upload profile picture if it has been changed
       if (profilePic && profilePic.uri !== originalProfilePic) {
@@ -235,8 +237,9 @@ const ProfilePageNative = ({ navigation }) => {
           />
           {/* Link to Forgot Password Page */}
           <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} activeOpacity={0.8}>
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            <Text style={styles.forgotPasswordLink}>Forgot Password?</Text>
           </TouchableOpacity>
+
           <TouchableOpacity style={styles.updateButton} onPress={() => setConfirmPopupVisible(true)} activeOpacity={0.8}>
             <Text style={styles.buttonText}>Update Profile</Text>
           </TouchableOpacity>
@@ -267,6 +270,13 @@ const ProfilePageNative = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  backgroundcontainer: {
+    flex: 1,
+    backgroundColor: '#121212',
+    padding: 10,
+    overflowy: 'auto',
+    overflowx: 'auto',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -280,15 +290,15 @@ const styles = StyleSheet.create({
   },
   form: {
     width: '100%',
-    maxWidth: 400,
-    padding: 20,
+    maxWidth: 500,
+    padding: 50,
     borderRadius: 10,
     backgroundColor: 'white',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.4,
     shadowRadius: 4,
-    elevation: 5,
+    elevation: 10,
   },
   title: {
     fontSize: 24,
@@ -358,6 +368,13 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     fontSize: 14,
   },
-});
+  forgotPasswordText: {
+    color: theme.primaryColor,
+    fontWeight: 'bold',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 15,
+  },
+})
 
 export default ProfilePageNative;

@@ -20,7 +20,9 @@ import {
 } from 'react-native';
 import theme from '../utils/theme';
 import Header from '../components/Header';
+
 import Popup from '../components/popup'; 
+
 
 const ForgotPasswordNative = ({ navigation }) => {
   // State variables
@@ -228,6 +230,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
+
   header: {
     width: '100%',
     position: 'absolute',
