@@ -15,7 +15,7 @@ const Popup = ({ visible, title, message, onClose, onConfirm }) => {
           <Text style={styles.message}>{message}</Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
+              <Text style={styles.cancelButtonText}>Close</Text>
             </TouchableOpacity>
             {onConfirm && (
               <TouchableOpacity style={styles.confirmButton} onPress={onConfirm}>
