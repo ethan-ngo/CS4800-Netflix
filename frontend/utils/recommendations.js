@@ -62,17 +62,47 @@ export const generateRecommendations = async (userID) => {
 
     console.log('Weighted genre dictionary:', genreWeights)
 
-    const sortedGenres = Object.entries(genreWeights).sort((a, b) => b[1] - a[1])
-    const genreList = sortedGenres.map(([g]) => g)
+    // Calculate relevance score for a content item based on its genres and the genre weights
+    const calculateRelevanceScore = (contentItem) => {
+      if (!contentItem.genres || contentItem.genres.length === 0) return 0;
+      
+      let score = 0;
+      // Sum up the weights of all matching genres
+      contentItem.genres.forEach(genre => {
+        if (genreWeights[genre]) {
+          score += genreWeights[genre];
+        }
+      });
+      
+      // Normalize by the number of genres to avoid favoring items with many genres
+      // (Optional, remove if you want to favor items with multiple matching genres)
+      score = score / contentItem.genres.length;
+      
+      return score;
+    };
 
-    const filteredMovies = allMovies.filter((m) => m.genres?.some((g) => genreList.includes(g)))
-
-    const filteredShows = allShows.filter((s) => s.genres?.some((g) => genreList.includes(g)))
+    // Process movies: calculate scores and sort by relevance
+    const scoredMovies = allMovies
+      .map(movie => ({
+        ...movie,
+        relevanceScore: calculateRelevanceScore(movie)
+      }))
+      .filter(movie => movie.relevanceScore > 0) // Only keep movies with matching genres
+      .sort((a, b) => b.relevanceScore - a.relevanceScore); // Sort by score descending
+    
+    // Process shows: calculate scores and sort by relevance
+    const scoredShows = allShows
+      .map(show => ({
+        ...show,
+        relevanceScore: calculateRelevanceScore(show)
+      }))
+      .filter(show => show.relevanceScore > 0) // Only keep shows with matching genres
+      .sort((a, b) => b.relevanceScore - a.relevanceScore); // Sort by score descending
 
     return {
-      movies: filteredMovies,
-      shows: filteredShows,
-    }
+      movies: scoredMovies,
+      shows: scoredShows
+    };
   } catch (err) {
     console.error('Error in generateRecommendations:', err)
     return { movies: [], shows: [] }

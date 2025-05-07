@@ -10,29 +10,31 @@
  * - navigation: React Navigation object for navigating between screens.
  */
 
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   StyleSheet,
   ScrollView,
   Image,
-} from 'react-native'
-import { validateEmail } from '../utils/validateEmail'
-import theme from '../utils/theme'
-import Header from '../components/Header'
-import LoadingOverlay from '../components/LoadingOverlay'
+} from 'react-native';
+import { validateEmail } from '../utils/validateEmail';
+import theme from '../utils/theme';
+import Header from '../components/Header';
+import LoadingOverlay from '../components/LoadingOverlay';
+import Popup from '../components/popup'; 
 
 const SignUpPageNative = ({ navigation }) => {
   // State variables
-  const [name, setName] = useState('') // User's name input
-  const [email, setEmail] = useState('') // User's email input
-  const [password, setPassword] = useState('') // User's password input
-  const [confirmPassword, setConfirmPassword] = useState('') // User's confirm password input
-  const [loading, setLoading] = useState(false) // Loading state for API calls
+  const [name, setName] = useState(''); // User's name input
+  const [email, setEmail] = useState(''); // User's email input
+  const [password, setPassword] = useState(''); // User's password input
+  const [confirmPassword, setConfirmPassword] = useState(''); // User's confirm password input
+  const [loading, setLoading] = useState(false); // Loading state for API calls
+  const [popupVisible, setPopupVisible] = useState(false); // State to control popup visibility
+  const [popupMessage, setPopupMessage] = useState(''); // State for popup message
 
   /**
    * handleSignUp - Handles the sign-up process.
@@ -43,37 +45,41 @@ const SignUpPageNative = ({ navigation }) => {
    * On success, the user is navigated to the Login page.
    */
   const handleSignUp = async () => {
-    setLoading(true)
+    setLoading(true);
     if (!name || !email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields')
-      setLoading(false)
-      return
+      setPopupMessage('Please fill in all fields');
+      setPopupVisible(true); 
+      setLoading(false);
+      return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match')
-      setLoading(false)
-      return
+      setPopupMessage('Passwords do not match');
+      setPopupVisible(true); 
+      setLoading(false);
+      return;
     }
 
     try {
       // Check if email is already in use
-      const res = await fetch(`${process.env.APP_URL}users?email=${email}`)
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
+      const res = await fetch(`${process.env.APP_URL}users?email=${email}`);
+      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
 
-      const users = await res.json()
-      const usersWithMatchingEmail = users.filter((user) => user.email === email)
+      const users = await res.json();
+      const usersWithMatchingEmail = users.filter((user) => user.email === email);
 
       if (usersWithMatchingEmail.length > 0) {
-        Alert.alert('Error', 'Email is already in use')
-        setLoading(false)
-        return
+        setPopupMessage('Email is already in use');
+        setPopupVisible(true); 
+        setLoading(false);
+        return;
       }
     } catch (error) {
-      console.error('Error checking email:', error)
-      Alert.alert('Error', 'Failed to check email')
-      setLoading(false)
-      return
+      console.error('Error checking email:', error);
+      setPopupMessage('Failed to check email');
+      setPopupVisible(true); 
+      setLoading(false);
+      return;
     }
 
     try {
@@ -84,21 +90,23 @@ const SignUpPageNative = ({ navigation }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ name, email, password, profilePic: null }),
-      })
+      });
 
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`)
+      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
 
-      const data = await res.json()
-      console.log('New user created:', data)
+      const data = await res.json();
+      console.log('New user created:', data);
 
-      Alert.alert('Success', 'Account created successfully')
-      navigation.navigate('Login') // Navigate to the login page
+      setPopupMessage('Account created successfully');
+      setPopupVisible(true); 
+      navigation.navigate('Login'); 
     } catch (error) {
-      console.error('Error creating user:', error)
-      Alert.alert('Error', 'Failed to create account')
+      console.error('Error creating user:', error);
+      setPopupMessage('Failed to create account');
+      setPopupVisible(true); 
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -127,7 +135,8 @@ const SignUpPageNative = ({ navigation }) => {
             onChangeText={setEmail}
             onBlur={() => {
               if (email && !validateEmail(email)) {
-                Alert.alert('Invalid Email', 'Please enter a valid email address')
+                setPopupMessage('Invalid Email: Please enter a valid email address');
+                setPopupVisible(true); 
               }
             }}
           />
@@ -160,9 +169,17 @@ const SignUpPageNative = ({ navigation }) => {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Popup Component */}
+      <Popup
+        visible={popupVisible}
+        title="Notification"
+        message={popupMessage}
+        onClose={() => setPopupVisible(false)} 
+      />
     </View>
-  )
-}
+  );
+};
 
 // Styles for the component
 const styles = StyleSheet.create({
@@ -235,6 +252,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
-})
+});
 
-export default SignUpPageNative
+export default SignUpPageNative;
